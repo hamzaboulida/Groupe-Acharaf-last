@@ -162,19 +162,6 @@ task = "shell.exec"
 args = "git push --set-upstream origin fresh-start "
 
 [[workflows.workflow]]
-name = "1"
-mode = "sequential"
-author = 57070929
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "git remote set-url origin https://hamzaboulida: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@github.com/hamzaboulida/Groupe-Acharaf-last.git"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "git checkout --orphan fresh-start"
-
-[[workflows.workflow]]
 name = "ALL"
 mode = "sequential"
 author = 57070929
@@ -203,6 +190,15 @@ args = "git config user.name \"Wiam Belhadj\""
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = " git config user.email \"your-email@example.com\""
+
+[[workflows.workflow]]
+name = "1"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git remote set-url origin https://hamzaboulida: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@github.com/hamzaboulida/Groupe-Acharaf-last.git"
 
 [agent]
 stack = "PNPM_WORKSPACE"
