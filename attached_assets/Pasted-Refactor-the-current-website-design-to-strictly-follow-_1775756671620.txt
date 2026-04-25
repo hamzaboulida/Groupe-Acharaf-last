@@ -1,0 +1,137 @@
+Refactor the current website design to strictly follow the Groupe Acharaf brand identity (charte graphique).
+
+The goal is to:
+
+Remove any random styling
+Create a coherent, minimal, editorial luxury system
+Make the website feel like a premium architecture / design brand
+🎨 COLORS (STRICT USAGE)
+
+Use ONLY these colors:
+
+Primary (dominant backgrounds / hero / dark sections):
+
+#082634
+
+Secondary (UI elements / overlays / cards):
+
+#8EA4AF
+
+Tertiary (light backgrounds / sections / contrast):
+
+#DCE0E7
+
+Secondary palette (for depth only, very subtle):
+
+#B2BED0
+#D1E8F8
+#080629
+#212F4F
+
+⚠️ IMPORTANT RULES:
+
+No random gold everywhere → only subtle accents if needed
+Avoid strong contrasts → keep soft, elegant transitions
+Use color hierarchy, not decoration
+✍️ TYPOGRAPHY (VERY IMPORTANT)
+
+Apply strict typography system:
+
+Titles / Headlines:
+
+Font: Quiche Text
+Large scale (hero titles very big)
+Elegant spacing (letter-spacing slightly increased)
+
+Body / UI text:
+
+Font: Roboto
+Clean, minimal, readable
+
+⚠️ Rules:
+
+No mixing random fonts
+Strong hierarchy (Hero > Section title > Paragraph)
+Use white space as design element
+🧠 DESIGN PHILOSOPHY
+
+Shift design to:
+
+👉 Minimal / Editorial / Architectural
+
+NOT:
+❌ Over-designed
+❌ Too many effects
+❌ “Marketing heavy”
+
+YES:
+✅ Clean layouts
+✅ Breathing space
+✅ Grid-based alignment
+✅ Strong image focus
+
+🎬 MOTION & EXPERIENCE (REFINE, NOT OVERDO)
+Keep animations smooth and slow
+Remove aggressive or unnecessary motion
+Use:
+Fade-in
+Parallax (very subtle)
+Smooth transitions
+
+👉 The feeling should be:
+Calm luxury, not flashy luxury
+
+🧱 UI IMPROVEMENTS TO APPLY
+1. HERO SECTION
+Keep cinematic image
+Add subtle dark overlay (#082634 with opacity)
+Improve text readability
+Increase typography elegance (spacing + size)
+2. SECTIONS SPACING
+Increase vertical spacing between sections
+Add more “air” → luxury feeling
+3. CARDS (PROJECTS / MARQUES)
+Use minimal cards
+Remove heavy borders/shadows
+Use:
+soft background (#DCE0E7 or transparent)
+hover = slight zoom + fade
+4. BUTTONS
+Use primary color (#082634)
+Text in white
+Hover = subtle opacity or color shift
+
+NO flashy buttons.
+
+5. BACKGROUNDS
+
+Alternate between:
+
+Dark sections (#082634)
+Light sections (#DCE0E7)
+
+👉 This creates rhythm and premium contrast
+
+🏛️ BRAND CONSISTENCY (CRITICAL)
+
+Make sure:
+
+Same typography everywhere
+Same spacing system
+Same color logic
+Same animation style
+
+👉 The site must feel like ONE system, not multiple styles
+
+🎯 FINAL RESULT
+
+The website should feel like:
+
+👉 A luxury architecture firm
+👉 A high-end editorial magazine
+👉 A minimal art gallery
+
+NOT:
+❌ A startup website
+❌ A template
+❌ A “real estate ads site”

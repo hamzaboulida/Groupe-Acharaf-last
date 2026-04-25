@@ -1,0 +1,136 @@
+Perform a **full design system audit and unification across the entire website**.
+
+## Scope
+
+Check **ALL pages and ALL sections**, including:
+
+* Home
+* À propos
+* Nos marques
+* Projets (listing + detail pages)
+* Actualités (listing + article pages)
+* Contact
+* Carrières
+* Footer, header, and all components
+
+---
+
+## Objective
+
+Ensure the website is **100% consistent, premium, and aligned with one unified design system**.
+
+---
+
+## What to audit and fix
+
+### 1. Colors
+
+* Use ONLY official brand colors
+* Remove any inconsistent or random colors
+* Ensure:
+
+  * Primary color is consistent everywhere
+  * Secondary colors are used properly
+  * Background colors are harmonized
+* Fix contrast issues (text always readable)
+
+---
+
+### 2. Typography
+
+* Unify:
+
+  * Font families
+  * Font weights
+  * Font sizes
+  * Line heights
+  * Letter spacing
+* Ensure consistent hierarchy:
+
+  * H1, H2, H3, body text, captions
+* Fix any sections where text looks different or off-brand
+
+---
+
+### 3. Buttons & CTAs
+
+* Standardize all buttons:
+
+  * Same style (primary / secondary)
+  * Same border radius
+  * Same hover effects
+* Ensure consistency across:
+
+  * Hero CTAs
+  * Forms
+  * Cards
+  * Navigation
+
+---
+
+### 4. Spacing & Layout
+
+* Normalize spacing:
+
+  * Section padding
+  * Margins between elements
+* Ensure consistent grid and alignment
+* Remove any visual imbalance
+
+---
+
+### 5. Components consistency
+
+Unify all reusable elements:
+
+* Cards (projects, articles, jobs)
+* Forms
+* Inputs
+* Filters
+* Navigation menu
+* Footer
+
+Everything should follow the same visual logic
+
+---
+
+### 6. Hero sections
+
+* Ensure all hero sections follow the same design language:
+
+  * Overlay style
+  * Typography placement
+  * Spacing
+* Consistent premium look across all pages
+
+---
+
+### 7. Animations & interactions
+
+* Standardize:
+
+  * Hover effects
+  * Transitions
+  * Micro-interactions
+* Keep them smooth and subtle (luxury feel)
+
+---
+
+## Important
+
+* Do NOT change content or structure
+* Only improve consistency, harmony, and design quality
+* Keep the luxury / premium positioning
+
+---
+
+## Final goal
+
+A website that feels:
+
+* Cohesive
+* Elegant
+* Premium
+* Designed as ONE system (not separate pages)
+
+Everything must look like it belongs to the same high-end brand.

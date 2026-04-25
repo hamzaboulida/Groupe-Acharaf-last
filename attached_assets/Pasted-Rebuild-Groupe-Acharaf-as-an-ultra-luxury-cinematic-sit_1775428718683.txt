@@ -1,0 +1,141 @@
+Rebuild “Groupe Acharaf” as an ultra-luxury cinematic site with a truly dynamic experience (brand switching, motion design, art-gallery layout).
+
+Brand + Visual
+Main brand color: #0e1327
+Luxury palette: deep navy, ivory/white, subtle gold accents
+Big typography + bold visuals
+Strong motion design, smooth transitions, micro-interactions, parallax
+Projects presented as art pieces in an art gallery style
+Core Dynamic Requirement
+Fully dynamic switching between:
+Groupe Acharaf main experience
+Estya (haut standing) experience
+Acharaf Immobilier (social/économique) experience
+Each brand feels like its own “showroom” with:
+Brand-specific hero imagery, accent, typography treatment
+Project listing filtered automatically by assigned brand
+Persistent brand context (brand badge/label visible everywhere)
+CMS / Back-office
+
+Back-office must allow managing:
+
+Projects (add/edit/delete)
+Assign to brand (Estya or Acharaf Immobilier)
+Upload images/videos
+Project stats and features
+Actualités (blog/news)
+Carrières (job postings + applications)
+Leads (form submissions) across pages
+SEO fields for every page/post/project:
+Meta title/description
+Canonical URL
+OpenGraph/Twitter
+OG image upload
+Make it non-developer-friendly for the client
+Pages + Section Structure
+
+All pages except “Nos Marques” must start with a cinematic hero section.
+Add more sections across pages (avoid empty layouts).
+
+Home
+
+Cinematic hero (video / motion graphics)
+Quick intro + USP (luxury positioning)
+Brand switcher module (Groupe → Estya/Acharaf)
+Featured projects (art-gallery cards)
+Animated counters (numbers count up when visible)
+Testimonials + trust signals
+“Our process” (timeline with motion)
+CTA + contact teaser
+
+À propos
+
+Hero
+About narrative + emotional branding
+Milestones (animated timeline)
+Leadership / vision section
+Luxury positioning (values + craftsmanship)
+Animated metrics (count-up)
+CTA: contact / discover projects
+
+Nos Marques
+
+Immediate immersive brand chooser (no hero if you prefer)
+Deep sections per brand:
+Brand story
+Brand positioning (Estya vs Acharaf)
+Brand-specific pillars
+Projects assigned preview
+CTA to brand-specific project listing
+
+Nos Projets
+
+Hero
+Filters: brand, status, type
+Gallery grid + motion interactions
+Dynamic map/locations section (optional)
+Highlighted project (feature module)
+CTA leads form
+
+Project detail page
+
+Fullscreen hero (image/video)
+Project overview + stats (animated numbers)
+Gallery / media showcase (cinematic)
+Key features + specs
+Trust signals
+CTA: call / WhatsApp / form
+Related projects (same brand)
+
+Actualités
+
+Hero
+Featured story carousel
+Blog grid with categories
+Author/date schema, SEO-friendly post templates
+Newsletter teaser (optional)
+
+Carrières
+
+Hero
+Culture + values
+Benefits + why join
+Job listings by location/department
+Job detail page
+Application form with file upload & back-office tracking
+
+Contact
+
+Hero
+Contact blocks (phone/email/WhatsApp)
+Map + office(s)
+Form with brand selection
+FAQ section (optional)
+Motion + Tech Requirements
+Modern stack (prefer Next.js)
+Animations with GSAP or Framer Motion
+Animated counters for all numbers
+Smooth page transitions (route transitions)
+Dark mode feel using #0e1327 backdrop
+Performance + accessibility considered
+SEO & Tracking (Mandatory)
+
+On-page SEO
+
+Semantic headings, clean URL structure, internal linking
+Image alt text, compressed images
+OpenGraph & Twitter card
+
+Technical SEO
+
+Fast Core Web Vitals
+Sitemap.xml + robots.txt
+Schema markup (Organization + RealEstate/Article)
+Canonical tags
+SSR/SSG where possible for SEO
+
+Tracking
+
+Install Google Tag Manager (GTM) on the site (must be detectable)
+Add GA4 + Google Ads conversions via GTM
+Ensure conversion fires on form submission (thank-you page or event)

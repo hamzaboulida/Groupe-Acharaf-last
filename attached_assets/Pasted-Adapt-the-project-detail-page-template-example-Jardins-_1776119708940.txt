@@ -1,0 +1,185 @@
+Adapt the **project detail page template** (example: “Jardins de Bouskoura”) to the **WHITE luxury version** of the website.
+
+Do NOT redesign the structure or content logic of the page.
+Keep all the existing sections, but convert the full page to the same white/light premium design system used in the white version of the website.
+
+## Objective
+
+Make every project detail page feel:
+
+* bright
+* premium
+* elegant
+* highly readable
+* consistent with the white version
+
+Not dark, not mixed, and not partially inherited from the dark version.
+
+---
+
+## 1. Background system
+
+Replace all dark backgrounds, dark blue blocks, and dark overlays with a light system:
+
+* Main page background: **#FFFFFF**
+* Alternate sections: **#F7F7F7** or very soft **#DCE0E7**
+* Remove heavy dark gradients
+* Keep subtle depth only with very light shadows, borders, and section separation
+
+---
+
+## 2. Text colors
+
+Use a strict readable hierarchy:
+
+* Main titles / headings: **#082634**
+* Paragraphs / body text: **#3B5661** or similar dark readable tone
+* Labels / metadata / secondary text: **#5C7480**
+* Never use light grey text on white or light grey backgrounds
+
+The whole page must have strong contrast and elegant readability.
+
+---
+
+## 3. Hero section
+
+Refine the project page hero in light version:
+
+* Keep the hero image
+* Reduce or remove dark overlay
+* Use a very subtle light-to-transparent overlay only if needed for readability
+* Keep title, marque, location, and tagline highly readable
+* Ensure CTAs are visible and premium
+
+### CTA styles
+
+* Primary CTA: filled **#082634** with white text
+* Secondary CTA: outline **#082634** with dark text
+
+---
+
+## 4. Information bar / key details
+
+For the section with:
+
+* localisation
+* type
+* statut
+* surfaces
+* prix de départ
+
+Convert it to a bright luxury card or light section:
+
+* white or soft grey background
+* subtle border or soft shadow
+* dark text hierarchy
+* strong readability
+
+### Very important:
+
+Highlight the **price** clearly:
+
+* “À partir de 780.000 DH” must stand out
+* use larger size and stronger weight
+* keep it premium, not flashy
+
+---
+
+## 5. Content sections
+
+Apply the white version styling to all sections:
+
+* Le projet
+* Galerie
+* Prestations
+* Art de vivre
+* Emplacement
+* Tarification
+* Contact direct
+* Projets similaires
+* Newsletter
+
+### Rules
+
+* white / soft light backgrounds
+* dark readable text
+* elegant spacing
+* subtle borders / shadows instead of dark blocks
+
+---
+
+## 6. Cards and gallery
+
+For gallery thumbnails, similar projects, feature cards, and pricing/contact blocks:
+
+* card background: white
+* subtle shadow:
+  `box-shadow: 0 10px 30px rgba(0,0,0,0.05)`
+* border radius: 12px to 16px
+* hover:
+
+  * slight lift
+  * soft shadow increase
+  * subtle image zoom
+
+---
+
+## 7. Contact block
+
+The “Intéressé par ce projet ?” block must also match the white version:
+
+* white or very soft grey background
+* dark text
+* premium contrast
+* WhatsApp button visible and elegant
+* no dark heavy background
+
+---
+
+## 8. Similar projects section
+
+The “Découvrez aussi / Projets similaires” section must match the light version:
+
+* white / soft grey section
+* clean project cards
+* dark text
+* visible prices
+* no dark inherited styling
+
+---
+
+## 9. Footer + newsletter consistency
+
+Ensure the newsletter block and footer also match the white version styling and are not inherited from dark theme styles.
+
+---
+
+## 10. Final consistency check
+
+Apply the white luxury system to the ENTIRE project detail page template, so all project detail pages automatically inherit the light version.
+
+This must include:
+
+* background colors
+* text colors
+* cards
+* CTAs
+* forms
+* pricing sections
+* related projects
+* footer elements
+
+## Final goal
+
+The project detail page must feel like:
+
+* a luxury brochure
+* a premium white editorial experience
+* highly readable
+* fully consistent with the white version
+
+Not:
+
+* a dark page inside a white site
+* mixed theme inheritance
+* low contrast design

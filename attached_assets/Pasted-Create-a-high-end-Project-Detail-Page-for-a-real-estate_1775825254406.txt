@@ -1,0 +1,271 @@
+Create a **high-end Project Detail Page** for a real estate developer website (Groupe Acharaf).
+
+This page must be **ultra-premium, cinematic, and conversion-focused**, while keeping consistency with the current design system (colors, typography, spacing).
+
+## 🎯 Objective
+
+Transform the project page into a **luxury sales page**, not just a showcase.
+
+The page must:
+
+* present the project like an **art piece**
+* clearly communicate **value**
+* highlight the **price strongly**
+* guide the user toward **contact / visit**
+
+---
+
+# 🧱 PAGE STRUCTURE (MANDATORY)
+
+## 1. Hero Section (Full Screen)
+
+* Fullscreen image or video background
+* Subtle dark overlay (keep image visible)
+* Content:
+
+  * Project name (very large typography)
+  * Marque (Estya / Acharaf)
+  * Tagline (short emotional sentence)
+  * Location (city)
+
+### CTA (IMPORTANT)
+
+* Primary: **“Découvrir le projet”**
+* Secondary: **“Prendre rendez-vous”**
+
+👉 Add smooth scroll indicator
+
+---
+
+## 2. Key Information Bar (Sticky or below hero)
+
+A clean horizontal block with:
+
+* 📍 Localisation
+* 🏷️ Type (Villa / Résidence / Appartements)
+* 📊 Statut (En cours / Livré / À venir)
+* 📐 Surfaces (range)
+* 💰 **PRIX À PARTIR DE — VERY IMPORTANT**
+
+### Price design:
+
+* Make it visually dominant
+* Bigger than other infos
+* Example:
+  **À partir de 1 250 000 DH**
+
+👉 Price must be immediately visible (NO hiding)
+
+---
+
+## 3. Project Introduction (Storytelling)
+
+* Elegant text block
+* 2–3 paragraphs max
+* Explain:
+
+  * concept
+  * lifestyle
+  * positioning (luxe / accessible)
+
+👉 Layout:
+
+* text left
+* image right (or vice versa)
+
+---
+
+## 4. Visual Gallery (Immersive)
+
+* Large horizontal gallery
+* mix of:
+
+  * exterior
+  * interior
+  * lifestyle visuals
+
+### Interaction:
+
+* smooth hover zoom
+* lightbox full screen on click
+
+---
+
+## 5. Key Features / Highlights
+
+Grid of 4–6 items:
+
+Examples:
+
+* architecture
+* matériaux
+* sécurité
+* équipements
+* emplacement
+
+👉 Use icons + short text
+👉 Keep it minimal and premium
+
+---
+
+## 6. Project Lifestyle Section (VERY IMPORTANT)
+
+Create an emotional section:
+
+* Large background image
+* Overlay text:
+
+  * “Un cadre de vie pensé pour…”
+  * short storytelling
+
+👉 This creates desire (very important for luxury)
+
+---
+
+## 7. Location Section
+
+* Map (Google Maps or placeholder)
+* Short text:
+
+  * proximity
+  * advantages
+
+Example:
+
+* écoles
+* axes routiers
+* centres commerciaux
+
+---
+
+## 8. Plans / Surfaces (if available)
+
+* simple grid or cards
+* show:
+
+  * types (T2, T3, villas…)
+  * surfaces
+
+---
+
+## 9. STRONG PRICE SECTION (CRITICAL)
+
+Create a dedicated block:
+
+### Design:
+
+* clean background (not noisy)
+* strong typography
+
+### Content:
+
+💰 **À partir de X DH**
+
+* optional:
+
+- payment flexibility
+- availability note
+
+👉 This must feel like a **decision trigger**
+
+---
+
+## 10. CTA Conversion Block (VERY IMPORTANT)
+
+This is where you capture leads.
+
+### Layout:
+
+* dark elegant background (#082634)
+* centered content
+
+### Content:
+
+* headline:
+  **“Intéressé par ce projet ?”**
+* subtext
+* CTA:
+
+  * “Prendre rendez-vous”
+  * “Demander plus d’informations”
+
+👉 Add WhatsApp quick action
+
+---
+
+## 11. Related Projects
+
+* show 3–4 projects
+* same marque or mixed
+
+---
+
+# 🎨 DESIGN RULES
+
+* Respect brand colors:
+
+  * primary: #082634
+  * secondary: #8EA4AF
+  * tertiary: #DCE0E7
+
+* Use:
+
+  * strong typography hierarchy
+  * large spacing BUT not empty
+  * smooth animations (fade, parallax, hover)
+
+---
+
+# ⚠️ UX / CONVERSION RULES
+
+* Price must NEVER be hidden
+* CTAs must be visible at all times
+* User should always know:
+
+  * what is the project
+  * how much it costs
+  * how to contact
+
+---
+
+# 🔍 SEO REQUIREMENTS
+
+For each project page:
+
+* dynamic meta title:
+  “Nom du projet | Immobilier à [Ville] | Groupe Acharaf”
+
+* meta description with keywords:
+  immobilier, projet, ville, luxe, investissement
+
+* H1 = project name
+
+* H2 = sections
+
+* clean URL:
+  /projets/nom-du-projet
+
+---
+
+# 🧠 FINAL GOAL
+
+This page must feel like:
+
+* a **luxury brochure**
+* a **sales funnel**
+* an **immersive experience**
+
+Not:
+
+* a simple listing
+* a generic template
+
+---
+
+Make the page modular and connected to the back-office so I can:
+
+* edit content
+* update price
+* change images
+* assign marque
+* manage projects easily

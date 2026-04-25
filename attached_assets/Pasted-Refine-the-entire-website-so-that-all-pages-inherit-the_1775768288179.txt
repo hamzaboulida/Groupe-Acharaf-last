@@ -1,0 +1,151 @@
+Refine the entire website so that all pages inherit the same design quality, visual coherence, and premium experience as the current homepage.
+
+Do not redesign the homepage. Use it as the **reference standard** for the whole website.
+
+## Main objective
+
+Apply the current homepage style system across the full website so the whole site feels like one coherent luxury brand experience.
+
+The pages that must be aligned with the homepage are:
+
+* À Propos
+* Nos Marques
+* Projets / listing page
+* Project detail pages
+* Actualités
+* Carrières
+* Contact
+* Footer across all pages
+
+---
+
+## 1. APPLY HOMEPAGE STYLE TO THE WHOLE WEBSITE
+
+Use the homepage as the visual and UX reference for:
+
+* spacing
+* typography hierarchy
+* section rhythm
+* premium contrast
+* motion style
+* image treatment
+* overlays
+* CTA design
+* transitions
+* footer treatment
+
+### Important
+
+Every page should feel like it belongs to the same world as the homepage:
+
+* same premium atmosphere
+* same cinematic direction
+* same editorial elegance
+* same UI consistency
+
+Do not let internal pages feel more basic, empty, or generic.
+
+---
+
+## 2. FLOATING WHATSAPP BUTTON
+
+Add a WhatsApp floating icon/button that is always visible on the website, like a premium chat/contact assistant.
+
+### Requirements
+
+* fixed position on all pages
+* visible on desktop and mobile
+* elegant and minimal
+* do not make it look cheap or aggressive
+* use smooth hover animation
+* use the brand design language
+* open WhatsApp contact link directly
+
+### Style
+
+* premium floating button
+* subtle shadow
+* rounded and elegant
+* integrated with the luxury UI, not like a default plugin
+
+It should feel like:
+👉 a premium contact shortcut
+Not:
+❌ a cheap chatbot widget
+
+---
+
+## 3. COLOR REPLACEMENT (VERY IMPORTANT)
+
+Replace the color:
+
+* **#212F4F**
+
+With:
+
+* **#8EA4AF**
+
+Apply this replacement everywhere on the website where #212F4F is currently used:
+
+* backgrounds
+* cards
+* subtle UI elements
+* borders
+* overlays if relevant
+* accents
+* secondary blocks
+
+### Important
+
+Do not break hierarchy:
+
+* **#082634** remains the primary dominant color
+* **#8EA4AF** becomes the secondary support color
+* **#DCE0E7** remains the light contrast color
+
+The final palette must feel:
+
+* cleaner
+* more coherent
+* more elegant
+* more aligned with the brand book
+
+---
+
+## 4. PAGE-BY-PAGE QUALITY CONTROL
+
+Each page must feel:
+
+* complete
+* premium
+* consistent with homepage quality
+* visually balanced
+* ready for authority and SEO
+
+### Check:
+
+* hero treatment
+* typography scale
+* spacing
+* CTA consistency
+* footer consistency
+* responsiveness
+* hover states
+* section transitions
+
+---
+
+## 5. FINAL RESULT
+
+The full website must feel like:
+
+* one premium brand system
+* one cinematic real estate experience
+* one coherent luxury interface
+
+Not:
+❌ a strong homepage with weaker internal pages
+❌ inconsistent UI between pages
+❌ random old colors still appearing
+
+The homepage is now the benchmark. Bring the entire website to that same level.

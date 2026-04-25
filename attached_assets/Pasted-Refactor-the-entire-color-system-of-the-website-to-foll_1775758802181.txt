@@ -1,0 +1,131 @@
+Refactor the entire color system of the website to follow a **strict luxury color hierarchy** based on the Groupe Acharaf brand identity.
+
+### 🚨 Critical Issue to Fix
+
+The current design incorrectly uses the secondary color (#8EA4AF) as the main background.
+
+This breaks the luxury positioning and creates a flat, non-premium feeling.
+
+---
+
+### 🎯 New Color Hierarchy (STRICT RULES)
+
+#### 1. PRIMARY COLOR (DOMINANT)
+
+* #082634 must be the **main background color**
+* Use it for:
+
+  * Hero sections
+  * Main sections
+  * Footer
+  * Navigation overlays
+  * Dark sections
+
+👉 This color defines the brand. It must dominate the experience.
+
+---
+
+#### 2. SECONDARY COLOR (SUPPORT ONLY)
+
+* #8EA4AF must be used ONLY for:
+
+  * UI elements (cards, dividers, subtle backgrounds)
+  * Secondary text
+  * Hover states
+  * Soft overlays
+
+❌ NEVER use it as a full page background
+
+---
+
+#### 3. TERTIARY COLOR (BREATHING SPACE)
+
+* #DCE0E7 used for:
+
+  * Light sections (only occasionally)
+  * Contrast blocks
+  * Content readability
+
+👉 Limit usage to 20–30% of the page max
+
+---
+
+#### 4. DEPTH COLORS (VERY IMPORTANT)
+
+Use:
+
+* #080629
+* #212F4F
+
+For:
+
+* Gradient overlays
+* Hero depth
+* Section transitions
+* Shadow backgrounds
+
+👉 This adds cinematic richness
+
+---
+
+### 🎨 BACKGROUND SYSTEM (VERY IMPORTANT)
+
+Apply this rhythm:
+
+* Hero → DARK (#082634 + overlay)
+* Next section → DARK
+* Then → LIGHT (#DCE0E7)
+* Then → DARK again
+
+👉 Create contrast and visual storytelling
+
+---
+
+### 🎬 HERO IMPROVEMENT
+
+* Add a **dark overlay gradient**:
+  from #080629 (top) → #082634 (bottom)
+* Reduce brightness of background image
+* Increase text contrast
+* Make it feel deeper and cinematic
+
+---
+
+### 🧱 FOOTER FIX (IMPORTANT)
+
+The footer must:
+
+* Use #082634 or darker (#080629)
+* Remove light/grey feeling
+* Feel like a **luxury closing scene**
+
+---
+
+### 🧠 DESIGN PRINCIPLES
+
+* Colors are not decorative → they define hierarchy
+* Dark = premium / luxury / emotional
+* Light = contrast / breathing space
+* Avoid flat backgrounds → use depth and gradients
+
+---
+
+### 🎯 FINAL RESULT
+
+The website must feel:
+
+* darker
+* deeper
+* more premium
+* more cinematic
+* more intentional
+
+NOT:
+❌ light SaaS website
+❌ random color usage
+❌ flat design
+
+YES:
+✅ luxury real estate brand
+✅ strong identity
+✅ high-end visual consistency

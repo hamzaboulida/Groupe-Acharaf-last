@@ -1,0 +1,93 @@
+Create a new visual direction for the full website using a white/light luxury theme.
+
+🔒 Constraints (very important)
+Do NOT change the content structure, pages, or sections
+Do NOT remove the dynamic/immersive feeling
+Do NOT break the admin/back-office / project management logic
+Only change the design system (colors, background, styling), and optimize spacing/alignment where needed
+🎯 Objective
+
+Make the site feel:
+
+white, clean, bright
+luxury / ultra-premium
+authoritative
+controlled, minimal, elegant
+editorial and architectural (not “soft” or “cheap”)
+🎨 Color System for White Version
+
+Use this palette strictly:
+
+Base
+
+Background base: #FFFFFF (white)
+Light sections: #DCE0E7 or very subtle off-white layers
+
+Primary (Authority)
+
+Text & key accents: #082634
+use for headings, strong text, key metrics, brand anchors
+
+Secondary (Support)
+
+UI elements, borders, cards: #8EA4AF
+subtle hover, subtle underlines, lines, dividers
+
+Avoid
+
+Do NOT bring back heavy dark backgrounds everywhere
+Do NOT use random blues outside the brand palette
+Do NOT use harsh gradients that look like “tech blue”
+🧱 Page-by-Page Styling Rules
+1) Heroes (Home, Nos Marques, About…)
+Keep hero experience + motion
+Use light feel:
+white typography layout area
+background image with very subtle overlay (only as needed for readability)
+Avoid dark hero blocks dominating; use text dominance instead
+2) Sections rhythm (very important)
+
+Make a clean rhythm:
+
+White section → Light section (#DCE0E7, very subtle) → White → etc.
+
+This creates luxury contrast without losing authority.
+
+3) Cards + grids (Projects, Actualités, etc.)
+White cards, subtle shadow or border using #8EA4AF with low opacity
+Clean hover:
+slight zoom
+subtle shadow increase
+maybe soft underline on links
+4) CTA system (must be consistent)
+Primary CTA: filled button with #082634, white text
+Secondary CTA: outline button (border #082634), text #082634
+Tertiary CTA: text link with underline or arrow using #082634
+Ensure CTAs are visible on white
+5) “Nos Marques” experience (must feel like two worlds)
+Keep emotional split and identity logic
+Use white theme but still differentiate:
+Estya: more minimal, architectural, luxury
+Acharaf: warmer, more lifestyle-friendly
+Keep readability always (no hidden content)
+6) Footers
+Use white footer or very light section with strong typographic hierarchy in #082634
+Keep it premium, not “heavy dark block”
+⚙️ Optimizations / UI Cleanups
+Fix any oversized section heights (tighten whitespace without losing luxury)
+Ensure grids/metrics don’t overlap on any screen size
+Tighten line-heights and spacing to feel editorial, not empty
+Make sure CTAs, metrics, and key texts are clearly legible on white
+🧠 Final goal
+
+The result should feel like:
+“Luxury architecture brand + real estate authority”
+with a light premium style.
+
+Not:
+
+“random white site”
+“cheap modern white template”
+“dark site with bits of white”
+
+The site must still feel like a high-end curated experience.

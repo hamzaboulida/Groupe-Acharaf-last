@@ -1,0 +1,101 @@
+Add initial demo projects to the website so the live version has visible content in the “Nos Projets” page and related project sections.
+
+## Objective
+
+Create a clean set of sample real estate projects that appear on the live website immediately, while keeping them fully manageable from the back-office.
+
+## Important requirement
+
+These projects must be:
+
+* visible on the public website right away
+* editable later from the admin/back-office
+* deletable later from the admin/back-office
+* structured the same way as future real projects
+
+Do NOT hardcode them in a way that cannot be managed later.
+
+---
+
+## Create sample projects for both marques
+
+### ESTYA (haut standing / ultra-luxe)
+
+Add at least 3 sample projects:
+
+1. luxury villa project
+2. premium residence project
+3. high-end urban project
+
+### ACHARAF IMMOBILIER (premium accessible / social housing)
+
+Add at least 3 sample projects:
+
+1. residential family project
+2. modern apartment residence
+3. accessible housing project
+
+---
+
+## For each project, include these fields
+
+Please make sure every demo project has:
+
+* project title
+* marque assignment:
+
+  * Estya
+  * or Acharaf Immobilier
+* short description
+* long description
+* city / location
+* project status (coming soon / en cours / livré)
+* type (villa / résidence / appartements / mixed)
+* hero image
+* gallery images
+* key highlights / features
+* surface or size info if relevant
+* CTA-ready structure for project detail page
+
+---
+
+## Admin / back-office requirement
+
+These demo projects must be inserted into the same data structure/database/CMS used by the website so that from the back-office I can:
+
+* edit them
+* delete them
+* add new ones later
+* assign them to the right marque
+* update their images and descriptions
+
+If there is already a projects collection/table in the admin, populate it with these demo entries.
+
+---
+
+## Front-end requirement
+
+Make sure these projects appear correctly in:
+
+* Nos Projets page
+* homepage featured projects section if applicable
+* Nos Marques page/project previews if applicable
+* individual project detail pages
+
+---
+
+## Content direction
+
+Use elegant placeholder content that matches the brand tone:
+
+* Estya = luxury, exclusive, architectural, premium
+* Acharaf Immobilier = accessible, family-oriented, comfortable, modern
+
+Keep the project names realistic and premium for Morocco.
+
+---
+
+## Final goal
+
+After this update, the live website must no longer feel empty.
+It should show a strong portfolio of demo projects, while keeping everything manageable from the back-office later.

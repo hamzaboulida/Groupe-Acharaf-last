@@ -1,0 +1,216 @@
+modules = ["nodejs-24", "postgresql-16"]
+
+[[artifacts]]
+id = "artifacts/api-server"
+
+[[artifacts]]
+id = "artifacts/mockup-sandbox"
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+
+[[workflows.workflow]]
+name = "artifacts/mockup-sandbox: Component Preview Server"
+author = "agent"
+mode = "sequential"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+artifactId = "XegfDyZt7HqfW2Bb8Ghoy"
+isCanvasWorkflow = true
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/mockup-sandbox run dev"
+cwd = "./artifacts/mockup-sandbox"
+waitForPort = 8081
+
+[workflows.workflow.tasks.env]
+PORT = "8081"
+BASE_PATH = "/__mockup"
+
+[[workflows.workflow]]
+name = "artifacts/groupe-acharaf: web"
+author = "agent"
+mode = "sequential"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+artifactId = "artifacts/groupe-acharaf"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/groupe-acharaf run dev"
+cwd = "./artifacts/groupe-acharaf"
+waitForPort = 19574
+router = "path"
+
+[workflows.workflow.tasks.env]
+PORT = "19574"
+BASE_PATH = "/"
+
+[[workflows.workflow]]
+name = "artifacts/api-server: API Server"
+author = "agent"
+mode = "sequential"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+artifactId = "3B4_FFSkEVBkAeYMFRJ2e"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/api-server run dev"
+cwd = "./artifacts/api-server"
+waitForPort = 8080
+
+[workflows.workflow.tasks.env]
+PORT = "8080"
+
+[[workflows.workflow]]
+name = "push"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git remote set-url origin https://hamzaboulida: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@github.com/hamzaboulida/Groupe-Acharaf-last.git"
+
+[[workflows.workflow]]
+name = "real push"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git remote set-url origin https://hamzaboulida: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@github.com/hamzaboulida/Groupe-Acharaf-last.git"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git checkout --orphan fresh-start git add . git commit -m \"Fresh start\" git push --set-upstream origin fresh-start "
+
+[[workflows.workflow]]
+name = "check push"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git checkout --orphan fresh-start"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git add ."
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git commit -m \"Fresh start\""
+
+[[workflows.workflow]]
+name = "final"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "check push"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git push origin fresh-start"
+
+[[workflows.workflow]]
+name = "hamza"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git remote set-url origin https://hamzaboulida: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@github.com/hamzaboulida/Groupe-Acharaf-last.git"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git checkout --orphan fresh-start git add . git commit -m \"Fresh start\" git push --set-upstream origin fresh-start "
+
+[[workflows.workflow]]
+name = "2"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git add . "
+
+[[workflows.workflow]]
+name = "3"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git commit -m \"Fresh start\" "
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git push --set-upstream origin fresh-start "
+
+[[workflows.workflow]]
+name = "1"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git remote set-url origin https://hamzaboulida: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@github.com/hamzaboulida/Groupe-Acharaf-last.git"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git checkout --orphan fresh-start"
+
+[[workflows.workflow]]
+name = "ALL"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "1"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "2"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "3"
+
+[[workflows.workflow]]
+name = "LOGIN"
+mode = "sequential"
+author = 57070929
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git config user.name \"Wiam Belhadj\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = " git config user.email \"your-email@example.com\""
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[nix]
+channel = "stable-25_05"

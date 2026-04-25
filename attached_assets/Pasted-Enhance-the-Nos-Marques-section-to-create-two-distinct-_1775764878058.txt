@@ -1,0 +1,119 @@
+Enhance the “Nos Marques” section to create two distinct emotional and visual experiences for each brand.
+
+The goal is not just visual difference, but **two completely different atmospheres**.
+
+---
+
+## 🎯 OBJECTIVE
+
+Transform this section into an immersive experience where users feel:
+
+* Estya = luxury, exclusivity, prestige
+* Acharaf Immobilier = accessibility, lifestyle, comfort
+
+---
+
+## 🏛️ ESTYA — LUXURY EXPERIENCE
+
+### Visual direction:
+
+* Use darker tones:
+
+  * #082634
+  * #080629
+* Add subtle dark gradient overlay
+* Use night or sunset architecture visuals
+* Reduce brightness slightly for a cinematic feel
+
+### Motion:
+
+* Slow zoom on image
+* Smooth fade transitions
+* Calm and elegant movement
+
+### Typography:
+
+* Large, minimal, high-end
+* Less text, more impact
+
+### Interaction:
+
+* On hover:
+
+  * deepen background
+  * increase contrast
+  * subtle zoom
+
+---
+
+## 🏡 ACHARAF IMMOBILIER — HUMAN EXPERIENCE
+
+### Visual direction:
+
+* Use lighter tones:
+
+  * #DCE0E7
+  * #B2BED0
+* Use daylight images
+* Show lifestyle, living spaces, warmth
+
+### Motion:
+
+* Slightly more dynamic than Estya
+* Gentle movement (not too slow, not too fast)
+
+### Typography:
+
+* Slightly more content than Estya
+* Still clean but more accessible
+
+### Interaction:
+
+* On hover:
+
+  * brighten slightly
+  * soft overlay
+  * smooth zoom
+
+---
+
+## 🔄 TRANSITION BETWEEN BOTH
+
+### IMPORTANT:
+
+The transition between Estya and Acharaf must feel like:
+👉 switching between two worlds
+
+### Add:
+
+* smooth visual transition between both blocks
+* slight shift in tone when moving cursor from one to the other
+* optional subtle center divider animation
+
+---
+
+## 🎨 DESIGN RULES
+
+* Keep global coherence with main brand (#082634)
+* Do not break overall identity
+* Differences must feel intentional, not random
+
+---
+
+## 🎯 FINAL RESULT
+
+User should feel:
+
+When seeing Estya:
+👉 “This is luxury. Exclusive. Premium.”
+
+When seeing Acharaf:
+👉 “This is accessible, comfortable, real life.”
+
+Not:
+❌ same feeling with different text
+❌ simple cards
+❌ only color variation
+
+But:
+✅ two distinct brand universes

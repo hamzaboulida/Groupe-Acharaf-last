@@ -1,0 +1,169 @@
+Perform a FULL audit of the website and its connection with the back-office (admin panel, database, and dynamic content).
+
+The goal is to ensure everything is fully functional, scalable, and ready for real business use.
+
+## 1. Global Objective
+
+Verify that ALL dynamic data is properly connected, editable from the back-office, and correctly displayed on the front-end.
+
+Identify any missing connections, static content that should be dynamic, or future limitations.
+
+---
+
+## 2. Projects (Projets)
+
+* Check that all projects are coming from the database (not hardcoded)
+* Verify:
+
+  * Title, description, images, location, price, status, etc.
+* Ensure:
+
+  * Add / Edit / Delete from back-office works correctly
+  * Project detail pages are dynamically generated
+* Confirm:
+
+  * No data loss after deploy/publish
+  * Images are properly stored (not temporary URLs)
+
+---
+
+## 3. Blog / Actualités
+
+* Ensure articles and categories are fully dynamic
+* Verify:
+
+  * Add / Edit / Delete articles from back-office
+  * Categories filtering works
+  * Article detail pages load correct content
+* Check SEO fields:
+
+  * Title, meta description, slug
+
+---
+
+## 4. Carrières (Jobs)
+
+* Check:
+
+  * Job offers are dynamic (from back-office)
+  * Add / Edit / Delete works
+* If no jobs exist:
+
+  * Display clean “no positions available” message
+* Verify:
+
+  * Each job has a detail page (optional but recommended)
+
+---
+
+## 5. Forms (Contact / Leads)
+
+### Contact form
+
+* Verify submission works correctly
+* Check where data is stored:
+
+  * Database / email / CRM
+* Ensure fields are captured:
+
+  * Name, email, phone, message
+* Add:
+
+  * Success / error states
+
+### Project interest forms
+
+* Ensure:
+
+  * Leads are linked to the correct project
+* Store:
+
+  * Source (project name, page)
+
+---
+
+## 6. Career Applications
+
+* Verify:
+
+  * Application form works
+  * CV upload (if exists)
+* Ensure data is stored in back-office:
+
+  * Name, email, phone, position, CV
+* Make applications easily manageable from admin
+
+---
+
+## 7. Newsletter
+
+* Check:
+
+  * Email subscription form works
+* Store subscribers in database
+* Ensure:
+
+  * No duplicates
+  * Basic validation (email format)
+* Prepare for future integration (email marketing tools)
+
+---
+
+## 8. Back-Office Structure
+
+Audit the admin panel:
+
+* Is it clean and easy to use?
+* Are all entities present:
+
+  * Projects
+  * Articles
+  * Jobs
+  * Leads
+  * Subscribers
+* Check permissions (if needed later)
+* Ensure scalability for future features
+
+---
+
+## 9. Data Persistence & Deployment
+
+* Ensure ALL data persists after publish/redeploy
+* No use of temporary/local storage
+* Use proper database/storage (not mock data)
+
+---
+
+## 10. Performance & Errors
+
+* Check:
+
+  * Broken links
+  * Missing images
+  * Slow loading components
+* Validate all forms and API calls
+
+---
+
+## 11. Future Improvements (IMPORTANT)
+
+Suggest improvements such as:
+
+* CRM integration for leads
+* Email automation
+* Analytics tracking
+* Lead source tracking (UTM, project, page)
+* Dashboard for performance
+
+---
+
+## Final Deliverable
+
+Provide:
+
+1. List of issues found
+2. What is working correctly
+3. What needs to be fixed urgently
+4. What should be improved for scalability
+
+Goal: Make the website fully operational, reliable, and ready for real clients and business growth.

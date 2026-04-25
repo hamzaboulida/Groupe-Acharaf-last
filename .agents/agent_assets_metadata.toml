@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "mr1JfVHNo1CUvbpoFcevK"
+uri = "file://artifacts/groupe-acharaf/src/assets/hero-bg.png"
+type = "image"
+title = "cinematic Moroccan architecture"
+
+[[generated]]
+id = "INh1LjDjQIOsVK_grA1Ht"
+uri = "file://artifacts/groupe-acharaf/src/assets/project-1.png"
+type = "image"
+title = "ultra luxury penthouse morocco"
+
+[[generated]]
+id = "l7YStC60-M64uwedzock4"
+uri = "file://artifacts/groupe-acharaf/src/assets/project-2.png"
+type = "image"
+title = "modern luxury villa exterior"
+
+[[generated]]
+id = "FBcVX-0stiABPXqg2yuy0"
+uri = "file://artifacts/groupe-acharaf/src/assets/project-3.png"
+type = "image"
+title = "premium social housing complex"
+
+[[generated]]
+id = "lYhTru5GnxdeY1jm1zHGG"
+uri = "file://artifacts/groupe-acharaf/src/assets/brand-estya.png"
+type = "image"
+title = "estya-luxury-night-villa"
+
+[[generated]]
+id = "9PIIMJyvRCKvrc-ZmbVWj"
+uri = "file://artifacts/groupe-acharaf/src/assets/brand-acharaf.png"
+type = "image"
+title = "acharaf-daylight-residential"
+
+[[generated]]
+id = "_Ue8kIeNsGhy9lbPQTACK"
+uri = "file://artifacts/groupe-acharaf/src/assets/article-1.png"
+type = "image"
+title = "moroccan real estate investment"
+
+[[generated]]
+id = "e6SJLpEomK2sTWQOGbT4i"
+uri = "file://artifacts/groupe-acharaf/src/assets/article-2.png"
+type = "image"
+title = "future of modern living"

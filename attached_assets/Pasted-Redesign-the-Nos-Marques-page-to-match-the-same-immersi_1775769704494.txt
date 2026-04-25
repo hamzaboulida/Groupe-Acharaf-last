@@ -1,0 +1,177 @@
+Redesign the “Nos Marques” page to match the same immersive, emotional, and premium experience we created in the homepage “Nos Marques” section.
+
+Do not create a standard page. This page must feel like entering two distinct brand universes.
+
+---
+
+## 🎯 OBJECTIVE
+
+Transform this page into a **full-screen immersive experience** where:
+
+* Estya and Acharaf are not just presented
+* They are **felt**
+
+---
+
+## 🏗️ STRUCTURE
+
+### 1. HERO — INTRODUCTION
+
+Create a strong cinematic hero:
+
+* Full screen height
+
+* Background image (neutral or architectural)
+
+* Title:
+  **“Deux visions. Une même exigence.”**
+
+* Subtitle:
+  Short, elegant sentence introducing both brands
+
+* Smooth fade-in animation
+
+---
+
+### 2. ESTYA SECTION — LUXURY WORLD
+
+Create a full immersive section:
+
+#### Layout
+
+* Full width / large section
+* Image dominant
+* Content overlaid or side-aligned
+
+#### Visual direction
+
+* Dark tones (#082634 / #080629)
+* Cinematic luxury visuals (night, warm lights, reflections)
+* High contrast
+
+#### Content
+
+* Title: ESTYA
+* Label: Ultra-Luxe
+* Short premium description
+* CTA: “Découvrir les projets Estya”
+
+#### Motion
+
+* Slow zoom on image
+* Smooth fade transitions
+
+👉 This section must feel:
+Luxury, rare, exclusive, silent power
+
+---
+
+### 3. TRANSITION BETWEEN WORLDS
+
+Add a soft transition:
+
+* spacing
+* subtle fade
+* optional divider text
+
+Example:
+**“Deux approches, un même engagement”**
+
+---
+
+### 4. ACHARAF SECTION — HUMAN WORLD
+
+Create a contrasting section:
+
+#### Layout
+
+* Similar structure but different feeling
+
+#### Visual direction
+
+* Lighter tones (#DCE0E7 / #B2BED0)
+* Daylight visuals
+* Warm and residential atmosphere
+
+#### Content
+
+* Title: ACHARAF IMMOBILIER
+* Label: Premium & Accessible
+* Short human-focused description
+* CTA: “Découvrir les projets Acharaf”
+
+#### Motion
+
+* Slightly more dynamic than Estya
+* Still smooth and premium
+
+👉 This section must feel:
+Comfort, life, accessibility, everyday luxury
+
+---
+
+### 5. OPTIONAL — PROJECT PREVIEW
+
+Under each brand:
+
+* Show 2–3 featured projects
+* Keep minimal and elegant
+
+---
+
+### 6. FINAL CTA
+
+End with a strong section:
+
+Title:
+**“Quel univers vous correspond ?”**
+
+Buttons:
+
+* Estya
+* Acharaf
+
+---
+
+## 🎨 DESIGN RULES
+
+* Respect brand palette
+* Use #082634 as primary anchor
+* Use contrast to differentiate both worlds
+* Maintain strong readability at all times
+* Avoid generic layouts
+
+---
+
+## 🎬 EXPERIENCE RULES
+
+* Smooth transitions
+* Cinematic feeling
+* No abrupt section changes
+* No “block” feeling
+
+---
+
+## ❌ AVOID
+
+* Basic grid layout
+* Simple text sections
+* Same style for both brands
+* Static presentation
+
+---
+
+## 🎯 FINAL RESULT
+
+This page must feel like:
+
+* entering two different real estate universes
+* a premium brand storytelling experience
+
+Not:
+❌ a standard informational page
+❌ a copy of the homepage
+❌ a list of brands
+
+But:
+✅ an immersive journey

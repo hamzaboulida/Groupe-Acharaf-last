@@ -1,0 +1,132 @@
+Refine the homepage to push the experience to a higher luxury level. Do not redesign, only enhance depth, emotion, and differentiation.
+
+---
+
+CRITICAL FIX — CONTENT VISIBILITY
+
+Currently, some content depends too much on hover or interaction.
+
+This must be corrected.
+
+Rules:
+Titles (Estya / Acharaf) must always be visible
+Descriptions must always be readable
+CTA buttons must always be visible
+
+❌ Do NOT hide content behind hover
+❌ Do NOT rely on interaction to reveal key information
+
+👉 The section must be fully understandable without any interaction
+
+## 🏷️ NOS MARQUES — MAKE TRUE DUAL EXPERIENCE (CRITICAL)
+
+The section must feel like two completely different worlds.
+
+### ESTYA (Luxury)
+
+* Darker tones (#082634, #080629)
+* Reduce brightness of image
+* Add subtle cinematic overlay
+* Use night or sunset feeling
+* Slower motion
+* Increase contrast and depth
+
+👉 Feeling:
+Luxury, exclusivity, silence, prestige
+
+---
+
+### ACHARAF IMMOBILIER (Accessible)
+
+* Brighter image (daylight)
+* Softer tones (#DCE0E7, #B2BED0)
+* Remove dark overlays
+* Add warmer feeling
+* Slightly more dynamic movement
+
+👉 Feeling:
+Life, accessibility, comfort, reality
+
+---
+
+### TRANSITION BETWEEN BOTH
+
+* When moving cursor from one side to the other:
+
+  * slight shift in global tone
+  * subtle animated divider or movement
+* Make it feel like switching between universes
+
+---
+
+## 🔢 KEY NUMBERS — MAKE THEM A STATEMENT
+
+* Increase size significantly (very large numbers)
+* Add strong spacing around section
+* Animate:
+
+  * count-up
+  * staggered appearance
+
+Optional:
+
+* place them over subtle background image or texture
+
+👉 Must feel like:
+A moment of authority and credibility
+
+---
+
+## 🎬 TRANSITIONS — REMOVE “SECTION FEELING”
+
+* Add smoother transitions:
+
+  * fade + slight translate
+  * subtle parallax
+* Slight overlap between sections
+
+👉 Goal:
+One continuous cinematic flow
+
+---
+
+## 🎯 CTA — MAKE IT A FINAL SIGNATURE
+
+* Increase headline size
+* Reduce text length
+* Add more vertical spacing
+* Make button more visible
+* Add subtle background movement or gradient
+
+👉 Feeling:
+Luxury invitation, not standard CTA
+
+---
+
+## 🎨 GLOBAL RULE
+
+Do not add new elements.
+Only enhance:
+
+* depth
+* contrast
+* emotion
+* movement
+
+---
+
+## 🎯 FINAL RESULT
+
+The homepage must feel like:
+
+* a luxury brand experience
+* a cinematic journey
+* a premium real estate universe
+
+Not:
+❌ a clean website
+❌ a good UI
+❌ a portfolio
+
+But:
+✅ an experience

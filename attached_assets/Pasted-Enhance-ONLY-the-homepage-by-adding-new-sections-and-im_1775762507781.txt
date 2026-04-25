@@ -1,0 +1,185 @@
+Enhance ONLY the homepage by adding new sections and improving flow, without redesigning the existing structure.
+
+The goal is to:
+
+* strengthen authority
+* improve SEO structure
+* create a more immersive and dynamic experience
+* keep full visual coherence with current design
+
+---
+
+## 🎬 GLOBAL RULE
+
+The homepage must feel like a **continuous cinematic experience**, not separated blocks.
+
+Avoid:
+❌ hard section breaks
+❌ random background colors
+❌ static blocks
+
+Prefer:
+✅ smooth transitions
+✅ layered sections
+✅ dynamic flow
+
+---
+
+## 🔢 KEY NUMBERS (IMPORTANT FIX)
+
+The current “Key Numbers” section feels like a separate block and the background color (#212F4F) is not aligned.
+
+### Refactor it completely:
+
+* REMOVE the background block feeling
+* Integrate numbers directly into the flow (overlay or inline section)
+* Use transparent or very subtle background
+* Place numbers over:
+
+  * image section
+  * or between transitions
+
+### Animation:
+
+* count-up animation
+* staggered appearance (not all at once)
+* slight vertical motion
+
+👉 It should feel like part of the story, not a section
+
+---
+
+## 🧠 ADD NEW SECTION 1 — EXPERTISE (VERY IMPORTANT)
+
+Add after “Notre Vision”
+
+### Title:
+
+**Notre Savoir-Faire**
+
+### Content:
+
+4 pillars:
+
+* Conception architecturale
+* Développement immobilier
+* Exécution & qualité
+* Accompagnement client
+
+### Design:
+
+* minimal layout
+* horizontal or grid
+* subtle hover animation
+* icons or very light visuals
+
+👉 This builds strong authority
+
+---
+
+## 🏛️ ADD NEW SECTION 2 — SIGNATURE / POSITIONING
+
+Add a strong brand statement section:
+
+### Example:
+
+**“Construire plus que des projets. Créer des références.”**
+
+* large typography (editorial style)
+* minimal text
+* strong spacing
+
+👉 This reinforces premium perception
+
+---
+
+## 🏡 IMPROVE “NOS PROJETS PHARES”
+
+Enhance without redesign:
+
+* add smooth reveal animation
+* add hover zoom + overlay
+* improve spacing
+* add subtle transition between cards
+
+👉 Make it feel alive
+
+---
+
+## 🏷️ IMPROVE “NOS MARQUES”
+
+Do not redesign, but enhance:
+
+* add subtle transition between both blocks
+* add slight parallax or hover movement
+* make it feel like switching between 2 worlds
+
+---
+
+## 💬 ADD NEW SECTION 3 — TESTIMONIALS (IMPORTANT)
+
+Add before CTA:
+
+### Title:
+
+**Ils nous font confiance**
+
+### Content:
+
+* 2–3 testimonials
+* short quotes
+* clean layout
+
+### Design:
+
+* minimal
+* fade-in animation
+* no heavy backgrounds
+
+👉 Adds trust and credibility
+
+---
+
+## 🎯 CTA SECTION (KEEP BUT REFINE)
+
+* keep current “Commençons ensemble”
+* improve spacing and typography
+* ensure background uses main color (#082634)
+* remove any color that breaks consistency
+
+---
+
+## 🧾 NEWSLETTER (KEEP)
+
+* keep minimal
+* improve alignment and spacing
+* make input + button more premium
+
+---
+
+## 🎨 DESIGN RULES
+
+* do NOT introduce new random colors
+* keep strong coherence with brand
+* use #082634 as main anchor
+* use light sections only when needed
+* increase white space for luxury feeling
+
+---
+
+## 🎯 FINAL RESULT
+
+Homepage should feel:
+
+* more complete
+* more premium
+* more immersive
+* more structured for SEO
+* more authoritative
+
+WITHOUT:
+❌ changing everything
+❌ breaking current design
+❌ adding heavy sections
+
+Only improve and extend the experience.

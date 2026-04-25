@@ -1,0 +1,137 @@
+Rebuild and refine the current Groupe Acharaf website to make it feel **more premium, darker, more cinematic, and far more dynamic**.
+
+Keep the current luxury/art-gallery direction, but evolve it into a **fully immersive digital experience**, not just a beautiful static website.
+
+### Creative direction
+
+The website must feel like:
+
+* **Ultra-premium**
+* **Cinematic**
+* **Smooth and immersive**
+* **Architectural and artistic**
+* A mix of **luxury real estate + fashion house + digital experience**
+
+### Important visual correction
+
+The current website feels **too light** because of the white/light backgrounds across many sections.
+Refactor the design system to make it more premium by using the brand palette more strategically:
+
+#### Main brand colors
+
+* Primary: **#082634**
+* Secondary: **#8EA4AF**
+* Tertiary: **#DCE0E7**
+
+#### Additional secondary colors
+
+* **#B2BED0**
+* **#D1E8F8**
+* **#080629**
+* **#212F4F**
+
+### Color system to apply
+
+* Use **dark, rich backgrounds** for most of the experience
+* Make **#082634** and **#080629** the dominant foundation colors
+* Use **#212F4F** for depth, overlays, panels, and transitions
+* Use **#DCE0E7** and **#B2BED0** only for contrast, breathing space, and selected lighter sections
+* Avoid large flat white sections
+* Remove any background colors that break the luxury cinematic mood
+
+### Typography
+
+* Use **Quiche Text** for hero titles and major headings
+* Use **Roboto** for body text and UI text
+* Increase elegance through spacing, scale, and composition
+* Keep typography editorial and refined
+
+### Dynamic experience (very important)
+
+I do not want the website to feel like a static art gallery.
+I want it to feel like a **real dynamic luxury experience**.
+
+Please add and improve:
+
+* Smooth scroll-based storytelling
+* Elegant parallax on hero and image sections
+* Layered motion between foreground and background
+* Section reveal animations
+* Smooth hover states
+* Animated image transitions
+* Cinematic page transitions between routes
+* Dynamic overlays and subtle movement in backgrounds
+* Micro-interactions on buttons, cards, and navigation
+* More fluid transitions between sections so the site feels continuous
+
+The motion should feel:
+
+* smooth
+* premium
+* subtle
+* artistic
+* never aggressive or cheap
+
+### Homepage improvements
+
+Refine the homepage so it feels more immersive and less static.
+
+Improve:
+
+* Hero section with richer overlay treatment and more depth
+* Transition from hero to next section
+* Add more dynamic storytelling blocks
+* Make the metrics/counters feel integrated and premium
+* Make the featured projects section more alive with animation and interaction
+* Make the brands section feel like an immersive switch between two worlds, not just two cards
+* Strengthen visual rhythm across the page
+
+### Footer improvement
+
+The current footer feels visually out of context.
+Redesign it so it becomes a **luxury closing section**, fully aligned with the rest of the site.
+
+Footer should feel:
+
+* darker
+* more minimal
+* more elegant
+* more integrated with the cinematic brand identity
+
+Use:
+
+* dark premium background from the brand palette
+* refined typography
+* cleaner spacing
+* subtle separators
+* elegant hover states
+
+It should feel like the final scene of a luxury film, not a generic corporate footer.
+
+### Global design goals
+
+* More depth
+* More contrast
+* More mood
+* More visual continuity
+* More dynamic transitions
+* Less plain white
+* Less static sections
+* Stronger premium feeling
+
+### Final objective
+
+Transform the current website into a **true luxury digital experience** where:
+
+* the interface feels richer and darker
+* the motion feels alive and smooth
+* the footer matches the world of the brand
+* the whole site feels more immersive, emotional, and premium
+
+Do not rebuild from zero.
+Use the current version as a base, but push it much further in terms of:
+
+* color depth
+* motion design
+* luxury atmosphere
+* immersive storytelling

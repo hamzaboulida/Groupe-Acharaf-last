@@ -1,0 +1,101 @@
+Refine the current Groupe Acharaf website with a **strict brand coherence system**. Do not redesign from zero. Improve the existing version.
+
+## Main correction
+
+The website must always prioritize the **main brand color**:
+
+* **Primary:** #082634
+
+This color must be the dominant foundation of the experience and create visual coherence from **header to footer**.
+
+## Color rules (strict)
+
+Use this hierarchy:
+
+* **#082634** = main background color for the global experience
+* **#8EA4AF** = support color only, for subtle UI details, cards, borders, hover states, or secondary elements
+* **#DCE0E7** = light contrast color only, for selected text blocks or soft contrast sections
+* **#080629** and **#212F4F** = depth colors only, for gradients, overlays, and dark transitions
+
+### Important restrictions
+
+* Do **not** use the secondary color as a dominant section background
+* Do **not** use random light blue/grey backgrounds in major sections
+* Do **not** use an out-of-context footer background
+* Keep the whole website visually coherent, premium, and controlled
+
+## Footer correction
+
+The footer background currently feels out of context.
+
+Please refactor the footer so it is fully aligned with the header and the rest of the brand universe:
+
+* use **#082634** or a darker variation based on the primary palette
+* keep it minimal, elegant, and premium
+* create a smooth visual continuity between the final section and the footer
+* remove any background tone that feels disconnected from the hero and navigation
+
+The footer should feel like a natural continuation of the brand, not a separate block.
+
+## “Commençons ensemble” section correction
+
+This section should **not** use a background color that breaks the brand coherence.
+
+Please:
+
+* redesign this section using the **main brand color system**
+* keep it premium, minimal, and elegant
+* create continuity with surrounding sections
+* make it feel integrated, not highlighted with a random tone
+
+## Hero section correction
+
+The hero section must feel:
+
+* cinematic
+* clear
+* premium
+* dynamic
+* elegant
+
+### Required changes
+
+* Remove the overly strong dark overlay
+* Keep the text readable, but let the image breathe more
+* Make the background visual clearer and more visible
+* Keep a refined dark gradient only if necessary for readability, but much lighter and more subtle than now
+
+## Dynamic hero background
+
+Make the hero background feel alive and premium:
+
+* background image should have a **slow cinematic zoom in / zoom out**
+* transition smoothly to another luxury image after a few seconds
+* create a refined slideshow effect with soft fading or elegant sliding transitions
+* movement must be subtle and smooth, never aggressive
+* the experience should feel luxurious and immersive
+
+The hero must feel like a **living scene**, not a static banner.
+
+## Global design principles
+
+* Maintain strong brand coherence across all sections
+* Use the primary color as the visual anchor
+* Make the website darker, richer, and more premium
+* Avoid random section colors
+* Ensure header, hero, sections, CTA blocks, and footer all feel part of the same design system
+
+## Final goal
+
+The final result should feel like:
+
+* one coherent luxury brand system
+* a premium cinematic real estate experience
+* elegant, dynamic, and intentional
+
+Not:
+
+* random color composition
+* disconnected footer
+* flat static hero
+* local design decisions without brand logic

@@ -1,0 +1,107 @@
+Build a ultra-luxury, cinematic website for Groupe Acharaf, a Moroccan real estate developer.
+
+🎯 OBJECTIVE
+
+Create a website that feels like:
+
+A luxury brand experience
+A digital art gallery for real estate
+Inspired by top developers (Dubai-level)
+
+References:
+
+DAMAC
+Lodha Group
+Omniyat
+🎨 STYLE & EXPERIENCE
+Cinematic storytelling (not a classic website)
+Fullscreen sections + video backgrounds
+Big typography, bold visuals
+Smooth animations (GSAP / Framer Motion style)
+Scroll-based storytelling
+Luxury minimal design
+
+🎨 Brand Color:
+
+Primary color: #0e1327 (deep luxury navy)
+Combine with: white, light grey, and subtle gold accents
+Micro-interactions & transitions
+Animated numbers (count-up effect)
+
+⚠️ Priority = Design, emotion, perception (not listings)
+
+🏛️ STRUCTURE
+
+Pages:
+
+Home
+À propos
+Nos Marques
+Nos Projets
+Actualités (blog SEO)
+Carrières
+Contact
+🏢 MARQUES
+
+2 brands:
+
+Estya (haut standing) → ultra luxury identity
+Acharaf Immobilier (économique/social) → clean premium identity
+
+👉 Each brand:
+
+Has its own projects
+Has its own visual identity
+Smooth dynamic transition when switching
+🏡 PROJECTS
+Projects displayed like art pieces
+Immersive grid with animations
+Filters by brand
+
+Project page includes:
+
+Cinematic gallery
+Fullscreen visuals
+Details (prix, surface, etc.)
+CTA (form + WhatsApp + call)
+⚙️ BACK-OFFICE (CMS)
+
+Admin dashboard to:
+
+Manage projects (add/edit/delete + assign to brand)
+Manage leads (form submissions)
+Manage Actualités (blog)
+Manage Carrières (jobs + applications)
+💡 SPECIAL FEATURES
+Animated counters
+Smooth page transitions
+Scroll-triggered animations
+Premium loading animation
+High-end mobile experience
+🔍 SEO (VERY IMPORTANT)
+On-Page SEO:
+Optimized meta titles & descriptions
+Proper H1–H6 structure
+SEO-friendly URLs
+Internal linking
+Image optimization (alt tags)
+Blog optimized for keywords
+Technical SEO:
+Fast loading (Core Web Vitals)
+Sitemap.xml + robots.txt
+Schema markup
+Mobile-first optimization
+Clean, indexable structure
+🧱 TECH
+React / Next.js
+GSAP or Framer Motion
+CMS (headless or custom)
+SEO-friendly rendering
+🎯 FINAL RESULT
+
+The website must feel like:
+👉 Luxury real estate × fashion brand × art gallery
+
+NOT:
+❌ Basic real estate site
+❌ Template design

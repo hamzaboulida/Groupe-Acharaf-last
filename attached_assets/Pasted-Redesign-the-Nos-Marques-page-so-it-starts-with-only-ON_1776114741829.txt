@@ -1,0 +1,73 @@
+Redesign the **“Nos Marques”** page so it starts with **only ONE section** that shows the 2 brands (Estya + Acharaf Immobilier) with an experience similar to the animated brand chooser on the homepage.
+
+Do NOT remove the homepage style system. Keep the luxury vibe, transitions, and premium typography. Fix only this page’s flow.
+
+---
+
+## UX requirement (core)
+
+* On initial load, show only:
+
+  * Estya
+  * Acharaf Immobilier
+  * both as an immersive animated split experience (like the homepage “Nos Marques” section)
+* When the user selects/clicks one brand:
+
+  * keep the top brand section visible and keep content readable at all times
+  * reveal the brand-specific sections below it
+  * hide/slide away the other brand’s sections (or fade them out)
+* Switching brands should instantly switch the revealed content below (without leaving the page)
+
+---
+
+## Brand selector behavior
+
+* Brand cards must be fully visible (titles + descriptions + CTAs always readable)
+* Hover should enhance, not reveal text
+* Selection must:
+
+  * visually “activate” the chosen brand
+  * dim/deactivate the other side elegantly
+* Add smooth animation (fade/slide/scale) on transitions
+* Mobile must work perfectly (no reliance on hover)
+
+---
+
+## Brand content (below the selector)
+
+Each brand’s revealed content should include:
+
+* Brand headline + positioning tagline
+* Short brand story section
+* Key highlights grid (4–6 items)
+* “Projet phares” preview (2–4 projects for that brand)
+* CTA block: “Découvrir les projets” / “Prendre contact”
+
+This content must exist for BOTH brands, but only one is shown at a time.
+
+---
+
+## State + URL (important)
+
+* Keep the selected brand in state
+* Optional but ideal: reflect selection in URL:
+
+  * /nos-marques?brand=estya or #estya
+    so a direct link opens the page with the right brand already selected
+* Back button must behave naturally
+
+---
+
+## SEO
+
+* Keep both brand contents in the DOM so search engines can still see the content (even if visually hidden with CSS)
+* Maintain proper headings hierarchy
+
+---
+
+## Final goal
+
+Make **Nos Marques** feel like a single, cinematic, interactive gateway:
+
+* first choose the universe
+* then the page “unfolds” the story for the chosen brand

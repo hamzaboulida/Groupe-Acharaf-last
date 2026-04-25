@@ -1,0 +1,92 @@
+Do a full **contrast optimization audit** for the entire WHITE version, section by section.
+
+The current issue is still: **muted grey text on grey/light backgrounds** (example: “Notre impact en chiffres” and the labels under the metrics). Fix this everywhere consistently.
+
+## Core objective
+
+* Make every text element readable in all sections
+* Keep luxury + authority, but prioritize readability
+* Don’t redesign the layout—fix the design system and component styles
+
+---
+
+## Create adaptive text tokens (mandatory)
+
+Define and apply the same tokens across all components:
+
+### On light / grey backgrounds (most of this site)
+
+* `textPrimaryLightBg`: **#082634**
+* `textMutedLightBg`: dark tone like **#3B5661** (still readable)
+* `textLabelLightBg`: subtle but readable like **#5C7480**
+
+### On dark backgrounds (hero overlays if any)
+
+* `textPrimaryDarkBg`: white
+* `textMutedDarkBg`: #BFD3DC (or similar)
+
+Rule: muted on light must STILL be readable (no ultra-faint grey).
+
+---
+
+## Component fixes (section-by-section)
+
+Audit and fix these components specifically:
+
+### 1) Stats / metrics section (“Notre impact en chiffres”)
+
+* Title + labels must use `textMutedLightBg` (not ultra light)
+* Numbers can stay premium, but labels must meet contrast
+* Ensure dividers/lines are subtle but visible
+* No label should drop below readable opacity
+
+### 2) “Nos projets phares” cards + brand chips
+
+* Brand chips must be readable on card backgrounds
+* Card meta (location/status) must use the new muted tokens
+
+### 3) Filters (tabs, pill filters)
+
+* Active + inactive states must be readable on white/grey backgrounds
+* If the background is grey, the inactive text must still be readable
+
+### 4) Blog/Actualités metadata
+
+* category label, date, reading time, etc. must use `textMutedLightBg`
+* no faint opacity
+
+### 5) Footer
+
+* Ensure footer text meets contrast on whatever background is used
+
+---
+
+## Minimum contrast rule
+
+Enforce a hard rule:
+
+* Body + labels on light backgrounds must meet **4.5:1** contrast (AA)
+* If a “decorative” style cannot meet this, swap to primary text color
+
+---
+
+## Safety net
+
+If any section still has poor contrast:
+
+* either darken text (preferred)
+* or lighten the background slightly
+* but do NOT leave “grey on grey”
+
+---
+
+## Final goal
+
+No section should have text that is hard to read. The site should feel:
+
+* clean white
+* premium
+* highly readable
+* consistent
+
+This fix must be applied to ALL sections and components, not just the hero.
