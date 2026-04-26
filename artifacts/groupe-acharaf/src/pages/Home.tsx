@@ -12,7 +12,7 @@ import {
 import { useGetStats, useListProjects } from "@workspace/api-client-react";
 import { CountUp } from "@/components/ui/count-up";
 
-import brandEstya   from "@/assets/brand-estya.png";
+import brandEstya from "@/assets/brand-estya.png";
 import brandAcharaf from "@/assets/brand-acharaf.png";
 
 /* ─────────────── Hero slides — night luxury visuals ─────────────── */
@@ -44,8 +44,8 @@ const SLIDES = [
   },
 ];
 const SLIDE_DURATION = 6000;
-const TRANSITION_S   = 1.4;
-const ZOOM_S         = 7;
+const TRANSITION_S = 1.4;
+const ZOOM_S = 7;
 
 /* Cinematic ease — used everywhere */
 const EC = [0.22, 1, 0.36, 1] as const;
@@ -127,7 +127,7 @@ function SectionReveal({
     offset: ["start 0.95", "start 0.45"],
   });
   const opacity = useTransform(scrollYProgress, [0, 1], [0.55, 1]);
-  const y       = useTransform(scrollYProgress, [0, 1], [40, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], [40, 0]);
 
   return (
     <motion.div ref={ref} style={{ opacity, y }} className={`relative ${className}`}>
@@ -138,18 +138,18 @@ function SectionReveal({
 
 /* ════════════════════════════════════════════════════════ */
 export default function Home() {
-  const { data: stats }    = useGetStats();
+  const { data: stats } = useGetStats();
   const { data: projects } = useListProjects({ featured: true });
 
   /* Exactly 4 curated projects — 2 Estya + 2 Acharaf, interleaved */
   const featuredSlice = useMemo(() => {
     if (!projects?.length || !Array.isArray(projects)) return [];
-    const estya   = projects.filter((p) => p.brand?.slug === "estya").slice(0, 2);
+    const estya = projects.filter((p) => p.brand?.slug === "estya").slice(0, 2);
     const acharaf = projects.filter((p) => p.brand?.slug === "acharaf-immobilier").slice(0, 2);
     // Interleave so the grid alternates brands: Estya / Acharaf / Estya / Acharaf
     const result: typeof projects = [];
     for (let i = 0; i < 2; i++) {
-      if (estya[i])   result.push(estya[i]);
+      if (estya[i]) result.push(estya[i]);
       if (acharaf[i]) result.push(acharaf[i]);
     }
     // Fallback: if one brand has fewer than 2, fill from the other up to 4
@@ -177,9 +177,9 @@ export default function Home() {
 
   /* Parallax for decorative glow orbs */
   const { scrollYProgress: pageProgress } = useScroll();
-  const glowY1 = useTransform(pageProgress, [0, 1], [0,  -120]);
-  const glowY2 = useTransform(pageProgress, [0, 1], [0,  -80]);
-  const glowY3 = useTransform(pageProgress, [0, 1], [0,  -60]);
+  const glowY1 = useTransform(pageProgress, [0, 1], [0, -120]);
+  const glowY2 = useTransform(pageProgress, [0, 1], [0, -80]);
+  const glowY3 = useTransform(pageProgress, [0, 1], [0, -60]);
 
   return (
     <Layout>
@@ -447,10 +447,10 @@ export default function Home() {
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-0">
               {[
-                { label: "Projets livrés",      value: stats.deliveredProjects, suffix: ""  },
-                { label: "Années d'expérience", value: stats.yearsExperience,   suffix: ""  },
-                { label: "Unités livrées",       value: stats.totalUnits,        suffix: "+" },
-                { label: "Villes présentes",     value: stats.cities,            suffix: ""  },
+                { label: "Projets livrés", value: stats.deliveredProjects, suffix: "" },
+                { label: "Années d'expérience", value: stats.yearsExperience, suffix: "" },
+                { label: "Unités livrées", value: stats.totalUnits, suffix: "+" },
+                { label: "Villes présentes", value: stats.cities, suffix: "" },
               ].map((stat, i) => (
                 <motion.div
                   key={i}
@@ -612,7 +612,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════
           TESTIMONIALS — Trust & credibility
       ══════════════════════════════════════════════ */}
-      <section className="pt-40 pb-60 bg-white relative overflow-hidden">
+      {/* <section className="pt-40 pb-60 bg-white relative overflow-hidden">
         <SectionReveal className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <motion.div {...fade(0)}>
@@ -651,7 +651,7 @@ export default function Home() {
             ))}
           </div>
         </SectionReveal>
-      </section>
+      </section> */}
 
     </Layout>
   );
@@ -673,18 +673,18 @@ function BrandCard({
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  const EC       = [0.22, 1, 0.36, 1] as const;
-  const isEstya  = brandId === "estya";
+  const EC = [0.22, 1, 0.36, 1] as const;
+  const isEstya = brandId === "estya";
 
   /* Combine hover + focus into a single "active" signal.
      selected state takes visual priority but is independent. */
   const isActive = isHovered || isFocused;
 
   /* Derived animation values — layered priority: selected > active > rest */
-  const imgScale  = selected ? 1.04 : isActive ? 1.03 : 1.0;
+  const imgScale = selected ? 1.04 : isActive ? 1.03 : 1.0;
   const overlayOp = selected ? 0.38 : isActive ? 0.44 : 0.55;
-  const liftY     = selected ? -4   : isActive ? -2   : 0;
-  const shadow    = selected
+  const liftY = selected ? -4 : isActive ? -2 : 0;
+  const shadow = selected
     ? "0 28px 70px rgba(8,38,52,0.20), 0 4px 14px rgba(8,38,52,0.12)"
     : isActive
       ? "0 14px 44px rgba(8,38,52,0.14), 0 2px 8px rgba(8,38,52,0.08)"
@@ -791,11 +791,10 @@ function BrandCard({
             <Link
               href="/nos-marques"
               onClick={(e) => e.stopPropagation()}
-              className={`group inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] border-b pb-0.5 transition-colors duration-500 ${
-                isEstya
+              className={`group inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] border-b pb-0.5 transition-colors duration-500 ${isEstya
                   ? "text-[#C8D4DA] border-[#8EA4AF]/40 hover:border-[#8EA4AF]/80"
                   : "text-[#DCE0E7] border-[#B2BED0]/40 hover:border-[#B2BED0]/80"
-              }`}
+                }`}
             >
               {isEstya ? "Explorer" : "Découvrir"}
               <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform duration-500" />

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 const col1 = [
   { href: "/a-propos", label: "Notre Maison" },
   { href: "/nos-marques", label: "Nos Marques" },
-  { href: "/nos-marques?brand=acharaf", label: "Acharaf Immobilier" },
+  //{ href: "/nos-marques?brand=acharaf", label: "Acharaf Immobilier" },
   { href: "/nos-projets", label: "Galerie de Projets" },
 ];
 const col2 = [
