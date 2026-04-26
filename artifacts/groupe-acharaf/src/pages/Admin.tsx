@@ -1371,6 +1371,94 @@ function ApplicationsTab() {
 // ──────────────────────────────────────────────────────────
 export default function Admin() {
   const [activeTab, setActiveTab] = useState<Tab>("projects");
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem("admin_auth") === "true";
+  });
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simple hardcoded authentication for demonstration
+    if (username === "admin" && password === "admin") {
+      sessionStorage.setItem("admin_auth", "true");
+      setIsAuthenticated(true);
+      setError("");
+    } else {
+      setError("Identifiants incorrects. Veuillez réessayer.");
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#082634] flex flex-col items-center justify-center font-sans p-4 relative overflow-hidden">
+        {/* Background elements for luxury feel */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
+          <div className="absolute top-[-10%] right-[-5%] w-[50%] aspect-square rounded-full border border-[#D8C7A3]/30" />
+          <div className="absolute bottom-[-20%] left-[-10%] w-[60%] aspect-square rounded-full border border-[#D8C7A3]/20" />
+        </div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-md bg-white p-12 shadow-2xl relative z-10"
+        >
+          <div className="text-center mb-10">
+            <div className="text-[#D8C7A3] font-serif text-3xl tracking-[0.15em] leading-none mb-1">GROUPE</div>
+            <div className="text-[#082634] font-serif text-3xl tracking-[0.15em] leading-none">ACHARAF</div>
+            <div className="text-[#8EA4AF] text-[9px] tracking-[0.3em] uppercase mt-4 font-bold opacity-60">
+              Espace Administration
+            </div>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-3">
+              <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Identifiant</label>
+              <input
+                type="text"
+                className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Entrez votre identifiant"
+              />
+            </div>
+            
+            <div className="space-y-3">
+              <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Mot de passe</label>
+              <input
+                type="password"
+                className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
+
+            {error && (
+              <div className="text-red-500 text-xs text-center font-medium bg-red-50 py-3 px-4 border border-red-100">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-[#082634] text-[#D8C7A3] px-12 py-4 mt-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all shadow-xl shadow-[#082634]/10"
+            >
+              Se connecter
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <a href="/" className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] hover:text-[#082634] transition-colors">
+              &larr; Retour au site
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex font-sans">
