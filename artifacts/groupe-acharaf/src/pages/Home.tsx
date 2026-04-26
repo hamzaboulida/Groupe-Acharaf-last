@@ -143,7 +143,7 @@ export default function Home() {
 
   /* Exactly 4 curated projects — 2 Estya + 2 Acharaf, interleaved */
   const featuredSlice = useMemo(() => {
-    if (!projects?.length) return [];
+    if (!projects?.length || !Array.isArray(projects)) return [];
     const estya   = projects.filter((p) => p.brand?.slug === "estya").slice(0, 2);
     const acharaf = projects.filter((p) => p.brand?.slug === "acharaf-immobilier").slice(0, 2);
     // Interleave so the grid alternates brands: Estya / Acharaf / Estya / Acharaf
