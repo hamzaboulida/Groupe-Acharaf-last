@@ -24,7 +24,7 @@ import {
   getListApplicationsQueryKey,
 } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
-import { X, Plus, Image as ImageIcon, Trash2, MapPin, Info, Layout as LayoutIcon, Search, Download } from "lucide-react";
+import { X, Plus, Image as ImageIcon, Trash2, MapPin, Info, Layout as LayoutIcon, Search, Download, Briefcase } from "lucide-react";
 
 type Tab = "projects" | "leads" | "articles" | "careers" | "applications";
 
@@ -67,21 +67,21 @@ function FileUpload({
 
   return (
     <div className="space-y-2">
-      <label className="block text-xs font-medium text-slate-500 uppercase tracking-wider">{label}</label>
+      <label className="block text-[10px] font-medium text-[#8EA4AF] uppercase tracking-[0.2em]">{label}</label>
       <div className="flex items-center gap-4">
         {value && (
-          <div className="relative w-20 h-20 border border-white/10 rounded overflow-hidden bg-white/5">
+          <div className="relative w-24 h-24 border border-white/10 overflow-hidden bg-white/5">
             <img src={value} alt="Preview" className="w-full h-full object-cover" />
             <button 
               type="button"
               onClick={() => onChange("")}
-              className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl"
+              className="absolute top-0 right-0 bg-[#082634] text-[#D8C7A3] p-1.5 hover:bg-[#D8C7A3] hover:text-[#082634] transition-colors"
             >
-              <X size={12} />
+              <X size={14} />
             </button>
           </div>
         )}
-        <label className="cursor-pointer bg-white/5 border border-white/10 px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 transition-colors rounded">
+        <label className="cursor-pointer bg-white/5 border border-white/10 px-5 py-3 text-[10px] uppercase tracking-[0.15em] text-[#D8C7A3] hover:bg-[#D8C7A3] hover:text-[#082634] transition-all">
           {uploading ? "Chargement..." : value ? "Changer" : "Choisir une image"}
           <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
         </label>
@@ -92,6 +92,11 @@ function FileUpload({
 
 
 
+
+const BRAND_DEEP = "#082634";
+const BRAND_GOLD = "#D8C7A3";
+const BRAND_MEDIUM = "#8EA4AF";
+const BRAND_LIGHT = "#DCE0E7";
 
 const NAV_ITEMS: { id: Tab; label: string }[] = [
   { id: "projects", label: "Projets" },
@@ -107,14 +112,14 @@ function formatDate(d: string) {
 
 function Badge({ children, color = "gold" }: { children: React.ReactNode; color?: "gold" | "blue" | "green" | "red" | "gray" }) {
   const colors = {
-    gold: "bg-[#c9a84c]/20 text-[#c9a84c] border border-[#c9a84c]/30",
-    blue: "bg-blue-500/20 text-blue-300 border border-blue-500/30",
-    green: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30",
-    red: "bg-red-500/20 text-red-300 border border-red-500/30",
-    gray: "bg-white/10 text-white/60 border border-white/10",
+    gold: "bg-[#D8C7A3]/10 text-[#D8C7A3] border border-[#D8C7A3]/20",
+    blue: "bg-[#8EA4AF]/10 text-[#8EA4AF] border border-[#8EA4AF]/20",
+    green: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+    red: "bg-red-500/10 text-red-400 border border-red-500/20",
+    gray: "bg-white/5 text-white/40 border border-white/10",
   };
   return (
-    <span className={`px-2 py-0.5 rounded text-xs font-medium tracking-wide ${colors[color]}`}>{children}</span>
+    <span className={`px-2.5 py-1 text-[10px] font-medium tracking-[0.15em] uppercase ${colors[color]}`}>{children}</span>
   );
 }
 
@@ -124,24 +129,27 @@ function ConfirmButton({ onConfirm, label = "Supprimer" }: { onConfirm: () => vo
     return (
       <button
         onClick={() => setStep(1)}
-        className="text-red-400 hover:text-red-300 text-sm px-2 py-1 rounded hover:bg-red-500/10 transition-colors"
+        className="text-white/40 hover:text-red-400 text-[10px] uppercase tracking-widest transition-colors px-2 py-1"
       >
         {label}
       </button>
     );
   }
   return (
-    <span className="flex gap-2">
+    <div className="flex items-center gap-2">
       <button
-        onClick={() => { onConfirm(); setStep(0); }}
-        className="text-red-400 text-sm font-semibold"
+        onClick={onConfirm}
+        className="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] uppercase tracking-widest px-3 py-1 hover:bg-red-500 hover:text-white transition-all"
       >
         Confirmer
       </button>
-      <button onClick={() => setStep(0)} className="text-white/40 text-sm">
+      <button
+        onClick={() => setStep(0)}
+        className="text-white/40 hover:text-white text-[10px] uppercase tracking-widest px-2"
+      >
         Annuler
       </button>
-    </span>
+    </div>
   );
 }
 
@@ -269,62 +277,65 @@ function ProjectsTab() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-end">
-          <div className="w-full max-w-4xl h-full bg-[#0a0f1e] border-l border-white/10 shadow-2xl overflow-y-auto">
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
+        <div className="fixed inset-0 bg-[#082634]/40 backdrop-blur-md z-[60] flex items-center justify-end">
+          <div className="w-full max-w-4xl h-full bg-white shadow-2xl overflow-y-auto">
+            <div className="p-12">
+              <div className="flex items-center justify-between mb-12 border-b border-[#DCE0E7] pb-8">
                 <div>
-                  <h2 className="text-2xl font-serif text-white">
-                    {editing !== null ? "Modifier le projet" : "Nouveau projet"}
+                  <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mb-2 font-medium">Edition Catalogue</p>
+                  <h2 className="text-3xl font-serif text-[#082634] font-light">
+                    {editing !== null ? "Modifier le projet" : "Nouveau projet immobilier"}
                   </h2>
-                  <p className="text-sm text-white/40 mt-1">Configurez tous les détails du projet immobilier.</p>
                 </div>
-                <button onClick={resetForm} className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/40 hover:text-white">
-                  <X size={20} />
+                <button 
+                  onClick={resetForm} 
+                  className="p-3 hover:bg-[#F8F9FA] transition-colors text-[#8EA4AF] hover:text-[#082634]"
+                >
+                  <X size={24} strokeWidth={1.5} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-12 pb-24">
+              <form onSubmit={handleSubmit} className="space-y-16 pb-32">
                 {/* Section 1: Informations de base */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2">
-                    <LayoutIcon size={14} className="text-[#c9a84c]" />
-                    <h3 className="text-xs font-bold text-white/80 uppercase tracking-widest">Informations Générales</h3>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
+                    <LayoutIcon size={16} className="text-[#D8C7A3]" />
+                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Informations Générales</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Marque</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Marque</label>
                       <select
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none appearance-none"
                         value={form.brandId}
                         onChange={(e) => setForm({ ...form, brandId: Number(e.target.value) })}
                       >
-                        {brands?.map((b) => <option key={b.id} value={b.id} className="bg-[#0a0f1e]">{b.name}</option>)}
+                        {brands?.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                       </select>
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Titre du projet</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Titre du projet</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         value={form.title}
                         onChange={(e) => setForm({ ...form, title: e.target.value })}
                         placeholder="Ex: Les Terrasses d'Acharaf"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Slug (URL)</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Slug (URL)</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         value={form.slug}
                         onChange={(e) => setForm({ ...form, slug: e.target.value })}
                         placeholder="Ex: les-terrasses-acharaf"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Accroche (Tagline)</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Accroche (Tagline)</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         value={form.tagline as string}
                         onChange={(e) => setForm({ ...form, tagline: e.target.value })}
                         placeholder="Ex: Un panorama d'exception sur la ville"
@@ -332,10 +343,10 @@ function ProjectsTab() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Description Principale (Intro)</label>
+                  <div className="space-y-3">
+                    <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Description Principale (Intro)</label>
                     <textarea
-                      className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-32 resize-none"
+                      className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none placeholder:text-[#8EA4AF]/50"
                       value={form.description as string}
                       onChange={(e) => setForm({ ...form, description: e.target.value })}
                     />
@@ -343,13 +354,13 @@ function ProjectsTab() {
                 </div>
 
                 {/* Section 2: Médias */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2">
-                    <ImageIcon size={14} className="text-[#c9a84c]" />
-                    <h3 className="text-xs font-bold text-white/80 uppercase tracking-widest">Images & Album</h3>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
+                    <ImageIcon size={16} className="text-[#D8C7A3]" />
+                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Images & Album</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <FileUpload 
                       label="Image de Couverture" 
                       value={form.coverImageUrl as string} 
@@ -357,23 +368,23 @@ function ProjectsTab() {
                     />
                     
                     <div className="space-y-4">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Galerie / Album Photos</label>
-                      <div className="grid grid-cols-3 gap-2">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Galerie / Album Photos</label>
+                      <div className="grid grid-cols-3 gap-3">
                         {form.images.map((img, i) => (
-                          <div key={i} className="relative aspect-square border border-white/10 rounded overflow-hidden group">
-                            <img src={img} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
+                          <div key={i} className="relative aspect-square border border-[#DCE0E7] overflow-hidden group bg-[#F8F9FA]">
+                            <img src={img} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" />
                             <button 
                               type="button" 
                               onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })}
-                              className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-bl opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-0 right-0 bg-[#082634] text-[#D8C7A3] p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              <Trash2 size={10} />
+                              <Trash2 size={12} />
                             </button>
                           </div>
                         ))}
-                        <label className="aspect-square border border-dashed border-white/10 rounded flex flex-col items-center justify-center cursor-pointer hover:border-[#c9a84c]/50 hover:bg-[#c9a84c]/5 transition-all text-white/20 hover:text-[#c9a84c]">
-                          <Plus size={20} />
-                          <span className="text-[9px] mt-1 font-bold uppercase tracking-widest">Ajouter</span>
+                        <label className="aspect-square border border-dashed border-[#DCE0E7] flex flex-col items-center justify-center cursor-pointer hover:border-[#D8C7A3] hover:bg-[#F8F9FA] transition-all text-[#8EA4AF]">
+                          <Plus size={24} strokeWidth={1.5} />
+                          <span className="text-[9px] mt-2 font-bold uppercase tracking-widest">Ajouter</span>
                           <input 
                             type="file" 
                             className="hidden" 
@@ -398,118 +409,118 @@ function ProjectsTab() {
                 </div>
 
                 {/* Section 3: Statut & Prix */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2">
-                    <Info size={14} className="text-[#c9a84c]" />
-                    <h3 className="text-xs font-bold text-white/80 uppercase tracking-widest">Disponibilités & Tarifs</h3>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
+                    <Info size={16} className="text-[#D8C7A3]" />
+                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Disponibilités & Tarifs</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Statut</label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Statut</label>
                       <select
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none appearance-none"
                         value={form.status}
                         onChange={(e) => setForm({ ...form, status: e.target.value as any })}
                       >
-                        <option value="upcoming" className="bg-[#0a0f1e]">À venir</option>
-                        <option value="ongoing" className="bg-[#0a0f1e]">En cours</option>
-                        <option value="completed" className="bg-[#0a0f1e]">Livré</option>
+                        <option value="upcoming">À venir</option>
+                        <option value="ongoing">En cours</option>
+                        <option value="completed">Livré</option>
                       </select>
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Prix Min (DH)</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Prix Min (DH)</label>
                       <input
                         type="number"
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.priceMin}
                         onChange={(e) => setForm({ ...form, priceMin: Number(e.target.value) })}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Prix Max (DH)</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Prix Max (DH)</label>
                       <input
                         type="number"
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.priceMax}
                         onChange={(e) => setForm({ ...form, priceMax: Number(e.target.value) })}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Surface Min (m²)</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Surface Min (m²)</label>
                       <input
                         type="number"
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.surfaceMin}
                         onChange={(e) => setForm({ ...form, surfaceMin: Number(e.target.value) })}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Surface Max (m²)</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Surface Max (m²)</label>
                       <input
                         type="number"
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.surfaceMax}
                         onChange={(e) => setForm({ ...form, surfaceMax: Number(e.target.value) })}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Date de livraison</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Date de livraison</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.deliveryDate as string}
                         onChange={(e) => setForm({ ...form, deliveryDate: e.target.value })}
                         placeholder="Ex: Fin 2025"
                       />
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 bg-white/5 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-center gap-4 bg-[#F8F9FA] p-6 border border-[#DCE0E7]">
                     <input
                       type="checkbox"
                       id="featured"
-                      className="w-4 h-4 text-[#c9a84c] bg-white/10 border-white/20 rounded focus:ring-[#c9a84c]"
+                      className="w-5 h-5 text-[#082634] border-[#DCE0E7] focus:ring-[#D8C7A3] cursor-pointer"
                       checked={form.featured}
                       onChange={(e) => setForm({ ...form, featured: e.target.checked })}
                     />
-                    <label htmlFor="featured" className="text-sm font-medium text-white/70 select-none cursor-pointer">
+                    <label htmlFor="featured" className="text-xs font-bold text-[#082634] uppercase tracking-widest select-none cursor-pointer">
                       Mettre en avant sur la page d'accueil
                     </label>
                   </div>
                 </div>
 
                 {/* Section 4: Story & Lifestyle */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2">
-                    <Search size={14} className="text-[#c9a84c]" />
-                    <h3 className="text-xs font-bold text-white/80 uppercase tracking-widest">Story & Lifestyle</h3>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
+                    <Search size={16} className="text-[#D8C7A3]" />
+                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Story & Lifestyle</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Section "Le Projet" (Détaillé)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="space-y-5">
+                      <h4 className="text-[10px] font-bold text-[#8EA4AF] uppercase tracking-widest border-l-2 border-[#D8C7A3] pl-3">Section "Le Projet"</h4>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Titre (défaut: Le Projet)"
                         value={form.storyTitle as string}
                         onChange={(e) => setForm({ ...form, storyTitle: e.target.value })}
                       />
                       <textarea
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-32 resize-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-40 resize-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Texte détaillé de la section story"
                         value={form.storyText as string}
                         onChange={(e) => setForm({ ...form, storyText: e.target.value })}
                       />
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Section "Art de Vivre"</h4>
+                    <div className="space-y-5">
+                      <h4 className="text-[10px] font-bold text-[#8EA4AF] uppercase tracking-widest border-l-2 border-[#D8C7A3] pl-3">Section "Art de Vivre"</h4>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Titre (défaut: Art de vivre)"
                         value={form.lifestyleTitle as string}
                         onChange={(e) => setForm({ ...form, lifestyleTitle: e.target.value })}
                       />
                       <textarea
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-32 resize-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-40 resize-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Texte de la section lifestyle"
                         value={form.lifestyleText as string}
                         onChange={(e) => setForm({ ...form, lifestyleText: e.target.value })}
@@ -519,50 +530,50 @@ function ProjectsTab() {
                 </div>
 
                 {/* Section 5: Localisation & Prestations */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2">
-                    <MapPin size={14} className="text-[#c9a84c]" />
-                    <h3 className="text-xs font-bold text-white/80 uppercase tracking-widest">Localisation & Prestations</h3>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
+                    <MapPin size={16} className="text-[#D8C7A3]" />
+                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Localisation & Prestations</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Localisation</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="space-y-5">
+                      <h4 className="text-[10px] font-bold text-[#8EA4AF] uppercase tracking-widest border-l-2 border-[#D8C7A3] pl-3">Localisation</h4>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Ville"
                         value={form.city as string}
                         onChange={(e) => setForm({ ...form, city: e.target.value })}
                       />
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Quartier / Adresse"
                         value={form.location as string}
                         onChange={(e) => setForm({ ...form, location: e.target.value })}
                       />
                       <textarea
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-24 resize-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Points forts de l'emplacement (un par ligne)"
                         value={form.locationAdvantages as string}
                         onChange={(e) => setForm({ ...form, locationAdvantages: e.target.value })}
                       />
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Prestations & CTA</h4>
+                    <div className="space-y-5">
+                      <h4 className="text-[10px] font-bold text-[#8EA4AF] uppercase tracking-widest border-l-2 border-[#D8C7A3] pl-3">Prestations & CTA</h4>
                       <textarea
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-24 resize-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Prestations (Points forts du projet, un par ligne)"
                         value={form.amenities as string}
                         onChange={(e) => setForm({ ...form, amenities: e.target.value })}
                       />
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Note financement (ex: Financement à 100% possible)"
                         value={form.financingDetails as string}
                         onChange={(e) => setForm({ ...form, financingDetails: e.target.value })}
                       />
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         placeholder="Texte du bouton CTA (défaut: Prendre rendez-vous)"
                         value={form.ctaText as string}
                         onChange={(e) => setForm({ ...form, ctaText: e.target.value })}
@@ -572,26 +583,26 @@ function ProjectsTab() {
                 </div>
 
                 {/* Section 6: SEO */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 border-b border-white/5 pb-2">
-                    <Search size={14} className="text-[#c9a84c]" />
-                    <h3 className="text-xs font-bold text-white/80 uppercase tracking-widest">Optimisation SEO</h3>
+                <div className="space-y-8 pb-12">
+                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
+                    <Search size={16} className="text-[#D8C7A3]" />
+                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Optimisation SEO</h3>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Méta Titre</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Titre</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
                         value={form.seoTitle as string}
                         onChange={(e) => setForm({ ...form, seoTitle: e.target.value })}
                         placeholder="Titre pour Google"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Méta Description</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Description</label>
                       <textarea
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-24 resize-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none placeholder:text-[#8EA4AF]/50"
                         value={form.seoDescription as string}
                         onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
                         placeholder="Description pour les résultats de recherche"
@@ -601,20 +612,20 @@ function ProjectsTab() {
                 </div>
               </form>
 
-              <div className="fixed bottom-0 right-0 w-full max-w-4xl bg-[#0a0f1e] border-t border-white/10 p-6 flex items-center justify-end gap-4 z-10">
+              <div className="fixed bottom-0 right-0 w-full max-w-4xl bg-white border-t border-[#DCE0E7] p-8 flex items-center justify-end gap-6 z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-6 py-2.5 text-sm font-medium text-white/50 hover:text-white transition-colors"
+                  className="text-[#8EA4AF] text-[10px] font-bold uppercase tracking-[0.2em] hover:text-[#082634] transition-colors"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleSubmit}
                   disabled={createProject.isPending || updateProject.isPending}
-                  className="bg-[#c9a84c] text-[#0e1327] px-10 py-2.5 rounded text-sm font-bold uppercase tracking-widest hover:bg-[#b8973b] transition-all disabled:opacity-50"
+                  className="bg-[#082634] text-[#D8C7A3] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all disabled:opacity-50 shadow-xl shadow-[#082634]/10"
                 >
-                  {createProject.isPending || updateProject.isPending ? "Enregistrement..." : "Enregistrer"}
+                  {createProject.isPending || updateProject.isPending ? "Enregistrement..." : "Enregistrer le projet"}
                 </button>
               </div>
             </div>
@@ -622,32 +633,84 @@ function ProjectsTab() {
         </div>
       )}
 
-      <div className="space-y-2">
-        {projects.map((p) => (
-          <div key={p.id} className="bg-white/5 border border-white/10 p-4 flex items-center justify-between hover:border-white/20 transition-colors">
-            <div className="flex items-center gap-4">
-              {p.coverImageUrl && <img src={p.coverImageUrl} alt="" className="w-16 h-12 object-cover opacity-70" />}
+      {/* Projects Tab Re-design */}
+      {(() => {
+        const statusColor = (s: string) => s === "completed" ? "green" : s === "ongoing" ? "gold" : "blue";
+        const statusLabel = (s: string) => s === "completed" ? "Livré" : s === "ongoing" ? "En cours" : "À venir";
+
+        return (
+          <div className="space-y-10">
+            <div className="flex items-center justify-between">
               <div>
-                <div className="text-white font-medium">{p.title}</div>
-                <div className="text-white/40 text-sm">{p.city} · {p.brand?.name}</div>
+                <h2 className="text-xl font-serif text-[#082634] tracking-tight">Liste des Projets</h2>
+                <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Gérez votre catalogue immobilier</p>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Badge color={statusColor(p.status) as "gold" | "blue" | "green" | "red" | "gray"}>{statusLabel(p.status)}</Badge>
-              {p.featured && <Badge color="gold">En vedette</Badge>}
-              <div className="text-white/30 text-xs">{formatDate(p.createdAt)}</div>
-              <button onClick={() => startEdit(p)} className="text-white/50 hover:text-white text-sm px-2 py-1 hover:bg-white/10 transition-colors">
-                Modifier
+              <button
+                onClick={() => { resetForm(); setShowForm(true); }}
+                className="bg-[#082634] text-[#D8C7A3] px-8 py-3.5 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all flex items-center gap-2 shadow-lg shadow-[#082634]/10"
+              >
+                <Plus size={14} />
+                Ajouter un Projet
               </button>
-              <ConfirmButton onConfirm={async () => {
-                await deleteProject.mutateAsync({ id: p.id });
-                qc.invalidateQueries({ queryKey: getListProjectsQueryKey() });
-              }} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {projects.map((p) => (
+                <div 
+                  key={p.id} 
+                  className="group bg-white border border-[#DCE0E7] p-6 flex items-center justify-between hover:border-[#D8C7A3] hover:shadow-xl hover:shadow-[#082634]/5 transition-all duration-500"
+                >
+                  <div className="flex items-center gap-8">
+                    <div className="relative w-24 h-24 overflow-hidden bg-[#F8F9FA]">
+                      {p.coverImageUrl ? (
+                        <img src={p.coverImageUrl} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[#8EA4AF]/30">
+                          <ImageIcon size={24} />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <Badge color={statusColor(p.status) as any}>{statusLabel(p.status)}</Badge>
+                        {p.featured && <Badge color="gold">Vedette</Badge>}
+                      </div>
+                      <h3 className="text-[#082634] font-serif text-xl font-light">{p.title}</h3>
+                      <div className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
+                        <MapPin size={10} className="text-[#D8C7A3]" />
+                        {p.city} <span className="opacity-30">|</span> {p.brand?.name}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-8">
+                    <div className="text-right hidden md:block">
+                      <div className="text-[#8EA4AF] text-[10px] uppercase tracking-widest mb-1 opacity-60">Créé le</div>
+                      <div className="text-[#082634] text-xs font-medium">{formatDate(p.createdAt)}</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => startEdit(p)} 
+                        className="bg-[#F8F9FA] text-[#082634] px-5 py-2.5 text-[10px] uppercase tracking-widest font-bold hover:bg-[#082634] hover:text-white transition-all"
+                      >
+                        Modifier
+                      </button>
+                      <ConfirmButton onConfirm={async () => {
+                        await deleteProject.mutateAsync({ id: p.id });
+                        qc.invalidateQueries({ queryKey: getListProjectsQueryKey() });
+                      }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {projects.length === 0 && (
+                <div className="py-20 text-center border-2 border-dashed border-[#DCE0E7] bg-white">
+                  <p className="text-[#8EA4AF] text-sm font-light">Aucun projet trouvé dans votre catalogue.</p>
+                </div>
+              )}
             </div>
           </div>
-        ))}
-        {projects.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucun projet.</p>}
-      </div>
+        );
+      })()}
     </div>
   );
 }
@@ -661,31 +724,59 @@ function LeadsTab() {
   const deleteLead = useDeleteLead();
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-serif text-white">Leads <span className="text-white/30 text-lg ml-2">({leads.length})</span></h2>
+    <div className="space-y-10">
+      <div>
+        <h2 className="text-xl font-serif text-[#082634] tracking-tight">Gestion des Leads</h2>
+        <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Suivez les demandes de renseignements</p>
       </div>
-      <div className="space-y-2">
+
+      <div className="grid grid-cols-1 gap-4">
         {leads.map((l) => (
-          <div key={l.id} className="bg-white/5 border border-white/10 p-4 hover:border-white/20 transition-colors">
+          <div key={l.id} className="bg-white border border-[#DCE0E7] p-8 hover:border-[#D8C7A3] hover:shadow-xl transition-all duration-500">
             <div className="flex items-start justify-between">
-              <div>
-                <div className="text-white font-medium">{l.firstName} {l.lastName}</div>
-                <div className="text-[#c9a84c] text-sm">{l.email} {l.phone && `· ${l.phone}`}</div>
-                {l.projectInterest && <div className="text-white/50 text-sm mt-1">Intérêt: {l.projectInterest}</div>}
-                {l.message && <div className="text-white/40 text-sm mt-2 max-w-2xl">{l.message}</div>}
+              <div className="space-y-4">
+                <div>
+                  <div className="text-[#082634] font-serif text-2xl font-light">{l.firstName} {l.lastName}</div>
+                  <div className="text-[#D8C7A3] text-[10px] uppercase tracking-[0.2em] font-bold mt-1">
+                    {l.email} {l.phone && <span className="mx-2 opacity-30">·</span>} {l.phone}
+                  </div>
+                </div>
+                
+                {l.projectInterest && (
+                  <div className="inline-flex items-center gap-2 bg-[#F8F9FA] px-3 py-1.5 border border-[#DCE0E7]">
+                    <span className="text-[#8EA4AF] text-[9px] uppercase tracking-widest font-bold">Intérêt:</span>
+                    <span className="text-[#082634] text-xs font-medium">{l.projectInterest}</span>
+                  </div>
+                )}
+                
+                {l.message && (
+                  <div className="text-[#3B5661] text-sm font-light leading-relaxed max-w-3xl italic">
+                    "{l.message}"
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-white/30 text-xs">{formatDate(l.createdAt)}</div>
-                <ConfirmButton onConfirm={async () => {
-                  await deleteLead.mutateAsync({ id: l.id });
-                  qc.invalidateQueries({ queryKey: getListLeadsQueryKey() });
-                }} />
+              
+              <div className="flex flex-col items-end gap-6">
+                <div className="text-right">
+                  <div className="text-[#8EA4AF] text-[10px] uppercase tracking-widest mb-1 opacity-60">Reçu le</div>
+                  <div className="text-[#082634] text-xs font-medium">{formatDate(l.createdAt)}</div>
+                </div>
+                <ConfirmButton 
+                  label="Supprimer le lead"
+                  onConfirm={async () => {
+                    await deleteLead.mutateAsync({ id: l.id });
+                    qc.invalidateQueries({ queryKey: getListLeadsQueryKey() });
+                  }} 
+                />
               </div>
             </div>
           </div>
         ))}
-        {leads.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucun lead.</p>}
+        {leads.length === 0 && (
+          <div className="py-20 text-center border-2 border-dashed border-[#DCE0E7] bg-white">
+            <p className="text-[#8EA4AF] text-sm font-light">Aucun lead n'a été enregistré pour le moment.</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -749,63 +840,70 @@ function ArticlesTab() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-serif text-white">Articles <span className="text-white/30 text-lg ml-2">({articles.length})</span></h2>
+    <div className="space-y-10">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-serif text-[#082634] tracking-tight">Articles & Actualités</h2>
+          <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Gérez le blog et les publications</p>
+        </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-[#c9a84c] text-[#0e1327] px-4 py-2 text-sm font-semibold tracking-wider hover:bg-[#b8973b] transition-colors"
+          className="bg-[#082634] text-[#D8C7A3] px-8 py-3.5 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all flex items-center gap-2 shadow-lg shadow-[#082634]/10"
         >
-          + Ajouter
+          <Plus size={14} />
+          Nouvel Article
         </button>
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-end">
-          <div className="w-full max-w-3xl h-full bg-[#0a0f1e] border-l border-white/10 shadow-2xl overflow-y-auto">
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
+        <div className="fixed inset-0 bg-[#082634]/40 backdrop-blur-md z-[60] flex items-center justify-end">
+          <div className="w-full max-w-4xl h-full bg-white shadow-2xl overflow-y-auto">
+            <div className="p-12">
+              <div className="flex items-center justify-between mb-12 border-b border-[#DCE0E7] pb-8">
                 <div>
-                  <h2 className="text-2xl font-serif text-white">
-                    {editing !== null ? "Modifier l'article" : "Nouvel article"}
+                  <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mb-2 font-medium">Contenu Éditorial</p>
+                  <h2 className="text-3xl font-serif text-[#082634] font-light">
+                    {editing !== null ? "Modifier l'article" : "Rédiger un nouvel article"}
                   </h2>
-                  <p className="text-sm text-white/40 mt-1">Publiez des actualités ou des articles de blog.</p>
                 </div>
-                <button onClick={resetForm} className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/40 hover:text-white">
-                  <X size={20} />
+                <button 
+                  onClick={resetForm} 
+                  className="p-3 hover:bg-[#F8F9FA] transition-colors text-[#8EA4AF] hover:text-[#082634]"
+                >
+                  <X size={24} strokeWidth={1.5} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-10 pb-24">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Titre *</label>
+              <form onSubmit={handleSubmit} className="space-y-16 pb-32">
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Titre de l'article</label>
                       <input
                         required
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.title}
                         onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        placeholder="Ex: Lancement de la résidence Estya"
+                        placeholder="Ex: L'avenir de l'immobilier de luxe à Casablanca"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Slug *</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Slug (URL)</label>
                       <input
                         required
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.slug}
                         onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                        placeholder="ex-article-titre"
+                        placeholder="avenir-immobilier-luxe-casablanca"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Catégorie</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Catégorie</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.category}
                         onChange={(e) => setForm({ ...form, category: e.target.value })}
-                        placeholder="Actualités, Prestige, etc."
+                        placeholder="Ex: Actualités, Lifestyle..."
                       />
                     </div>
                   </div>
@@ -816,57 +914,57 @@ function ArticlesTab() {
                     onChange={(url) => setForm({ ...form, coverImageUrl: url })} 
                   />
 
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Extrait (Résumé)</label>
+                  <div className="space-y-3">
+                    <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Résumé (Extrait)</label>
                     <textarea
-                      className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-20 resize-none"
+                      className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-24 resize-none"
                       value={form.excerpt}
                       onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Contenu complet</label>
+                  <div className="space-y-3">
+                    <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Contenu de l'article</label>
                     <textarea
-                      className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-64 resize-none"
+                      className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-[400px] resize-none"
                       value={form.content}
                       onChange={(e) => setForm({ ...form, content: e.target.value })}
                     />
                   </div>
 
-                  <div className="flex items-center gap-3 bg-white/5 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-center gap-4 bg-[#F8F9FA] p-6 border border-[#DCE0E7]">
                     <input
                       type="checkbox"
                       id="published"
-                      className="w-4 h-4 text-[#c9a84c] bg-white/10 border-white/20 rounded focus:ring-[#c9a84c]"
+                      className="w-5 h-5 text-[#082634] border-[#DCE0E7] focus:ring-[#D8C7A3] cursor-pointer"
                       checked={form.published}
                       onChange={(e) => setForm({ ...form, published: e.target.checked })}
                     />
-                    <label htmlFor="published" className="text-sm font-medium text-white/70 select-none cursor-pointer">
+                    <label htmlFor="published" className="text-xs font-bold text-[#082634] uppercase tracking-widest select-none cursor-pointer">
                       Publier l'article immédiatement
                     </label>
                   </div>
                 </div>
 
                 {/* SEO */}
-                <div className="space-y-6 pt-6 border-t border-white/5">
-                  <h3 className="text-xs font-bold text-white/80 uppercase tracking-widest flex items-center gap-2">
-                    <Search size={14} className="text-[#c9a84c]" />
-                    Optimisation SEO
-                  </h3>
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Méta Titre</label>
+                <div className="space-y-8 pb-12">
+                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
+                    <Search size={16} className="text-[#D8C7A3]" />
+                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Optimisation SEO</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Titre</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.metaTitle}
                         onChange={(e) => setForm({ ...form, metaTitle: e.target.value })}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Méta Description</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Description</label>
                       <textarea
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-24 resize-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none"
                         value={form.metaDescription}
                         onChange={(e) => setForm({ ...form, metaDescription: e.target.value })}
                       />
@@ -875,14 +973,14 @@ function ArticlesTab() {
                 </div>
               </form>
 
-              <div className="fixed bottom-0 right-0 w-full max-w-3xl bg-[#0a0f1e] border-t border-white/10 p-6 flex items-center justify-end gap-4 z-10">
-                <button type="button" onClick={resetForm} className="px-6 py-2.5 text-sm font-medium text-white/50 hover:text-white transition-colors">Annuler</button>
+              <div className="fixed bottom-0 right-0 w-full max-w-4xl bg-white border-t border-[#DCE0E7] p-8 flex items-center justify-end gap-6 z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                <button type="button" onClick={resetForm} className="text-[#8EA4AF] text-[10px] font-bold uppercase tracking-[0.2em] hover:text-[#082634] transition-colors">Annuler</button>
                 <button
                   onClick={handleSubmit}
                   disabled={createArticle.isPending || updateArticle.isPending}
-                  className="bg-[#c9a84c] text-[#0e1327] px-10 py-2.5 rounded text-sm font-bold uppercase tracking-widest hover:bg-[#b8973b] transition-all disabled:opacity-50"
+                  className="bg-[#082634] text-[#D8C7A3] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all disabled:opacity-50 shadow-xl shadow-[#082634]/10"
                 >
-                  {createArticle.isPending || updateArticle.isPending ? "Enregistrement..." : "Enregistrer"}
+                  {createArticle.isPending || updateArticle.isPending ? "Enregistrement..." : "Enregistrer l'article"}
                 </button>
               </div>
             </div>
@@ -890,20 +988,32 @@ function ArticlesTab() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="grid grid-cols-1 gap-4">
         {articles.map((a) => (
-          <div key={a.id} className="bg-white/5 border border-white/10 p-4 flex items-center justify-between hover:border-white/20 transition-colors">
-            <div className="flex items-center gap-4">
-              {a.coverImageUrl && <img src={a.coverImageUrl} alt="" className="w-16 h-12 object-cover opacity-70" />}
+          <div key={a.id} className="group bg-white border border-[#DCE0E7] p-6 flex items-center justify-between hover:border-[#D8C7A3] hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-8">
+              <div className="relative w-32 h-20 overflow-hidden bg-[#F8F9FA]">
+                {a.coverImageUrl ? (
+                  <img src={a.coverImageUrl} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[#8EA4AF]/30">
+                    <ImageIcon size={20} />
+                  </div>
+                )}
+              </div>
               <div>
-                <div className="text-white font-medium">{a.title}</div>
-                <div className="text-white/40 text-sm">{a.category}</div>
+                <div className="flex items-center gap-3 mb-2">
+                  <Badge color={a.published ? "green" : "gray"}>{a.published ? "Publié" : "Brouillon"}</Badge>
+                  {a.category && <Badge color="blue">{a.category}</Badge>}
+                </div>
+                <h3 className="text-[#082634] font-serif text-lg font-light">{a.title}</h3>
+                <div className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">
+                  Par l'équipe Acharaf <span className="mx-2 opacity-30">·</span> {formatDate(a.createdAt)}
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Badge color={a.published ? "green" : "gray"}>{a.published ? "Publié" : "Brouillon"}</Badge>
-              <div className="text-white/30 text-xs">{formatDate(a.createdAt)}</div>
-              <button onClick={() => startEdit(a)} className="text-white/50 hover:text-white text-sm px-2 py-1 hover:bg-white/10 transition-colors">Modifier</button>
+            <div className="flex items-center gap-3">
+              <button onClick={() => startEdit(a)} className="bg-[#F8F9FA] text-[#082634] px-5 py-2.5 text-[10px] uppercase tracking-widest font-bold hover:bg-[#082634] hover:text-white transition-all">Modifier</button>
               <ConfirmButton onConfirm={async () => {
                 await deleteArticle.mutateAsync({ id: a.id });
                 qc.invalidateQueries({ queryKey: getListArticlesQueryKey() });
@@ -982,86 +1092,93 @@ function CareersTab() {
   const typeLabel = (t: string) => ({ "full-time": "CDI", "part-time": "Temps partiel", internship: "Stage", freelance: "Freelance" }[t] ?? t);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-serif text-white">Offres d'emploi <span className="text-white/30 text-lg ml-2">({careers.length})</span></h2>
+    <div className="space-y-10">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-serif text-[#082634] tracking-tight">Offres d'Emploi</h2>
+          <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Gérez vos opportunités de carrière</p>
+        </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-[#c9a84c] text-[#0e1327] px-4 py-2 text-sm font-semibold tracking-wider hover:bg-[#b8973b] transition-colors"
+          className="bg-[#082634] text-[#D8C7A3] px-8 py-3.5 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all flex items-center gap-2 shadow-lg shadow-[#082634]/10"
         >
-          + Ajouter
+          <Plus size={14} />
+          Nouvelle Offre
         </button>
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-end">
-          <div className="w-full max-w-3xl h-full bg-[#0a0f1e] border-l border-white/10 shadow-2xl overflow-y-auto">
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
+        <div className="fixed inset-0 bg-[#082634]/40 backdrop-blur-md z-[60] flex items-center justify-end">
+          <div className="w-full max-w-4xl h-full bg-white shadow-2xl overflow-y-auto">
+            <div className="p-12">
+              <div className="flex items-center justify-between mb-12 border-b border-[#DCE0E7] pb-8">
                 <div>
-                  <h2 className="text-2xl font-serif text-white">
-                    {editing !== null ? "Modifier l'offre" : "Nouvelle offre"}
+                  <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mb-2 font-medium">Gestion RH</p>
+                  <h2 className="text-3xl font-serif text-[#082634] font-light">
+                    {editing !== null ? "Modifier l'offre" : "Publier une nouvelle offre"}
                   </h2>
-                  <p className="text-sm text-white/40 mt-1">Gérez les opportunités de carrière au sein du groupe.</p>
                 </div>
-                <button onClick={resetForm} className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/40 hover:text-white">
-                  <X size={20} />
+                <button 
+                  onClick={resetForm} 
+                  className="p-3 hover:bg-[#F8F9FA] transition-colors text-[#8EA4AF] hover:text-[#082634]"
+                >
+                  <X size={24} strokeWidth={1.5} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-10 pb-24">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Titre du poste *</label>
+              <form onSubmit={handleSubmit} className="space-y-16 pb-32">
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Titre du poste *</label>
                       <input
                         required
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.title}
                         onChange={(e) => setForm({ ...form, title: e.target.value })}
                         placeholder="Ex: Architecte d'intérieur Senior"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Slug (URL) *</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Slug (URL) *</label>
                       <input
                         required
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.slug}
                         onChange={(e) => setForm({ ...form, slug: e.target.value })}
                         placeholder="architecte-interieur-senior"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Département *</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Département *</label>
                       <input
                         required
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.department}
                         onChange={(e) => setForm({ ...form, department: e.target.value })}
                         placeholder="Ex: Design & Architecture"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Ville</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Ville</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.location}
                         onChange={(e) => setForm({ ...form, location: e.target.value })}
                         placeholder="Ex: Casablanca"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Type de contrat</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Type de contrat</label>
                       <select
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none appearance-none"
                         value={form.type}
                         onChange={(e) => setForm({ ...form, type: e.target.value as any })}
                       >
-                        <option value="full-time" className="bg-[#0a0f1e]">CDI</option>
-                        <option value="part-time" className="bg-[#0a0f1e]">Temps partiel</option>
-                        <option value="internship" className="bg-[#0a0f1e]">Stage</option>
-                        <option value="freelance" className="bg-[#0a0f1e]">Freelance</option>
+                        <option value="full-time">CDI</option>
+                        <option value="part-time">Temps partiel</option>
+                        <option value="internship">Stage</option>
+                        <option value="freelance">Freelance</option>
                       </select>
                     </div>
                   </div>
@@ -1072,48 +1189,48 @@ function CareersTab() {
                     onChange={(url) => setForm({ ...form, coverImageUrl: url })} 
                   />
 
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Description du poste</label>
+                  <div className="space-y-3">
+                    <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Description du poste</label>
                     <textarea
-                      className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-64 resize-none"
+                      className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-64 resize-none"
                       value={form.description}
                       onChange={(e) => setForm({ ...form, description: e.target.value })}
                     />
                   </div>
 
-                  <div className="flex items-center gap-3 bg-white/5 p-4 rounded-lg border border-white/5">
+                  <div className="flex items-center gap-4 bg-[#F8F9FA] p-6 border border-[#DCE0E7]">
                     <input
                       type="checkbox"
                       id="active"
-                      className="w-4 h-4 text-[#c9a84c] bg-white/10 border-white/20 rounded focus:ring-[#c9a84c]"
+                      className="w-5 h-5 text-[#082634] border-[#DCE0E7] focus:ring-[#D8C7A3] cursor-pointer"
                       checked={form.active}
                       onChange={(e) => setForm({ ...form, active: e.target.checked })}
                     />
-                    <label htmlFor="active" className="text-sm font-medium text-white/70 select-none cursor-pointer">
+                    <label htmlFor="active" className="text-xs font-bold text-[#082634] uppercase tracking-widest select-none cursor-pointer">
                       Offre active (visible sur le site)
                     </label>
                   </div>
                 </div>
 
                 {/* SEO */}
-                <div className="space-y-6 pt-6 border-t border-white/5">
-                  <h3 className="text-xs font-bold text-white/80 uppercase tracking-widest flex items-center gap-2">
-                    <Search size={14} className="text-[#c9a84c]" />
-                    Optimisation SEO
-                  </h3>
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Méta Titre</label>
+                <div className="space-y-8 pb-12">
+                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
+                    <Search size={16} className="text-[#D8C7A3]" />
+                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Optimisation SEO</h3>
+                  </div>
+                  <div className="grid grid-cols-1 gap-8">
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Titre</label>
                       <input
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
                         value={form.metaTitle}
                         onChange={(e) => setForm({ ...form, metaTitle: e.target.value })}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest">Méta Description</label>
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Description</label>
                       <textarea
-                        className="w-full bg-white/5 border border-white/10 text-white px-4 py-2.5 rounded text-sm focus:border-[#c9a84c]/50 transition-all outline-none h-24 resize-none"
+                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none"
                         value={form.metaDescription}
                         onChange={(e) => setForm({ ...form, metaDescription: e.target.value })}
                       />
@@ -1122,14 +1239,14 @@ function CareersTab() {
                 </div>
               </form>
 
-              <div className="fixed bottom-0 right-0 w-full max-w-3xl bg-[#0a0f1e] border-t border-white/10 p-6 flex items-center justify-end gap-4 z-10">
-                <button type="button" onClick={resetForm} className="px-6 py-2.5 text-sm font-medium text-white/50 hover:text-white transition-colors">Annuler</button>
+              <div className="fixed bottom-0 right-0 w-full max-w-4xl bg-white border-t border-[#DCE0E7] p-8 flex items-center justify-end gap-6 z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                <button type="button" onClick={resetForm} className="text-[#8EA4AF] text-[10px] font-bold uppercase tracking-[0.2em] hover:text-[#082634] transition-colors">Annuler</button>
                 <button
                   onClick={handleSubmit}
                   disabled={createCareer.isPending || updateCareer.isPending}
-                  className="bg-[#c9a84c] text-[#0e1327] px-10 py-2.5 rounded text-sm font-bold uppercase tracking-widest hover:bg-[#b8973b] transition-all disabled:opacity-50"
+                  className="bg-[#082634] text-[#D8C7A3] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all disabled:opacity-50 shadow-xl shadow-[#082634]/10"
                 >
-                  {createCareer.isPending || updateCareer.isPending ? "Enregistrement..." : "Enregistrer"}
+                  {createCareer.isPending || updateCareer.isPending ? "Enregistrement..." : "Enregistrer l'offre"}
                 </button>
               </div>
             </div>
@@ -1137,26 +1254,44 @@ function CareersTab() {
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="grid grid-cols-1 gap-4">
         {careers.map((c) => (
-          <div key={c.id} className="bg-white/5 border border-white/10 p-4 flex items-center justify-between hover:border-white/20 transition-colors">
-            <div>
-              <div className="text-white font-medium">{c.title}</div>
-              <div className="text-white/40 text-sm">{c.department} · {c.location}</div>
+          <div key={c.id} className="bg-white border border-[#DCE0E7] p-6 flex items-center justify-between hover:border-[#D8C7A3] hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center gap-6">
+              <div className="w-12 h-12 bg-[#F8F9FA] flex items-center justify-center text-[#D8C7A3]">
+                <Briefcase size={20} strokeWidth={1.5} />
+              </div>
+              <div>
+                <div className="flex items-center gap-3 mb-1.5">
+                  <Badge color="blue">{typeLabel(c.type)}</Badge>
+                  <Badge color={c.active ? "green" : "gray"}>{c.active ? "Active" : "Brouillon"}</Badge>
+                </div>
+                <h3 className="text-[#082634] font-serif text-lg font-light">{c.title}</h3>
+                <div className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">
+                  {c.department} <span className="mx-2 opacity-30">·</span> {c.location}
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Badge color="blue">{typeLabel(c.type)}</Badge>
-              <Badge color={c.active ? "green" : "gray"}>{c.active ? "Active" : "Inactive"}</Badge>
-              <div className="text-white/30 text-xs">{formatDate(c.createdAt)}</div>
-              <button onClick={() => startEdit(c)} className="text-white/50 hover:text-white text-sm px-2 py-1 hover:bg-white/10 transition-colors">Modifier</button>
-              <ConfirmButton onConfirm={async () => {
-                await deleteCareer.mutateAsync({ id: c.id });
-                qc.invalidateQueries({ queryKey: getListCareersQueryKey() });
-              }} />
+            <div className="flex items-center gap-6">
+              <div className="text-right hidden md:block">
+                <div className="text-[#8EA4AF] text-[10px] uppercase tracking-widest mb-1 opacity-60">Publiée le</div>
+                <div className="text-[#082634] text-xs font-medium">{formatDate(c.createdAt)}</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={() => startEdit(c)} className="bg-[#F8F9FA] text-[#082634] px-5 py-2.5 text-[10px] uppercase tracking-widest font-bold hover:bg-[#082634] hover:text-white transition-all">Modifier</button>
+                <ConfirmButton onConfirm={async () => {
+                  await deleteCareer.mutateAsync({ id: c.id });
+                  qc.invalidateQueries({ queryKey: getListCareersQueryKey() });
+                }} />
+              </div>
             </div>
           </div>
         ))}
-        {careers.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucune offre.</p>}
+        {careers.length === 0 && (
+          <div className="py-20 text-center border-2 border-dashed border-[#DCE0E7] bg-white">
+            <p className="text-[#8EA4AF] text-sm font-light">Aucune offre d'emploi disponible.</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1169,38 +1304,63 @@ function ApplicationsTab() {
   const { data: applications = [] } = useListApplications();
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-serif text-white">Candidatures <span className="text-white/30 text-lg ml-2">({applications.length})</span></h2>
+    <div className="space-y-10">
+      <div>
+        <h2 className="text-xl font-serif text-[#082634] tracking-tight">Candidatures Reçues</h2>
+        <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Consultez les dossiers des candidats</p>
       </div>
-      <div className="space-y-2">
+
+      <div className="grid grid-cols-1 gap-4">
         {applications.map((a) => (
-          <div key={a.id} className="bg-white/5 border border-white/10 p-4 hover:border-white/20 transition-colors">
+          <div key={a.id} className="bg-white border border-[#DCE0E7] p-8 hover:border-[#D8C7A3] hover:shadow-xl transition-all duration-500">
             <div className="flex items-start justify-between">
-              <div>
-                <div className="text-white font-medium">{a.firstName} {a.lastName}</div>
-                <div className="text-[#c9a84c] text-sm">{a.email} {a.phone && `· ${a.phone}`}</div>
-                {a.career && <div className="text-white/50 text-sm mt-1">Poste: {a.career.title}</div>}
-                {a.message && <div className="text-white/40 text-sm mt-2 max-w-2xl">{a.message}</div>}
+              <div className="space-y-6">
+                <div>
+                  <div className="text-[#082634] font-serif text-2xl font-light">{a.firstName} {a.lastName}</div>
+                  <div className="text-[#D8C7A3] text-[10px] uppercase tracking-[0.2em] font-bold mt-1">
+                    {a.email} {a.phone && <span className="mx-2 opacity-30">·</span>} {a.phone}
+                  </div>
+                </div>
+
+                {a.career && (
+                  <div className="inline-flex items-center gap-2 bg-[#082634]/5 px-3 py-1.5 border border-[#082634]/10">
+                    <span className="text-[#8EA4AF] text-[9px] uppercase tracking-widest font-bold">Poste:</span>
+                    <span className="text-[#082634] text-xs font-medium">{a.career.title}</span>
+                  </div>
+                )}
+
+                {a.message && (
+                  <div className="text-[#3B5661] text-sm font-light leading-relaxed max-w-2xl italic border-l-2 border-[#D8C7A3]/30 pl-4">
+                    "{a.message}"
+                  </div>
+                )}
+
                 {a.cvUrl && (
-                  <div className="mt-4">
+                  <div className="pt-2">
                     <a 
                       href={a.cvUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded text-xs text-white/70 hover:bg-white/10 hover:text-white transition-all"
+                      className="inline-flex items-center gap-3 bg-[#082634] text-[#D8C7A3] px-6 py-3 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#0a3245] transition-all shadow-lg shadow-[#082634]/10"
                     >
-                      <Download size={14} className="text-[#c9a84c]" />
-                      Voir le CV (PDF)
+                      <Download size={14} />
+                      Télécharger le CV (PDF)
                     </a>
                   </div>
                 )}
               </div>
-              <div className="text-white/30 text-xs">{formatDate(a.createdAt)}</div>
+              <div className="text-right">
+                <div className="text-[#8EA4AF] text-[10px] uppercase tracking-widest mb-1 opacity-60">Candidature du</div>
+                <div className="text-[#082634] text-xs font-medium">{formatDate(a.createdAt)}</div>
+              </div>
             </div>
           </div>
         ))}
-        {applications.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucune candidature.</p>}
+        {applications.length === 0 && (
+          <div className="py-20 text-center border-2 border-dashed border-[#DCE0E7] bg-white">
+            <p className="text-[#8EA4AF] text-sm font-light">Aucune candidature reçue pour le moment.</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1213,22 +1373,23 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState<Tab>("projects");
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] flex">
+    <div className="min-h-screen bg-[#F8F9FA] flex font-sans">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#0e1327] border-r border-white/10 flex-shrink-0">
-        <div className="p-6 border-b border-white/10">
-          <div className="text-[#c9a84c] font-serif text-xl tracking-widest">GROUPE</div>
-          <div className="text-white font-serif text-xl tracking-widest">ACHARAF</div>
-          <div className="text-white/30 text-xs tracking-widest mt-1">BACK-OFFICE</div>
+      <aside className="w-72 bg-[#082634] flex-shrink-0 flex flex-col sticky top-0 h-screen">
+        <div className="p-10">
+          <div className="text-[#D8C7A3] font-serif text-2xl tracking-[0.15em] leading-none mb-1">GROUPE</div>
+          <div className="text-white font-serif text-2xl tracking-[0.15em] leading-none">ACHARAF</div>
+          <div className="text-[#8EA4AF] text-[10px] tracking-[0.3em] uppercase mt-4 font-medium opacity-60">Back-Office</div>
         </div>
-        <nav className="p-4 space-y-1">
+
+        <nav className="flex-1 px-6 space-y-2">
           {NAV_ITEMS.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full text-left px-4 py-3 text-sm tracking-wide transition-colors ${
+              className={`w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] transition-all duration-300 ${
                 activeTab === item.id
-                  ? "bg-[#c9a84c]/10 text-[#c9a84c] border-l-2 border-[#c9a84c]"
+                  ? "bg-[#D8C7A3] text-[#082634] font-semibold"
                   : "text-white/50 hover:text-white hover:bg-white/5"
               }`}
             >
@@ -1236,24 +1397,45 @@ export default function Admin() {
             </button>
           ))}
         </nav>
-        <div className="absolute bottom-6 left-0 w-64 px-6">
-          <a href="/" className="text-white/30 text-xs hover:text-white/60 transition-colors tracking-wide">
+
+        <div className="p-10">
+          <a 
+            href="/" 
+            className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] hover:text-[#D8C7A3] transition-colors"
+          >
             &larr; Retour au site
           </a>
         </div>
       </aside>
 
       {/* Main */}
-      <main className="flex-1 overflow-auto">
-        <header className="bg-[#0e1327] border-b border-white/10 px-8 py-4">
-          <h1 className="text-white/60 text-sm tracking-widest uppercase">{NAV_ITEMS.find((n) => n.id === activeTab)?.label}</h1>
+      <main className="flex-1 flex flex-col min-w-0">
+        <header className="bg-white border-b border-[#DCE0E7] px-12 py-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-[#082634] font-serif text-3xl font-light tracking-tight">
+              {NAV_ITEMS.find((n) => n.id === activeTab)?.label}
+            </h1>
+            <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-2">
+              Gestion de la plateforme
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <div className="text-[#082634] text-xs font-medium">Administrateur</div>
+              <div className="text-[#8EA4AF] text-[10px] uppercase tracking-wider">Accès Complet</div>
+            </div>
+            <div className="w-10 h-10 bg-[#082634] text-[#D8C7A3] flex items-center justify-center font-serif text-lg">
+              A
+            </div>
+          </div>
         </header>
-        <div className="p-8">
+
+        <div className="p-12 max-w-7xl">
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             {activeTab === "projects" && <ProjectsTab />}
             {activeTab === "leads" && <LeadsTab />}
