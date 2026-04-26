@@ -47,8 +47,8 @@ if (process.env.NODE_ENV === "production") {
     "public",
   );
   app.use(express.static(frontendDist));
-  // SPA fallback — send index.html for any non-API route
-  app.get("*", (_req, res) => {
+  // SPA fallback — send index.html for any non-API route (Express v5 syntax)
+  app.get(/.*/, (_req, res) => {
     res.sendFile(path.join(frontendDist, "index.html"));
   });
 }
