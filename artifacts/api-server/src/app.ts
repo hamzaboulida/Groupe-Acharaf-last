@@ -41,7 +41,6 @@ if (process.env.NODE_ENV === "production") {
     __dirname,
     "..",
     "..",
-    "..",
     "groupe-acharaf",
     "dist",
     "public",
