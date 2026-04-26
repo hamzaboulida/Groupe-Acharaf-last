@@ -10,9 +10,11 @@ interface CountUpProps {
 
 export function CountUp({ end, duration = 2, suffix = "", prefix = "" }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
+  // No margin offset — we just need the element to be visible
+  const inView = useInView(ref, { once: false });
+  const [hasAnimated, setHasAnimated] = useState(false);
   const [value, setValue] = useState("0");
-  
+
   const motionValue = useMotionValue(0);
   const springValue = useSpring(motionValue, {
     duration: duration * 1000,
@@ -20,10 +22,19 @@ export function CountUp({ end, duration = 2, suffix = "", prefix = "" }: CountUp
   });
 
   useEffect(() => {
-    if (inView) {
+    // Only animate once we have real data (end > 0) AND the element is in view
+    if (inView && end > 0 && !hasAnimated) {
+      motionValue.set(end);
+      setHasAnimated(true);
+    }
+  }, [inView, end, motionValue, hasAnimated]);
+
+  // If end changes after animation (shouldn't happen but just in case), re-animate
+  useEffect(() => {
+    if (hasAnimated && end > 0) {
       motionValue.set(end);
     }
-  }, [inView, end, motionValue]);
+  }, [end, hasAnimated, motionValue]);
 
   useEffect(() => {
     return springValue.on("change", (latest) => {
