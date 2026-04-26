@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useParams, Link } from "wouter";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useGetProject, useCreateLead } from "@workspace/api-client-react";
+import { useGetProject, useCreateLead, getGetProjectQueryKey } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
 import {
   MapPin, Ruler, Calendar, ChevronDown, ArrowRight, Phone,
@@ -205,7 +205,7 @@ export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const projectId = id ? Number(id) : 0;
 
-  const { data: project, isLoading } = useGetProject(projectId, { query: { enabled: !!projectId } });
+  const { data: project, isLoading } = useGetProject(projectId, { query: { queryKey: getGetProjectQueryKey(projectId), enabled: !!projectId } });
 
   const [activeImage, setActiveImage] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);

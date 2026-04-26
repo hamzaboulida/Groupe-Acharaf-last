@@ -25,7 +25,7 @@ router.get("/sitemap.xml", async (_req, res) => {
         .where(eq(articlesTable.published, true)),
     ]);
 
-    const staticUrls = [
+    const staticUrls: { loc: string; priority: string; changefreq: string; lastmod?: string }[] = [
       { loc: `${BASE_URL}/`, priority: "1.0", changefreq: "weekly" },
       { loc: `${BASE_URL}/a-propos`, priority: "0.8", changefreq: "monthly" },
       { loc: `${BASE_URL}/nos-marques`, priority: "0.9", changefreq: "monthly" },

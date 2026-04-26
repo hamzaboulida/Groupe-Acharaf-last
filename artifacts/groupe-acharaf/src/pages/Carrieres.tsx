@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { useListCareers, useApplyForCareer } from "@workspace/api-client-react";
+import { useListCareers, useApplyForCareer, Career } from "@workspace/api-client-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { MapPin, Briefcase } from "lucide-react";
@@ -28,7 +28,7 @@ function CareerCard({
   career,
   onApply,
 }: {
-  career: NonNullable<ReturnType<typeof useListCareers>["data"]>[0];
+  career: Career;
   onApply: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -99,7 +99,7 @@ function CareerCard({
                     Profil recherché
                   </h4>
                   <ul className="space-y-2">
-                    {career.requirements.map((r, i) => (
+                    {career.requirements.map((r: string, i: number) => (
                       <li
                         key={i}
                         className="flex items-start gap-3 text-[#3B5661] text-sm font-light"
