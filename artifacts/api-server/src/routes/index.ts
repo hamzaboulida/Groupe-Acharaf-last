@@ -8,6 +8,7 @@ import leadsRouter from "./leads";
 import subscribersRouter from "./subscribers";
 import statsRouter from "./stats";
 import seoRouter from "./seo";
+import uploadsRouter from "./uploads";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(careersRouter);
 router.use(leadsRouter);
 router.use(subscribersRouter);
 router.use(statsRouter);
+router.use(uploadsRouter);
 
 export default router;

@@ -122,12 +122,16 @@ router.get("/applications", async (_req, res): Promise<void> => {
       career: {
         id: careersTable.id,
         title: careersTable.title,
+        slug: careersTable.slug,
         department: careersTable.department,
         location: careersTable.location,
         type: careersTable.type,
         description: careersTable.description,
         requirements: careersTable.requirements,
+        coverImageUrl: careersTable.coverImageUrl,
         active: careersTable.active,
+        metaTitle: careersTable.metaTitle,
+        metaDescription: careersTable.metaDescription,
         createdAt: careersTable.createdAt,
       },
     })

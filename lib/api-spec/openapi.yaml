@@ -229,6 +229,31 @@ paths:
         "204":
           description: Deleted
 
+  /uploads:
+    post:
+      operationId: uploadFile
+      tags: [projects]
+      summary: Upload a file
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Upload success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+
   # ── Articles ─────────────────────────────────────────────────────────────
   /articles:
     get:
@@ -635,6 +660,44 @@ components:
           type: array
           items:
             type: string
+        tagline:
+          type: string
+          nullable: true
+        shortDescription:
+          type: string
+          nullable: true
+        storyTitle:
+          type: string
+          nullable: true
+        storyText:
+          type: string
+          nullable: true
+        lifestyleTitle:
+          type: string
+          nullable: true
+        lifestyleText:
+          type: string
+          nullable: true
+        locationAdvantages:
+          type: array
+          items:
+            type: string
+          nullable: true
+        mapLocation:
+          type: string
+          nullable: true
+        financingDetails:
+          type: string
+          nullable: true
+        ctaText:
+          type: string
+          nullable: true
+        seoTitle:
+          type: string
+          nullable: true
+        seoDescription:
+          type: string
+          nullable: true
         createdAt:
           type: string
           format: date-time
@@ -687,6 +750,32 @@ components:
           type: array
           items:
             type: string
+        tagline:
+          type: string
+        shortDescription:
+          type: string
+        storyTitle:
+          type: string
+        storyText:
+          type: string
+        lifestyleTitle:
+          type: string
+        lifestyleText:
+          type: string
+        locationAdvantages:
+          type: array
+          items:
+            type: string
+        mapLocation:
+          type: string
+        financingDetails:
+          type: string
+        ctaText:
+          type: string
+        seoTitle:
+          type: string
+        seoDescription:
+          type: string
       required:
         - brandId
         - title
@@ -767,7 +856,7 @@ components:
       properties:
         id:
           type: integer
-        title:
+        slug:
           type: string
         department:
           type: string
@@ -782,14 +871,21 @@ components:
           type: array
           items:
             type: string
+        coverImageUrl:
+          type: string
         active:
           type: boolean
+        metaTitle:
+          type: string
+        metaDescription:
+          type: string
         createdAt:
           type: string
           format: date-time
       required:
         - id
         - title
+        - slug
         - department
         - type
         - active
@@ -800,6 +896,8 @@ components:
       properties:
         title:
           type: string
+        slug:
+          type: string
         department:
           type: string
         location:
@@ -813,10 +911,17 @@ components:
           type: array
           items:
             type: string
+        coverImageUrl:
+          type: string
         active:
           type: boolean
+        metaTitle:
+          type: string
+        metaDescription:
+          type: string
       required:
         - title
+        - slug
         - department
         - type
 

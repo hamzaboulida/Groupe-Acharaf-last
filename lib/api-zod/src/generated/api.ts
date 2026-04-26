@@ -144,6 +144,18 @@ export const ListProjectsResponseItem = zod.object({
   coverImageUrl: zod.string().optional(),
   images: zod.array(zod.string()).optional(),
   amenities: zod.array(zod.string()).optional(),
+  tagline: zod.string().nullish(),
+  shortDescription: zod.string().nullish(),
+  storyTitle: zod.string().nullish(),
+  storyText: zod.string().nullish(),
+  lifestyleTitle: zod.string().nullish(),
+  lifestyleText: zod.string().nullish(),
+  locationAdvantages: zod.array(zod.string()).nullish(),
+  mapLocation: zod.string().nullish(),
+  financingDetails: zod.string().nullish(),
+  ctaText: zod.string().nullish(),
+  seoTitle: zod.string().nullish(),
+  seoDescription: zod.string().nullish(),
   createdAt: zod.coerce.date(),
 });
 export const ListProjectsResponse = zod.array(ListProjectsResponseItem);
@@ -168,6 +180,18 @@ export const CreateProjectBody = zod.object({
   coverImageUrl: zod.string().optional(),
   images: zod.array(zod.string()).optional(),
   amenities: zod.array(zod.string()).optional(),
+  tagline: zod.string().optional(),
+  shortDescription: zod.string().optional(),
+  storyTitle: zod.string().optional(),
+  storyText: zod.string().optional(),
+  lifestyleTitle: zod.string().optional(),
+  lifestyleText: zod.string().optional(),
+  locationAdvantages: zod.array(zod.string()).optional(),
+  mapLocation: zod.string().optional(),
+  financingDetails: zod.string().optional(),
+  ctaText: zod.string().optional(),
+  seoTitle: zod.string().optional(),
+  seoDescription: zod.string().optional(),
 });
 
 /**
@@ -209,6 +233,18 @@ export const GetProjectResponse = zod.object({
   coverImageUrl: zod.string().optional(),
   images: zod.array(zod.string()).optional(),
   amenities: zod.array(zod.string()).optional(),
+  tagline: zod.string().nullish(),
+  shortDescription: zod.string().nullish(),
+  storyTitle: zod.string().nullish(),
+  storyText: zod.string().nullish(),
+  lifestyleTitle: zod.string().nullish(),
+  lifestyleText: zod.string().nullish(),
+  locationAdvantages: zod.array(zod.string()).nullish(),
+  mapLocation: zod.string().nullish(),
+  financingDetails: zod.string().nullish(),
+  ctaText: zod.string().nullish(),
+  seoTitle: zod.string().nullish(),
+  seoDescription: zod.string().nullish(),
   createdAt: zod.coerce.date(),
 });
 
@@ -236,6 +272,18 @@ export const UpdateProjectBody = zod.object({
   coverImageUrl: zod.string().optional(),
   images: zod.array(zod.string()).optional(),
   amenities: zod.array(zod.string()).optional(),
+  tagline: zod.string().optional(),
+  shortDescription: zod.string().optional(),
+  storyTitle: zod.string().optional(),
+  storyText: zod.string().optional(),
+  lifestyleTitle: zod.string().optional(),
+  lifestyleText: zod.string().optional(),
+  locationAdvantages: zod.array(zod.string()).optional(),
+  mapLocation: zod.string().optional(),
+  financingDetails: zod.string().optional(),
+  ctaText: zod.string().optional(),
+  seoTitle: zod.string().optional(),
+  seoDescription: zod.string().optional(),
 });
 
 export const UpdateProjectResponse = zod.object({
@@ -270,6 +318,18 @@ export const UpdateProjectResponse = zod.object({
   coverImageUrl: zod.string().optional(),
   images: zod.array(zod.string()).optional(),
   amenities: zod.array(zod.string()).optional(),
+  tagline: zod.string().nullish(),
+  shortDescription: zod.string().nullish(),
+  storyTitle: zod.string().nullish(),
+  storyText: zod.string().nullish(),
+  lifestyleTitle: zod.string().nullish(),
+  lifestyleText: zod.string().nullish(),
+  locationAdvantages: zod.array(zod.string()).nullish(),
+  mapLocation: zod.string().nullish(),
+  financingDetails: zod.string().nullish(),
+  ctaText: zod.string().nullish(),
+  seoTitle: zod.string().nullish(),
+  seoDescription: zod.string().nullish(),
   createdAt: zod.coerce.date(),
 });
 
@@ -278,6 +338,17 @@ export const UpdateProjectResponse = zod.object({
  */
 export const DeleteProjectParams = zod.object({
   id: zod.coerce.number(),
+});
+
+/**
+ * @summary Upload a file
+ */
+export const UploadFileBody = zod.object({
+  file: zod.instanceof(File).optional(),
+});
+
+export const UploadFileResponse = zod.object({
+  url: zod.string().optional(),
 });
 
 /**
@@ -395,13 +466,16 @@ export const ListCareersQueryParams = zod.object({
 
 export const ListCareersResponseItem = zod.object({
   id: zod.number(),
-  title: zod.string(),
+  slug: zod.string(),
   department: zod.string(),
   location: zod.string().optional(),
   type: zod.enum(["full-time", "part-time", "internship", "freelance"]),
   description: zod.string().optional(),
   requirements: zod.array(zod.string()).optional(),
+  coverImageUrl: zod.string().optional(),
   active: zod.boolean(),
+  metaTitle: zod.string().optional(),
+  metaDescription: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });
 export const ListCareersResponse = zod.array(ListCareersResponseItem);
@@ -411,12 +485,16 @@ export const ListCareersResponse = zod.array(ListCareersResponseItem);
  */
 export const CreateCareerBody = zod.object({
   title: zod.string(),
+  slug: zod.string(),
   department: zod.string(),
   location: zod.string().optional(),
   type: zod.enum(["full-time", "part-time", "internship", "freelance"]),
   description: zod.string().optional(),
   requirements: zod.array(zod.string()).optional(),
+  coverImageUrl: zod.string().optional(),
   active: zod.boolean().optional(),
+  metaTitle: zod.string().optional(),
+  metaDescription: zod.string().optional(),
 });
 
 /**
@@ -428,13 +506,16 @@ export const GetCareerParams = zod.object({
 
 export const GetCareerResponse = zod.object({
   id: zod.number(),
-  title: zod.string(),
+  slug: zod.string(),
   department: zod.string(),
   location: zod.string().optional(),
   type: zod.enum(["full-time", "part-time", "internship", "freelance"]),
   description: zod.string().optional(),
   requirements: zod.array(zod.string()).optional(),
+  coverImageUrl: zod.string().optional(),
   active: zod.boolean(),
+  metaTitle: zod.string().optional(),
+  metaDescription: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });
 
@@ -447,23 +528,30 @@ export const UpdateCareerParams = zod.object({
 
 export const UpdateCareerBody = zod.object({
   title: zod.string(),
+  slug: zod.string(),
   department: zod.string(),
   location: zod.string().optional(),
   type: zod.enum(["full-time", "part-time", "internship", "freelance"]),
   description: zod.string().optional(),
   requirements: zod.array(zod.string()).optional(),
+  coverImageUrl: zod.string().optional(),
   active: zod.boolean().optional(),
+  metaTitle: zod.string().optional(),
+  metaDescription: zod.string().optional(),
 });
 
 export const UpdateCareerResponse = zod.object({
   id: zod.number(),
-  title: zod.string(),
+  slug: zod.string(),
   department: zod.string(),
   location: zod.string().optional(),
   type: zod.enum(["full-time", "part-time", "internship", "freelance"]),
   description: zod.string().optional(),
   requirements: zod.array(zod.string()).optional(),
+  coverImageUrl: zod.string().optional(),
   active: zod.boolean(),
+  metaTitle: zod.string().optional(),
+  metaDescription: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });
 
@@ -498,13 +586,16 @@ export const ListApplicationsResponseItem = zod.object({
   career: zod
     .object({
       id: zod.number(),
-      title: zod.string(),
+      slug: zod.string(),
       department: zod.string(),
       location: zod.string().optional(),
       type: zod.enum(["full-time", "part-time", "internship", "freelance"]),
       description: zod.string().optional(),
       requirements: zod.array(zod.string()).optional(),
+      coverImageUrl: zod.string().optional(),
       active: zod.boolean(),
+      metaTitle: zod.string().optional(),
+      metaDescription: zod.string().optional(),
       createdAt: zod.coerce.date(),
     })
     .optional(),
@@ -529,7 +620,6 @@ export const ListLeadsResponseItem = zod.object({
   subject: zod.string().optional(),
   message: zod.string().optional(),
   projectInterest: zod.string().optional(),
-  source: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });
 export const ListLeadsResponse = zod.array(ListLeadsResponseItem);
@@ -545,7 +635,6 @@ export const CreateLeadBody = zod.object({
   subject: zod.string().optional(),
   message: zod.string().optional(),
   projectInterest: zod.string().optional(),
-  source: zod.string().optional(),
 });
 
 /**

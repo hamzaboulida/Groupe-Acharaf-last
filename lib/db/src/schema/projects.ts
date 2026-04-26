@@ -19,6 +19,23 @@ export const projectsTable = pgTable("projects", {
   featured: boolean("featured").notNull().default(false),
   coverImageUrl: text("cover_image_url"),
   images: text("images").array(),
+  
+  // New details fields
+  tagline: text("tagline"),
+  shortDescription: text("short_description"),
+  storyTitle: text("story_title"),
+  storyText: text("story_text"),
+  lifestyleTitle: text("lifestyle_title"),
+  lifestyleText: text("lifestyle_text"),
+  locationAdvantages: text("location_advantages").array(),
+  mapLocation: text("map_location"),
+  financingDetails: text("financing_details"),
+  ctaText: text("cta_text"),
+  
+  // SEO
+  seoTitle: text("seo_title"),
+  seoDescription: text("seo_description"),
+
   amenities: text("amenities").array(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

@@ -77,6 +77,18 @@ export interface Project {
   coverImageUrl?: string;
   images?: string[];
   amenities?: string[];
+  tagline?: string | null;
+  shortDescription?: string | null;
+  storyTitle?: string | null;
+  storyText?: string | null;
+  lifestyleTitle?: string | null;
+  lifestyleText?: string | null;
+  locationAdvantages?: string[] | null;
+  mapLocation?: string | null;
+  financingDetails?: string | null;
+  ctaText?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
   createdAt: string;
 }
 
@@ -106,6 +118,18 @@ export interface CreateProjectBody {
   coverImageUrl?: string;
   images?: string[];
   amenities?: string[];
+  tagline?: string;
+  shortDescription?: string;
+  storyTitle?: string;
+  storyText?: string;
+  lifestyleTitle?: string;
+  lifestyleText?: string;
+  locationAdvantages?: string[];
+  mapLocation?: string;
+  financingDetails?: string;
+  ctaText?: string;
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 export interface Article {
@@ -148,13 +172,16 @@ export const CareerType = {
 
 export interface Career {
   id: number;
-  title: string;
+  slug: string;
   department: string;
   location?: string;
   type: CareerType;
   description?: string;
   requirements?: string[];
+  coverImageUrl?: string;
   active: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
   createdAt: string;
 }
 
@@ -170,12 +197,16 @@ export const CreateCareerBodyType = {
 
 export interface CreateCareerBody {
   title: string;
+  slug: string;
   department: string;
   location?: string;
   type: CreateCareerBodyType;
   description?: string;
   requirements?: string[];
+  coverImageUrl?: string;
   active?: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 export interface Application {
@@ -207,7 +238,6 @@ export interface Lead {
   subject?: string;
   message?: string;
   projectInterest?: string;
-  source?: string;
   createdAt: string;
 }
 
@@ -219,17 +249,6 @@ export interface CreateLeadBody {
   subject?: string;
   message?: string;
   projectInterest?: string;
-  source?: string;
-}
-
-export interface Subscriber {
-  id: number;
-  email: string;
-  createdAt: string;
-}
-
-export interface CreateSubscriberBody {
-  email: string;
 }
 
 export interface Stats {
@@ -255,6 +274,14 @@ export const ListProjectsStatus = {
   ongoing: "ongoing",
   completed: "completed",
 } as const;
+
+export type UploadFileBody = {
+  file?: Blob;
+};
+
+export type UploadFile200 = {
+  url?: string;
+};
 
 export type ListArticlesParams = {
   published?: boolean;

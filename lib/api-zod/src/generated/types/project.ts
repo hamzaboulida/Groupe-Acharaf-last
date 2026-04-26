@@ -27,5 +27,17 @@ export interface Project {
   coverImageUrl?: string;
   images?: string[];
   amenities?: string[];
+  tagline?: string | null;
+  shortDescription?: string | null;
+  storyTitle?: string | null;
+  storyText?: string | null;
+  lifestyleTitle?: string | null;
+  lifestyleText?: string | null;
+  locationAdvantages?: string[] | null;
+  mapLocation?: string | null;
+  financingDetails?: string | null;
+  ctaText?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
   createdAt: Date;
 }

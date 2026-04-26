@@ -35,6 +35,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
+// Serve uploads locally (dev)
+const localUploads = path.resolve(__dirname, "..", "..", "public", "uploads");
+app.use("/uploads", express.static(localUploads));
+
 // Serve the Vite-built frontend in production
 if (process.env.NODE_ENV === "production") {
   const frontendDist = path.resolve(

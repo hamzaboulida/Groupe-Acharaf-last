@@ -224,7 +224,16 @@ export default function ProjectDetail() {
   /* SEO */
   useEffect(() => {
     if (project) {
-      document.title = `${project.title} | Immobilier à ${project.city ?? project.location} | Groupe Acharaf`;
+      document.title = project.seoTitle || `${project.title} | Immobilier à ${project.city ?? project.location} | Groupe Acharaf`;
+      if (project.seoDescription) {
+        let meta = document.querySelector('meta[name="description"]');
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('name', 'description');
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', project.seoDescription);
+      }
     }
   }, [project]);
 
@@ -304,10 +313,10 @@ export default function ProjectDetail() {
               {project?.title ?? "Projet d'exception"}
             </h1>
 
-            {/* Tagline from brand */}
-            {project?.brand?.tagline && (
+            {/* Tagline */}
+            {(project?.tagline || project?.brand?.tagline) && (
               <p className="text-white/45 font-light text-base md:text-lg mb-3 max-w-lg italic font-serif">
-                "{project.brand.tagline}"
+                "{project?.tagline || project?.brand?.tagline}"
               </p>
             )}
 
@@ -328,7 +337,7 @@ export default function ProjectDetail() {
                 }}
                 className="btn-outline-light group"
               >
-                Découvrir le projet
+                {project?.ctaText || "Découvrir le projet"}
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </button>
               <a
@@ -450,10 +459,10 @@ export default function ProjectDetail() {
               <div>
                 <p className="text-[#5C7480] text-xs tracking-[0.22em] uppercase mb-6">Le projet</p>
                 <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634] mb-8 leading-tight">
-                  {project.title}
+                  {project.storyTitle || project.title}
                 </h2>
                 <p className="text-[#3B5661] font-light leading-[1.9] text-base mb-8">
-                  {project.description}
+                  {project.storyText || project.description}
                 </p>
                 {/* Micro-stats */}
                 <div className="flex gap-8 pt-6 border-t border-[#DCE0E7]">
@@ -629,10 +638,10 @@ export default function ProjectDetail() {
         >
           <p className="text-[#8EA4AF] text-xs tracking-[0.25em] uppercase mb-6 opacity-80">Art de vivre</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white leading-tight mb-6">
-            Un cadre de vie pensé<br />pour l'essentiel
+            {project?.lifestyleTitle || "Un cadre de vie pensé pour l'essentiel"}
           </h2>
           <p className="text-white/45 font-light leading-[1.9] text-base mb-10 max-w-lg">
-            {project?.brand?.description ??
+            {project?.lifestyleText || project?.brand?.description ||
               "Chaque espace a été conçu pour offrir le meilleur équilibre entre confort, élégance et fonctionnalité — une vision de l'habitat qui transcende l'ordinaire."}
           </p>
           <a
@@ -670,16 +679,15 @@ export default function ProjectDetail() {
                   {project.city ? `, ${project.city}` : ""}
                 </h2>
                 <p className="text-[#3B5661] font-light leading-[1.9] text-sm mb-10">
-                  Un emplacement stratégique offrant un accès privilégié aux principaux axes de la ville,
-                  aux établissements scolaires, aux centres commerciaux et aux zones d'activité.
+                  {project.mapLocation || "Un emplacement stratégique offrant un accès privilégié aux principaux axes de la ville, aux établissements scolaires, aux centres commerciaux et aux zones d'activité."}
                 </p>
                 <div className="grid grid-cols-2 gap-4">
-                  {[
+                  {(project.locationAdvantages && project.locationAdvantages.length > 0 ? project.locationAdvantages : [
                     "Écoles à proximité",
                     "Accès autoroute rapide",
                     "Commerces & services",
                     "Transports en commun",
-                  ].map((item) => (
+                  ]).map((item) => (
                     <div key={item} className="flex items-center gap-3">
                       <div className="w-1.5 h-1.5 bg-[#8EA4AF] rounded-full shrink-0" />
                       <span className="text-[#3B5661] font-light text-sm">{item}</span>
@@ -726,7 +734,7 @@ export default function ProjectDetail() {
               </p>
             )}
             <p className="text-white/50 text-xs font-light max-w-xs mx-auto leading-relaxed mb-10">
-              Financement disponible. Contactez-nous pour connaître les conditions et disponibilités actuelles.
+              {project?.financingDetails || "Financement disponible. Contactez-nous pour connaître les conditions et disponibilités actuelles."}
             </p>
             <div className="flex justify-center">
               <a

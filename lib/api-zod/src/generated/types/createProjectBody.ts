@@ -24,4 +24,16 @@ export interface CreateProjectBody {
   coverImageUrl?: string;
   images?: string[];
   amenities?: string[];
+  tagline?: string;
+  shortDescription?: string;
+  storyTitle?: string;
+  storyText?: string;
+  lifestyleTitle?: string;
+  lifestyleText?: string;
+  locationAdvantages?: string[];
+  mapLocation?: string;
+  financingDetails?: string;
+  ctaText?: string;
+  seoTitle?: string;
+  seoDescription?: string;
 }

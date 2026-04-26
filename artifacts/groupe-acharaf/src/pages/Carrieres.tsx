@@ -271,13 +271,24 @@ export default function Carrieres() {
     title: string;
   } | null>(null);
 
+  /* SEO & Page State */
+  React.useEffect(() => {
+    document.title = "Carrières | Rejoignez le Groupe Acharaf";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute("content", "Découvrez nos opportunités de carrière et rejoignez une équipe passionnée par l'immobilier d'exception au Maroc.");
+    }
+  }, []);
+
+  const pageHeaderImage = careers.find(c => c.coverImageUrl)?.coverImageUrl || heroBg;
+
   return (
     <Layout>
       {/* ── Hero ── */}
       <section className="relative h-[65vh] w-full flex items-end pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src={heroBg}
+            src={pageHeaderImage}
             alt=""
             className="w-full h-full object-cover scale-105 brightness-[0.72]"
           />

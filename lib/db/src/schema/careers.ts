@@ -5,12 +5,16 @@ import { z } from "zod/v4";
 export const careersTable = pgTable("careers", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
   department: text("department").notNull(),
   location: text("location"),
   type: text("type").notNull().default("full-time"),
   description: text("description"),
   requirements: text("requirements").array(),
+  coverImageUrl: text("cover_image_url"),
   active: boolean("active").notNull().default(true),
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
