@@ -126,109 +126,133 @@ export default function NosProjets() {
                 transition={{ duration: 0.4 }}
               >
                 {/* Featured — Full width, landscape on desktop / portrait on mobile */}
-                {featuredProject && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, ease: EC }}
-                    className="mb-16 md:mb-24 group cursor-pointer"
-                  >
-                    <Link href={`/nos-projets/${featuredProject.id}`}>
-                      {/* Image — taller on mobile so title fits comfortably */}
-                      <div className="relative w-full aspect-[4/3] md:aspect-[21/8] overflow-hidden bg-[#8EA4AF]/10">
-                        {featuredProject.coverImageUrl && (
-                          <motion.img
-                            src={featuredProject.coverImageUrl}
-                            alt={featuredProject.title}
-                            className="w-full h-full object-cover"
-                            whileHover={{ scale: 1.04 }}
-                            transition={{ duration: 1.4, ease: EC }}
-                          />
-                        )}
-                        {/* Strong bottom scrim so text is always readable */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-1000" />
+                {featuredProject && (() => {
+                  const isOngoing = featuredProject.status === "ongoing";
+                  const CardWrapper = isOngoing ? Link : "div";
+                  const wrapperProps = isOngoing ? { href: `/nos-projets/${featuredProject.id}` } : {};
 
-                        {/* Badges — top left */}
-                        <div className="absolute top-4 left-4 flex gap-2">
-                          <span className="px-3 py-1 bg-white/85 backdrop-blur-sm border border-white/50 text-[#082634] text-[10px] tracking-[0.15em] uppercase">
-                            {featuredProject.brand?.name || "Projet"}
-                          </span>
-                          <span className="px-3 py-1 bg-[#8EA4AF] text-[#082634] text-[10px] tracking-[0.15em] uppercase font-medium">
-                            {STATUS_LABELS[featuredProject.status ?? ""] ?? featuredProject.status}
-                          </span>
-                        </div>
-
-                        {/* Title + CTA — pinned to bottom */}
-                        <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 flex items-end justify-between gap-4">
-                          <div className="min-w-0">
-                            <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-serif text-white font-light leading-tight mb-1 line-clamp-2">
-                              {featuredProject.title}
-                            </h2>
-                            <p className="text-white/70 tracking-[0.14em] uppercase text-[10px] flex items-center gap-1.5">
-                              <MapPin size={10} className="text-[#8EA4AF] shrink-0" />
-                              <span className="truncate">{featuredProject.location}</span>
-                            </p>
-                          </div>
-                          <div className="shrink-0 w-10 h-10 md:w-14 md:h-14 border border-white/25 flex items-center justify-center text-white backdrop-blur-sm group-hover:bg-[#8EA4AF] group-hover:border-[#8EA4AF] group-hover:text-[#082634] transition-all duration-500">
-                            <ArrowRight size={16} className="-rotate-45 group-hover:rotate-0 transition-transform duration-500" />
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                )}
-
-                {/* Staggered grid — 2 cols on mobile, offset stagger on md+ */}
-                <div className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-16 lg:gap-24">
-                  {galleryProjects.map((project, index) => (
+                  return (
                     <motion.div
-                      key={project.id}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-60px" }}
-                      transition={{ duration: 0.9, delay: index * 0.07, ease: EC }}
-                      className={`group cursor-pointer ${index % 2 !== 0 ? "md:mt-24" : ""}`}
+                      initial={{ opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 1, ease: EC }}
+                      className={`mb-16 md:mb-24 group ${isOngoing ? "cursor-pointer" : "cursor-default"}`}
                     >
-                      <Link href={`/nos-projets/${project.id}`}>
-                        {/* Image */}
-                        <div className="relative overflow-hidden aspect-[3/4] mb-3 md:mb-6 bg-[#8EA4AF]/10">
-                          {project.coverImageUrl && (
+                      <CardWrapper {...(wrapperProps as any)}>
+                        {/* Image — taller on mobile so title fits comfortably */}
+                        <div className="relative w-full aspect-[4/3] md:aspect-[21/8] overflow-hidden bg-[#8EA4AF]/10">
+                          {featuredProject.coverImageUrl && (
                             <motion.img
-                              src={project.coverImageUrl}
-                              alt={project.title}
+                              src={featuredProject.coverImageUrl}
+                              alt={featuredProject.title}
                               className="w-full h-full object-cover"
-                              whileHover={{ scale: 1.06 }}
-                              transition={{ duration: 1.2, ease: EC }}
+                              whileHover={isOngoing ? { scale: 1.04 } : {}}
+                              transition={{ duration: 1.4, ease: EC }}
                             />
                           )}
-                          <div className="absolute inset-0 bg-black/8 group-hover:bg-transparent transition-colors duration-700" />
-                          {/* Brand badge */}
-                          <div className="absolute top-3 left-3">
-                            <span className="px-2 py-1 bg-white/85 backdrop-blur-sm border border-white/50 text-[#082634] text-[9px] tracking-[0.12em] uppercase">
-                              {project.brand?.name}
+                          {/* Strong bottom scrim so text is always readable */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                          <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-1000" />
+
+                          {/* Badges — top left */}
+                          <div className="absolute top-4 left-4 flex gap-2">
+                            <span className="px-3 py-1 bg-white/85 backdrop-blur-sm border border-white/50 text-[#082634] text-[10px] tracking-[0.15em] uppercase">
+                              {featuredProject.brand?.name || "Projet"}
+                            </span>
+                            <span className="px-3 py-1 bg-[#8EA4AF] text-[#082634] text-[10px] tracking-[0.15em] uppercase font-medium">
+                              {STATUS_LABELS[featuredProject.status ?? ""] ?? featuredProject.status}
                             </span>
                           </div>
-                        </div>
 
-                        {/* Meta */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <h3 className="text-sm md:text-xl font-serif text-[#082634] font-light leading-snug group-hover:text-[#8EA4AF] transition-colors duration-500 mb-1">
-                              {project.title}
-                            </h3>
-                            <p className="text-[#5C7480] tracking-[0.1em] uppercase text-[9px] md:text-xs flex items-center gap-1">
-                              <MapPin size={9} className="text-[#8EA4AF] shrink-0" />
-                              <span className="truncate">{project.location}</span>
-                            </p>
-                          </div>
-                          <div className="shrink-0 w-7 h-7 md:w-9 md:h-9 border border-[#8EA4AF]/25 flex items-center justify-center text-[#5C7480] group-hover:bg-[#8EA4AF] group-hover:border-[#8EA4AF] group-hover:text-[#082634] transition-all duration-500">
-                            <ArrowRight size={11} className="-rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+                          {/* Title + CTA — pinned to bottom */}
+                          <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 flex items-end justify-between gap-4">
+                            <div className="min-w-0">
+                              <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-serif text-white font-light leading-tight mb-1 line-clamp-2">
+                                {featuredProject.title}
+                              </h2>
+                              <p className="text-white/70 tracking-[0.14em] uppercase text-[10px] flex items-center gap-1.5">
+                                <MapPin size={10} className="text-[#8EA4AF] shrink-0" />
+                                <span className="truncate">{featuredProject.location}</span>
+                              </p>
+                            </div>
+                            
+                            {/* CTA — only for ongoing */}
+                            {isOngoing && (
+                              <div className="shrink-0 w-10 h-10 md:w-14 md:h-14 border border-white/25 flex items-center justify-center text-white backdrop-blur-sm group-hover:bg-[#8EA4AF] group-hover:border-[#8EA4AF] group-hover:text-[#082634] transition-all duration-500">
+                                <ArrowRight size={16} className="-rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+                              </div>
+                            )}
                           </div>
                         </div>
-                      </Link>
+                      </CardWrapper>
                     </motion.div>
-                  ))}
+                  );
+                })()}
+
+                {/* Gallery grid — 1 col on mobile, 2 cols on md+ */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-24">
+                  {galleryProjects.map((project, index) => {
+                    const isOngoing = project.status === "ongoing";
+                    const CardWrapper = isOngoing ? Link : "div";
+                    const wrapperProps = isOngoing ? { href: `/nos-projets/${project.id}` } : {};
+
+                    return (
+                      <motion.div
+                        key={project.id}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-60px" }}
+                        transition={{ duration: 0.9, delay: index * 0.07, ease: EC }}
+                        className={`group ${isOngoing ? "cursor-pointer" : "cursor-default"} ${index % 2 !== 0 ? "md:mt-24" : ""}`}
+                      >
+                        <CardWrapper {...(wrapperProps as any)}>
+                          {/* Image */}
+                          <div className="relative overflow-hidden aspect-[3/4] mb-3 md:mb-6 bg-[#8EA4AF]/10">
+                            {project.coverImageUrl && (
+                              <motion.img
+                                src={project.coverImageUrl}
+                                alt={project.title}
+                                className="w-full h-full object-cover"
+                                whileHover={isOngoing ? { scale: 1.06 } : {}}
+                                transition={{ duration: 1.2, ease: EC }}
+                              />
+                            )}
+                            <div className="absolute inset-0 bg-black/8 group-hover:bg-transparent transition-colors duration-700" />
+                            
+                            {/* Badges — top left */}
+                            <div className="absolute top-3 left-3 flex gap-2">
+                              <span className="px-2 py-1 bg-white/85 backdrop-blur-sm border border-white/50 text-[#082634] text-[9px] tracking-[0.12em] uppercase">
+                                {project.brand?.name || "Projet"}
+                              </span>
+                              <span className="px-2 py-1 bg-[#8EA4AF] text-[#082634] text-[9px] tracking-[0.12em] uppercase font-medium">
+                                {STATUS_LABELS[project.status ?? ""] ?? project.status}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Meta */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <h3 className={`text-xl md:text-2xl font-serif text-[#082634] font-light leading-snug transition-colors duration-500 mb-1 ${isOngoing ? "group-hover:text-[#8EA4AF]" : ""}`}>
+                                {project.title}
+                              </h3>
+                              <p className="text-[#5C7480] tracking-[0.12em] uppercase text-[10px] md:text-xs flex items-center gap-1">
+                                <MapPin size={9} className="text-[#8EA4AF] shrink-0" />
+                                <span className="truncate">{project.location}</span>
+                              </p>
+                            </div>
+                            
+                            {/* CTA — only for ongoing */}
+                            {isOngoing && (
+                              <div className="shrink-0 w-9 h-9 border border-[#8EA4AF]/25 flex items-center justify-center text-[#5C7480] group-hover:bg-[#8EA4AF] group-hover:border-[#8EA4AF] group-hover:text-[#082634] transition-all duration-500">
+                                <ArrowRight size={14} className="-rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+                              </div>
+                            )}
+                          </div>
+                        </CardWrapper>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </motion.div>
             </AnimatePresence>
