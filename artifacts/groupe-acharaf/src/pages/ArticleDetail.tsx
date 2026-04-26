@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useParams, Link } from "wouter";
-import { useGetArticle } from "@workspace/api-client-react";
+import { useGetArticle, getGetArticleQueryKey } from "@workspace/api-client-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { motion } from "framer-motion";
@@ -14,7 +14,7 @@ export default function ArticleDetail() {
   const articleId = id ? Number(id) : 0;
 
   const { data: article, isLoading, isError } = useGetArticle(articleId, {
-    query: { enabled: !!articleId },
+    query: { queryKey: getGetArticleQueryKey(articleId), enabled: !!articleId },
   });
 
   /* SEO */

@@ -11,7 +11,7 @@ import heroBg from "@/assets/hero-bg.png";
 const EC = [0.22, 1, 0.36, 1] as const;
 
 export default function Actualites() {
-  const { data: articles = [], isLoading } = useListArticles({ params: { published: true } });
+  const { data: articles = [], isLoading } = useListArticles({ published: true });
   const [activeCategory, setActiveCategory] = useState("Tous");
 
   /* Derive categories dynamically from articles */

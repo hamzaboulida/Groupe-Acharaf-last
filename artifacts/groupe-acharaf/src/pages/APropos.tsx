@@ -7,11 +7,12 @@ import { Link } from "wouter";
 import { ArrowRight, Trophy, Target, Users } from "lucide-react";
 import heroBg from "@/assets/hero-bg.png";
 
-const fade = (delay = 0) => ({
+const EC_EASE = [0.22, 1, 0.36, 1] as const;
+const fade = (delay = 0, duration = 1) => ({
   initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-80px" },
-  transition: { duration: 1, delay, ease: [0.22, 1, 0.36, 1] },
+  viewport: { once: true, margin: "-80px" } as const,
+  transition: { duration, delay, ease: EC_EASE },
 });
 
 export default function APropos() {

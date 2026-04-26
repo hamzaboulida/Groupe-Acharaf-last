@@ -14,23 +14,23 @@ COPY tsconfig.json tsconfig.base.json ./
 # Copy package descriptors across monorepo to cache deps
 COPY artifacts/api-server/package.json ./artifacts/api-server/
 COPY artifacts/groupe-acharaf/package.json ./artifacts/groupe-acharaf/
-COPY artifacts/mockup-sandbox/package.json ./artifacts/mockup-sandbox/
 COPY lib/api-zod/package.json ./lib/api-zod/
 COPY lib/api-client-react/package.json ./lib/api-client-react/
 COPY lib/db/package.json ./lib/db/
 
-RUN pnpm --filter "@workspace/api-server" --filter "@workspace/groupe-acharaf" --filter "@workspace/mockup-sandbox" --filter "@workspace/api-zod" --filter "@workspace/api-client-react" --filter "@workspace/db" install --frozen-lockfile
+RUN pnpm --filter "@workspace/api-server" --filter "@workspace/groupe-acharaf" --filter "@workspace/api-zod" --filter "@workspace/api-client-react" --filter "@workspace/db" install --frozen-lockfile
 
 # Copy the rest of the relevant source code
 COPY artifacts/api-server/ ./artifacts/api-server/
 COPY artifacts/groupe-acharaf/ ./artifacts/groupe-acharaf/
-COPY artifacts/mockup-sandbox/ ./artifacts/mockup-sandbox/
 COPY lib/ ./lib/
 
 # Build shared libs first
 RUN pnpm --filter "@workspace/api-zod" --filter "@workspace/api-client-react" --filter "@workspace/db" install --frozen-lockfile
 
 # Note: We run the root build. This will trigger typechecking and building all workspaces
+# PORT is not used at build time but prevents vite config crashing if any plugin reads it
+ENV PORT=5000
 RUN pnpm run build
 
 # ---
