@@ -64,9 +64,11 @@ if (process.env.NODE_ENV === "production" && gcsBucketName) {
       }
       
       stream.pipe(res);
+      return;
     } catch (err) {
       logger.error({ err }, "GCS Proxy error");
       res.status(500).send("Storage service error");
+      return;
     }
   });
 } else {
