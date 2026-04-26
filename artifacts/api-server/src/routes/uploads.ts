@@ -41,9 +41,8 @@ router.post("/uploads", upload.single("file"), async (req: Request, res: Respons
       });
 
       blobStream.on("finish", () => {
-        // Construct the public URL
-        const publicUrl = `https://storage.googleapis.com/${gcsBucketName}/${blob.name}`;
-        res.json({ url: publicUrl });
+        // Return a relative URL so it goes through our /uploads proxy
+        res.json({ url: `/uploads/${filename}` });
       });
 
       blobStream.end(req.file.buffer);
