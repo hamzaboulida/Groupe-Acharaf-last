@@ -118,6 +118,7 @@ router.get("/applications", async (_req, res): Promise<void> => {
       email: applicationsTable.email,
       phone: applicationsTable.phone,
       message: applicationsTable.message,
+      cvUrl: applicationsTable.cvUrl,
       createdAt: applicationsTable.createdAt,
       career: {
         id: careersTable.id,

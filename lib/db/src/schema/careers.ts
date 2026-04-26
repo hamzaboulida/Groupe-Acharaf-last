@@ -30,6 +30,7 @@ export const applicationsTable = pgTable("applications", {
   email: text("email").notNull(),
   phone: text("phone"),
   message: text("message"),
+  cvUrl: text("cv_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

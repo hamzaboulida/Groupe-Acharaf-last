@@ -219,6 +219,7 @@ export interface Application {
   email: string;
   phone?: string;
   message?: string;
+  cvUrl?: string;
   createdAt: string;
 }
 
@@ -228,6 +229,7 @@ export interface CreateApplicationBody {
   email: string;
   phone?: string;
   message?: string;
+  cvUrl?: string;
 }
 
 export interface Lead {

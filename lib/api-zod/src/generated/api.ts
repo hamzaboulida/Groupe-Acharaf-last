@@ -578,6 +578,7 @@ export const ApplyForCareerBody = zod.object({
   email: zod.string(),
   phone: zod.string().optional(),
   message: zod.string().optional(),
+  cvUrl: zod.string().optional(),
 });
 
 /**
@@ -608,6 +609,7 @@ export const ListApplicationsResponseItem = zod.object({
   email: zod.string(),
   phone: zod.string().optional(),
   message: zod.string().optional(),
+  cvUrl: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });
 export const ListApplicationsResponse = zod.array(ListApplicationsResponseItem);

@@ -24,7 +24,7 @@ import {
   getListApplicationsQueryKey,
 } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
-import { X, Plus, Image as ImageIcon, Trash2, MapPin, Info, Layout as LayoutIcon, Search } from "lucide-react";
+import { X, Plus, Image as ImageIcon, Trash2, MapPin, Info, Layout as LayoutIcon, Search, Download } from "lucide-react";
 
 type Tab = "projects" | "leads" | "articles" | "careers" | "applications";
 
@@ -1182,6 +1182,19 @@ function ApplicationsTab() {
                 <div className="text-[#c9a84c] text-sm">{a.email} {a.phone && `· ${a.phone}`}</div>
                 {a.career && <div className="text-white/50 text-sm mt-1">Poste: {a.career.title}</div>}
                 {a.message && <div className="text-white/40 text-sm mt-2 max-w-2xl">{a.message}</div>}
+                {a.cvUrl && (
+                  <div className="mt-4">
+                    <a 
+                      href={a.cvUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded text-xs text-white/70 hover:bg-white/10 hover:text-white transition-all"
+                    >
+                      <Download size={14} className="text-[#c9a84c]" />
+                      Voir le CV (PDF)
+                    </a>
+                  </div>
+                )}
               </div>
               <div className="text-white/30 text-xs">{formatDate(a.createdAt)}</div>
             </div>

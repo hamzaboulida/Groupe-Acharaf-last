@@ -946,6 +946,8 @@ components:
           type: string
         message:
           type: string
+        cvUrl:
+          type: string
         createdAt:
           type: string
           format: date-time
@@ -969,6 +971,8 @@ components:
         phone:
           type: string
         message:
+          type: string
+        cvUrl:
           type: string
       required:
         - firstName

@@ -14,6 +14,7 @@ type ApplicationForm = {
   email: string;
   phone: string;
   message: string;
+  cvUrl: string;
 };
 
 const TYPE_LABEL: Record<string, string> = {
@@ -139,6 +140,8 @@ function ApplicationModal({
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ApplicationForm>();
   const [sent, setSent] = useState(false);
@@ -220,10 +223,44 @@ function ApplicationModal({
                 {...register("message")}
                 className={`${inputClass} resize-none`}
               />
+
+              <div className="space-y-2">
+                <label className="text-white/40 text-[10px] uppercase tracking-widest block">Votre CV (PDF) *</label>
+                <div className="relative group">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      try {
+                        const res = await fetch("/api/uploads", { method: "POST", body: formData });
+                        const data = await res.json();
+                        if (data.url) {
+                          setValue("cvUrl", data.url);
+                        }
+                      } catch (err) {
+                        console.error("Upload failed", err);
+                      }
+                    }}
+                  />
+                  <div className="w-full bg-white/4 border border-white/10 p-4 text-center group-hover:border-white/25 transition-colors">
+                    <div className="text-white/40 text-xs flex items-center justify-center gap-2">
+                      <span className="text-lg">+</span>
+                      {watch("cvUrl") ? "CV téléchargé avec succès" : "Cliquez pour joindre votre CV"}
+                    </div>
+                  </div>
+                </div>
+                {errors.cvUrl && <span className="text-red-400 text-[10px]">CV requis</span>}
+              </div>
+
               <div className="flex gap-3 pt-2">
                 <button
                   type="submit"
-                  disabled={apply.isPending}
+                  disabled={apply.isPending || !watch("cvUrl")}
                   className="flex-1 bg-[#8EA4AF] text-[#082634] py-3 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#B2BED0] transition-colors disabled:opacity-50"
                 >
                   {apply.isPending ? "Envoi…" : "Envoyer ma candidature"}
