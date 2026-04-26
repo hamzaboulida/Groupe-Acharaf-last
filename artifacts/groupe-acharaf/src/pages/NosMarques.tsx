@@ -81,9 +81,20 @@ function EstyaContent({ projects }: { projects?: Array<{ id: number; title: stri
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.1, delay: 0.2, ease: EC }}
+              className="relative aspect-[4/5] overflow-hidden order-first lg:order-last"
+            >
+              <img src={estyaBg} alt="Estya" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#080629]/60 via-transparent to-transparent" />
+            </motion.div>
+
+            <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.1, ease: EC }}
+              className="order-last lg:order-first"
             >
               <p className="text-[#8EA4AF]/75 text-[9px] tracking-[0.35em] uppercase mb-8">L'univers Estya</p>
               <h2 className="text-4xl md:text-5xl font-serif font-light text-white leading-[1.1] mb-8">
@@ -103,16 +114,6 @@ function EstyaContent({ projects }: { projects?: Array<{ id: number; title: stri
                 Découvrir les projets Estya
                 <ArrowRight size={12} className="group-hover:translate-x-1.5 transition-transform duration-300" />
               </Link>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.1, delay: 0.2, ease: EC }}
-              className="relative aspect-[4/5] overflow-hidden"
-            >
-              <img src={estyaBg} alt="Estya" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#080629]/60 via-transparent to-transparent" />
             </motion.div>
           </div>
         </div>
@@ -183,7 +184,7 @@ function AcharafContent({ projects }: { projects?: Array<{ id: number; title: st
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.1, delay: 0.2, ease: EC }}
-              className="relative aspect-[4/5] overflow-hidden order-2 lg:order-1"
+              className="relative aspect-[4/5] overflow-hidden order-first lg:order-last"
             >
               <img src={acharafBg} alt="Acharaf Immobilier" className="w-full h-full object-cover brightness-95" />
               <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-transparent to-transparent" />
@@ -193,7 +194,7 @@ function AcharafContent({ projects }: { projects?: Array<{ id: number; title: st
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.1, ease: EC }}
-              className="order-1 lg:order-2"
+              className="order-last lg:order-first"
             >
               <p className="text-[#5C7480] text-[9px] tracking-[0.35em] uppercase mb-8">L'univers Acharaf</p>
               <h2 className="text-4xl md:text-5xl font-serif font-light text-[#082634] leading-[1.1] mb-8">
