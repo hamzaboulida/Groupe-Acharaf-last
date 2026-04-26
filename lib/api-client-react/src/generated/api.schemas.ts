@@ -172,6 +172,7 @@ export const CareerType = {
 
 export interface Career {
   id: number;
+  title: string;
   slug: string;
   department: string;
   location?: string;

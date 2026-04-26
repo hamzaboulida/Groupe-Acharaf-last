@@ -466,6 +466,7 @@ export const ListCareersQueryParams = zod.object({
 
 export const ListCareersResponseItem = zod.object({
   id: zod.number(),
+  title: zod.string(),
   slug: zod.string(),
   department: zod.string(),
   location: zod.string().optional(),
@@ -506,6 +507,7 @@ export const GetCareerParams = zod.object({
 
 export const GetCareerResponse = zod.object({
   id: zod.number(),
+  title: zod.string(),
   slug: zod.string(),
   department: zod.string(),
   location: zod.string().optional(),
@@ -542,6 +544,7 @@ export const UpdateCareerBody = zod.object({
 
 export const UpdateCareerResponse = zod.object({
   id: zod.number(),
+  title: zod.string(),
   slug: zod.string(),
   department: zod.string(),
   location: zod.string().optional(),
@@ -586,6 +589,7 @@ export const ListApplicationsResponseItem = zod.object({
   career: zod
     .object({
       id: zod.number(),
+      title: zod.string(),
       slug: zod.string(),
       department: zod.string(),
       location: zod.string().optional(),
