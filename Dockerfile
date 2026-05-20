@@ -1,4 +1,4 @@
-FROM node:20-slim AS builder
+FROM node:22-slim AS builder
 
 # Set pnpm home path and enable corepack
 ENV PNPM_HOME="/pnpm"
@@ -35,7 +35,7 @@ RUN pnpm run build
 
 # ---
 # Runner Stage
-FROM node:20-slim AS runner
+FROM node:22-slim AS runner
 
 WORKDIR /app
 
