@@ -22,7 +22,7 @@ export default function APropos() {
   return (
     <Layout>
       {/* ── Hero ── */}
-      <section className="relative h-screen w-full flex items-end pb-36 lg:pb-48 overflow-hidden">
+      <section className="relative h-screen min-h-[700px] w-full flex items-end pb-24 lg:pb-32 overflow-hidden">
 
         {/* Parallax wrapper + slow continuous zoom — both run independently */}
         <motion.div
@@ -65,12 +65,12 @@ export default function APropos() {
           {/* Headline — clip-reveal slide up */}
           <div className="overflow-hidden mb-7">
             <motion.h1
-              className="text-6xl md:text-8xl lg:text-9xl font-serif font-light text-white leading-[0.92] tracking-tight max-w-4xl"
+              className="text-5xl md:text-7xl lg:text-8xl font-serif font-light text-white leading-[0.92] tracking-tight max-w-3xl"
               initial={{ y: "105%" }}
               animate={{ y: 0 }}
               transition={{ duration: 1.35, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
-              Créer les références<br />résidentielles <br />de demain
+              Créer les références résidentielles de demain
             </motion.h1>
           </div>
 
