@@ -66,26 +66,26 @@ const PILLARS = [
   {
     num: "01",
     icon: <PenTool size={22} strokeWidth={1.2} />,
-    title: "Conception architecturale",
-    desc: "Des plans pensés par les meilleurs architectes, où esthétique et fonctionnalité coexistent en harmonie.",
+    title: "Architecture & conception",
+    desc: "Des espaces élégants et fonctionnels, imaginés autour des attentes réelles des acquéreurs.",
   },
   {
     num: "02",
     icon: <Building2 size={22} strokeWidth={1.2} />,
-    title: "Développement immobilier",
-    desc: "Une maîtrise complète du cycle — de l'acquisition foncière à la livraison — avec une vision long terme.",
+    title: "Études & programmation",
+    desc: "Des projets pensés à partir d’une lecture fine des marchés, des usages et des évolutions urbaines.",
   },
   {
     num: "03",
     icon: <Wrench size={22} strokeWidth={1.2} />,
-    title: "Exécution & qualité",
-    desc: "Des standards d'exécution qui surpassent les attentes : matériaux nobles, délais tenus, finitions impeccables.",
+    title: "Construction & qualité",
+    desc: "Des réalisations conçues avec exigence, portées par des standards élevés de construction et de finition.",
   },
   {
     num: "04",
     icon: <Users size={22} strokeWidth={1.2} />,
-    title: "Accompagnement client",
-    desc: "Un suivi personnalisé de bout en bout, bien au-delà de la remise des clés.",
+    title: "Livraison & accompagnement",
+    desc: "Une remise des clés encadrée avec soin, accompagnée d’un suivi attentif jusqu’à votre installation.",
   },
 ];
 
@@ -245,7 +245,7 @@ export default function Home() {
               initial={{ y: "110%" }} animate={{ y: 0 }}
               transition={{ duration: 1.2, delay: 0.5, ease: EC }}
             >
-              L'Art de Vivre
+              Habiter mieux
             </motion.h1>
           </div>
           <div className="overflow-hidden mb-14">
@@ -254,7 +254,7 @@ export default function Home() {
               initial={{ y: "110%" }} animate={{ y: 0 }}
               transition={{ duration: 1.2, delay: 0.7, ease: EC }}
             >
-              au sommet
+              commence ici.
             </motion.h1>
           </div>
 
@@ -307,7 +307,7 @@ export default function Home() {
               />
               <motion.div {...fade(0.1)}>
                 <p className="text-[#3B5661] text-sm font-light leading-relaxed max-w-xs">
-                  Depuis plus de vingt ans, Groupe Acharaf façonne un nouveau chapitre de l'art de vivre au Maroc.
+                  Depuis plus de 46 ans, le Groupe Acharaf imagine des lieux pensés pour traverser le temps.
                 </p>
               </motion.div>
             </div>
@@ -318,7 +318,7 @@ export default function Home() {
                 transition={{ duration: 1.5, ease: EC }}
                 className="text-4xl md:text-5xl lg:text-6xl font-serif text-[#082634] font-light leading-[1.1] tracking-tight"
               >
-                Une vision singulière de l'immobilier, où chaque détail est pensé pour créer des œuvres intemporelles.
+                Développer des projets immobiliers durables et finement pensés, conçus pour répondre aux attentes réelles des acquéreurs.
               </motion.h2>
             </div>
           </div>
@@ -394,19 +394,19 @@ export default function Home() {
               transition={{ duration: 1.3, delay: 0.1, ease: EC }}
               className="text-5xl md:text-7xl lg:text-8xl font-serif text-white font-light leading-[0.95] tracking-tight"
             >
-              Construire plus que
+              Construire avec exigence,
             </motion.h2>
           </div>
-          <div className="overflow-hidden mb-3">
+          {/* <div className="overflow-hidden mb-3">
             <motion.h2
               initial={{ y: "100%" }} whileInView={{ y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1.3, delay: 0.22, ease: EC }}
               className="text-5xl md:text-7xl lg:text-8xl font-serif text-white font-light leading-[0.95] tracking-tight"
             >
-              des projets.
+              l’essentiel qui dure.
             </motion.h2>
-          </div>
+          </div> */}
           <div className="overflow-hidden mt-5">
             <motion.h2
               initial={{ y: "100%" }} whileInView={{ y: 0 }}
@@ -414,7 +414,7 @@ export default function Home() {
               transition={{ duration: 1.3, delay: 0.38, ease: EC }}
               className="text-5xl md:text-7xl lg:text-8xl font-serif italic text-white/50 font-light leading-[0.95] tracking-tight"
             >
-              Créer des références.
+              l’essentiel qui dure.
             </motion.h2>
           </div>
         </SectionReveal>
@@ -449,7 +449,7 @@ export default function Home() {
               {[
                 { label: "Projets livrés", value: stats.deliveredProjects, suffix: "" },
                 { label: "Années d'expérience", value: stats.yearsExperience, suffix: "" },
-                { label: "Unités livrées", value: stats.totalUnits, suffix: "+" },
+                { label: "Unités livrées", value: stats.totalUnits, suffix: "" },
                 { label: "Villes présentes", value: stats.cities, suffix: "" },
               ].map((stat, i) => (
                 <motion.div
@@ -571,13 +571,13 @@ export default function Home() {
               viewport={{ once: true }} transition={{ duration: 1.2, delay: 0.1, ease: EC }}
               className="text-4xl md:text-5xl font-serif text-[#082634] font-light"
             >
-              Deux univers, une exigence
+              Deux références, une exigence
             </motion.h2>
             <motion.p
               {...fade(0.2)}
               className="text-[#3B5661] font-light text-sm mt-5 max-w-sm mx-auto leading-relaxed"
             >
-              Deux marques complémentaires pour répondre à toutes les aspirations résidentielles.
+              Deux marques pensées pour répondre à chaque besoin résidentiel.
             </motion.p>
           </div>
 
@@ -792,8 +792,8 @@ function BrandCard({
               href="/nos-marques"
               onClick={(e) => e.stopPropagation()}
               className={`group inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] border-b pb-0.5 transition-colors duration-500 ${isEstya
-                  ? "text-[#C8D4DA] border-[#8EA4AF]/40 hover:border-[#8EA4AF]/80"
-                  : "text-[#DCE0E7] border-[#B2BED0]/40 hover:border-[#B2BED0]/80"
+                ? "text-[#C8D4DA] border-[#8EA4AF]/40 hover:border-[#8EA4AF]/80"
+                : "text-[#DCE0E7] border-[#B2BED0]/40 hover:border-[#B2BED0]/80"
                 }`}
             >
               {isEstya ? "Explorer" : "Découvrir"}

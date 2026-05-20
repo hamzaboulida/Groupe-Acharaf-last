@@ -583,7 +583,7 @@ export default function ProjectDetail() {
               className="mb-14"
             >
               <p className="text-[#3B5661] text-xs tracking-[0.22em] uppercase mb-4">Prestations</p>
-              <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634]">Points forts du projet</h2>
+              <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634]">Prestations  du projet</h2>
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

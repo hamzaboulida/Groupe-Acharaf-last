@@ -21,12 +21,12 @@ router.get("/stats", async (_req, res): Promise<void> => {
   const cities = citiesResult?.count ?? 5;
 
   const stats = {
-    totalProjects: total,
-    deliveredProjects: delivered,
-    yearsExperience: 20,
-    totalUnits: total > 0 ? total * 120 : 0,
+    totalProjects: 41,
+    deliveredProjects: 41,
+    yearsExperience: 46,
+    totalUnits: 9720,
     satisfiedClients: delivered > 0 ? delivered * 95 : 0,
-    cities: cities || 5,
+    cities: 7,
   };
 
   res.json(GetStatsResponse.parse(stats));
