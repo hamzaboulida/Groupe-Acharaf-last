@@ -97,10 +97,10 @@ function EstyaContent({ projects }: { projects?: BrandPreviewProject[] }) {
               </h2>
               <div className="h-px w-12 bg-[#8EA4AF]/20 mb-8" />
               <p className="text-white/70 font-light leading-relaxed text-[15px] mb-5">
-                La quintessence du luxe immobilier marocain. Des adresses confidentielles, des volumes majestueux, des matériaux nobles choisis aux quatre coins du monde.
+                ESTYA incarne la vision résidentielle moyen et haut standing du Groupe Acharaf. La marque développe des projets conçus avec une attention particulière portée à l’architecture, à la qualité des finitions et à l’expérience de vie des résidents. Pensés dans une logique d’élégance, de confort et de durabilité.
               </p>
               <p className="text-white/55 font-light leading-relaxed text-sm mb-10">
-                Chaque résidence Estya est une œuvre architecturale unique — conçue en nombre limité, pour une clientèle internationale qui n'attend que ce qui ne peut être répété.
+                Les projets ESTYA s’adressent à une clientèle à la recherche d’un cadre de vie moderne, cohérent et valorisant.
               </p>
               <Link
                 href="/nos-projets?brand=1"
@@ -207,10 +207,10 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
               </h2>
               <div className="h-px w-12 bg-[#082634]/15 mb-8" />
               <p className="text-[#082634] font-light leading-relaxed text-[15px] mb-5">
-                Des projets résidentiels pensés pour le bien-être des familles. Espaces verts, architecture contemporaine et matériaux durables pour une vie épanouie.
+                Acharaf Immobilier porte le développement de projets résidentiels accessibles et fonctionnels, pensés pour répondre aux attentes réelles des acquéreurs et aux dynamiques des marchés locaux. À travers une approche fondée sur la maîtrise des coûts, la qualité de réalisation et la pertinence des emplacements.
               </p>
               <p className="text-[#082634] font-light leading-relaxed text-sm mb-10">
-                Acharaf Immobilier incarne l'excellence accessible&nbsp;: une qualité de vie premium, sans compromis sur l'authenticité ni sur le confort du quotidien.
+                La marque développe des projets offrant un équilibre durable entre accessibilité, confort et valeur d’usage.
               </p>
               <Link
                 href="/nos-projets?brand=2"
@@ -386,7 +386,7 @@ export default function NosMarques() {
               animate={{ opacity: (acharafActive || hoveredBrand === "acharaf") ? 0.2 : hoveredBrand === "estya" ? 1 : 0.9 }}
               transition={{ duration: 0.7 }}
             >
-              La quintessence du luxe immobilier marocain. Des adresses confidentielles, des volumes majestueux.
+              Des adresses où architecture, distinction et qualité d’exécution se rencontrent. 
             </motion.p>
 
             {/* Selection state */}
@@ -521,7 +521,7 @@ export default function NosMarques() {
               animate={{ opacity: (estyaActive || hoveredBrand === "estya") ? 0.2 : hoveredBrand === "acharaf" ? 1 : 0.9 }}
               transition={{ duration: 0.7 }}
             >
-              Des projets résidentiels pensés pour le bien-être des familles, alliant qualité et accessibilité.
+              Une approche résidentielle pensée pour concilier confort, fonctionnalité et accessibilité.
             </motion.p>
 
             {/* Selection state */}

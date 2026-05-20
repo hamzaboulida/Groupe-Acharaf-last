@@ -70,7 +70,7 @@ export default function APropos() {
               animate={{ y: 0 }}
               transition={{ duration: 1.35, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
-              Forger l'avenir<br />de l'immobilier<br />d'exception
+              Créer les références<br />résidentielles <br />de demain
             </motion.h1>
           </div>
 
@@ -81,7 +81,7 @@ export default function APropos() {
             transition={{ duration: 1.1, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
             className="text-white/55 font-light text-sm max-w-xs leading-relaxed"
           >
-            Deux décennies d'excellence au service de l'immobilier marocain de prestige.
+            Plus de quarante ans d’expertise au service de projets conçus pour marquer durablement leur environnement.
           </motion.p>
 
         </div>
@@ -99,7 +99,7 @@ export default function APropos() {
             >
               <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-6">Notre Histoire</p>
               <h2 className="text-4xl md:text-5xl font-serif text-[#082634] mb-8 leading-tight font-light">
-                Une passion pour la perfection, transmise de génération en génération.
+                Une vision de l’exigence portée dans le temps.
               </h2>
               <motion.div
                 initial={{ width: 0 }}
@@ -109,7 +109,7 @@ export default function APropos() {
                 className="h-px bg-[#082634]/25 mb-8"
               />
               <div className="space-y-5 text-[#082634] font-light leading-relaxed text-sm">
-                <p>Depuis plus de deux décennies, Groupe Acharaf sculpte le paysage urbain marocain. Notre mission dépasse la simple construction de murs ; nous créons des espaces de vie où l'art, le confort et le prestige se rencontrent pour définir une nouvelle norme d'excellence.</p>
+                <p>Depuis plus de quatre décennies, le groupe contribue à façonner le paysage urbain marocain en développant, à travers ses différentes marques, une offre résidentielle diversifiée portée par une exigence constante de qualité, de cohérence et de maîtrise d’exécution.</p>
                 <p>Né de la vision d'un bâtisseur passionné, le groupe s'est développé autour d'une conviction profonde : chaque projet doit être unique, pensé pour ses futurs occupants et respectueux de son environnement.</p>
               </div>
             </motion.div>
@@ -132,7 +132,7 @@ export default function APropos() {
                 <div className="absolute inset-0 bg-[#082634]/10 group-hover:bg-transparent transition-colors duration-700" />
               </div>
               <div className="absolute -bottom-8 -left-6 bg-[#082634] text-white p-8 w-52">
-                <div className="text-5xl font-serif mb-2 font-light">20+</div>
+                <div className="text-5xl font-serif mb-2 font-light">46</div>
                 <div className="text-xs uppercase tracking-[0.15em] text-[#8EA4AF]">Années d'excellence</div>
               </div>
             </motion.div>
@@ -152,9 +152,9 @@ export default function APropos() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#8EA4AF]/12">
             {[
-              { icon: <Trophy size={22} />, title: "L'Excellence", desc: "La recherche constante de la perfection dans les finitions, le choix des matériaux et le design architectural." },
-              { icon: <Target size={22} />, title: "L'Innovation", desc: "Intégrer les dernières avancées technologiques et architecturales pour un habitat durable et intelligent." },
-              { icon: <Users size={22} />, title: "L'Humain", desc: "Placer le bien-être de nos clients au centre de toute réflexion conceptuelle et opérationnelle." },
+              { icon: <Trophy size={22} />, title: "Exigence", desc: "Des standards élevés à chaque étape du projet." },
+              { icon: <Target size={22} />, title: "Pérennité", desc: "Des projets pensés pour durer et évoluer avec leur environnement." },
+              { icon: <Users size={22} />, title: "Humain", desc: "Placer le bien-être de nos clients au centre de toute réflexion conceptuelle et opérationnelle." },
             ].map((value, i) => (
               <motion.div
                 key={i}
@@ -186,10 +186,10 @@ export default function APropos() {
           <div className="max-w-4xl mx-auto relative">
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#8EA4AF]/30 -translate-x-1/2 hidden md:block" />
             {[
-              { year: "2000", title: "Fondation du Groupe", desc: "Création de Groupe Acharaf avec une première réalisation résidentielle à Casablanca." },
-              { year: "2010", title: "Lancement Acharaf Immobilier", desc: "Structuration de la marque premium pour répondre à la demande croissante." },
-              { year: "2018", title: "Création de la marque Estya", desc: "Naissance de notre signature ultra-luxe pour une clientèle internationale exigeante." },
-              { year: "2023", title: "Expansion Nationale", desc: "Lancement de projets d'envergure à Rabat, Marrakech et Tanger." },
+              { year: "1980", title: "Fondation du Groupe", desc: "Création de Groupe Acharaf avec une première réalisation résidentielle à Casablanca." },
+              { year: "1999", title: "Lancement Acharaf Immobilier", desc: "Structuration de la marque premium pour répondre à la demande croissante." },
+              { year: "2007", title: "Expansion Nationale", desc: "Lancement de projets d'envergure à Rabat, Agadir et Marrakech." },
+              { year: "2019", title: "Création de la marque Estya", desc: "Naissance de notre signature de standing." },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -248,8 +248,8 @@ export default function APropos() {
           {stats && (
             <div className="flex flex-wrap justify-center gap-16 md:gap-40 mb-14">
               {[
-                { value: stats.totalProjects,    label: "Projets initiés" },
-                { value: stats.satisfiedClients, label: "Clients satisfaits" },
+                { value: stats.totalProjects, label: "Projets livrés" },
+                { value: stats.cities, label: "villes représentées" },
               ].map((s, i) => (
                 <motion.div key={i} {...fade(i * 0.15)}>
                   <div className="text-7xl md:text-9xl font-serif text-white mb-3 font-light">
