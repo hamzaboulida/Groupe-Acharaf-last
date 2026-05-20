@@ -10,15 +10,11 @@ import type { CareerType } from "./careerType";
 export interface Career {
   id: number;
   title: string;
-  slug: string;
   department: string;
   location?: string;
   type: CareerType;
   description?: string;
   requirements?: string[];
-  coverImageUrl?: string;
   active: boolean;
-  metaTitle?: string;
-  metaDescription?: string;
   createdAt: Date;
 }

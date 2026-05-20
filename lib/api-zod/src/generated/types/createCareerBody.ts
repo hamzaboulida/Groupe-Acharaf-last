@@ -9,14 +9,10 @@ import type { CreateCareerBodyType } from "./createCareerBodyType";
 
 export interface CreateCareerBody {
   title: string;
-  slug: string;
   department: string;
   location?: string;
   type: CreateCareerBodyType;
   description?: string;
   requirements?: string[];
-  coverImageUrl?: string;
   active?: boolean;
-  metaTitle?: string;
-  metaDescription?: string;
 }

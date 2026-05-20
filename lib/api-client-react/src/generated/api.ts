@@ -34,8 +34,6 @@ import type {
   ListProjectsParams,
   Project,
   Stats,
-  UploadFile200,
-  UploadFileBody,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -973,96 +971,6 @@ export const useDeleteProject = <
   TContext
 > => {
   return useMutation(getDeleteProjectMutationOptions(options));
-};
-
-/**
- * @summary Upload a file
- */
-export const getUploadFileUrl = () => {
-  return `/api/uploads`;
-};
-
-export const uploadFile = async (
-  uploadFileBody: UploadFileBody,
-  options?: RequestInit,
-): Promise<UploadFile200> => {
-  const formData = new FormData();
-  if (uploadFileBody.file !== undefined) {
-    formData.append(`file`, uploadFileBody.file);
-  }
-
-  return customFetch<UploadFile200>(getUploadFileUrl(), {
-    ...options,
-    method: "POST",
-    body: formData,
-  });
-};
-
-export const getUploadFileMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof uploadFile>>,
-    TError,
-    { data: BodyType<UploadFileBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof uploadFile>>,
-  TError,
-  { data: BodyType<UploadFileBody> },
-  TContext
-> => {
-  const mutationKey = ["uploadFile"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof uploadFile>>,
-    { data: BodyType<UploadFileBody> }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return uploadFile(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type UploadFileMutationResult = NonNullable<
-  Awaited<ReturnType<typeof uploadFile>>
->;
-export type UploadFileMutationBody = BodyType<UploadFileBody>;
-export type UploadFileMutationError = ErrorType<unknown>;
-
-/**
- * @summary Upload a file
- */
-export const useUploadFile = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof uploadFile>>,
-    TError,
-    { data: BodyType<UploadFileBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof uploadFile>>,
-  TError,
-  { data: BodyType<UploadFileBody> },
-  TContext
-> => {
-  return useMutation(getUploadFileMutationOptions(options));
 };
 
 /**

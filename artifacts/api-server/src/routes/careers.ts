@@ -34,7 +34,8 @@ router.post("/careers", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const [career] = await db.insert(careersTable).values(parsed.data).returning();
+  const slug = parsed.data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
+  const [career] = await db.insert(careersTable).values({ ...parsed.data, slug }).returning();
   res.status(201).json(GetCareerResponse.parse(career));
 });
 

@@ -15,5 +15,6 @@ export interface Lead {
   subject?: string;
   message?: string;
   projectInterest?: string;
+  source?: string;
   createdAt: Date;
 }

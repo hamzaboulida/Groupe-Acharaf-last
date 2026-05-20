@@ -12,5 +12,4 @@ export interface CreateApplicationBody {
   email: string;
   phone?: string;
   message?: string;
-  cvUrl?: string;
 }

@@ -16,6 +16,5 @@ export interface Application {
   email: string;
   phone?: string;
   message?: string;
-  cvUrl?: string;
   createdAt: Date;
 }

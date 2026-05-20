@@ -45,13 +45,9 @@ export const projectsTable = pgTable("projects", {
   images: text("images").array(),
   
   // New details fields
-  tagline: text("tagline"),
-  shortDescription: text("short_description"),
   storyTitle: text("story_title"),
   storyText: text("story_text"),
-  lifestyleTitle: text("lifestyle_title"),
   lifestyleText: text("lifestyle_text"),
-  locationAdvantages: text("location_advantages").array(),
   mapLocation: text("map_location"),
   financingDetails: text("financing_details"),
   ctaText: text("cta_text"),
