@@ -8,7 +8,7 @@ const navLinks = [
   { href: "/a-propos", label: "À Propos" },
   { href: "/nos-marques", label: "Nos Marques" },
   { href: "/nos-projets", label: "Projets" },
-  { href: "/actualites", label: "Actualités" },
+  { href: "/opportunites", label: "Opportunités" },
   { href: "/carrieres", label: "Carrières" },
 ];
 

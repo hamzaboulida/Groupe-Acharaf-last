@@ -11,7 +11,7 @@ const col1 = [
   { href: "/nos-projets", label: "Galerie de Projets" },
 ];
 const col2 = [
-  { href: "/actualites", label: "Actualités" },
+  { href: "/opportunites", label: "Opportunités" },
   { href: "/carrieres", label: "Carrières" },
   { href: "/contact", label: "Contact" },
 ];
@@ -43,7 +43,7 @@ export function Footer() {
               transition={{ duration: 0.9 }}
               className="max-w-md"
             >
-              <p className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-4">Newsletter</p>
+              <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-4">Newsletter</p>
               <h3 className="font-serif text-3xl text-[#082634] font-light leading-snug">
                 L'Art de Vivre,<br />en avant-première.
               </h3>
@@ -67,7 +67,7 @@ export function Footer() {
               />
               <button
                 type="submit"
-                className="bg-[#082634] text-white px-5 py-3.5 hover:bg-[#0a3548] transition-colors flex-shrink-0 flex items-center gap-2"
+                className="bg-[#082634] text-white px-5 py-3.5 hover:bg-[#082634] transition-colors flex-shrink-0 flex items-center gap-2"
               >
                 <Send size={13} />
               </button>
@@ -85,14 +85,14 @@ export function Footer() {
                   Groupe <span className="text-[#8EA4AF] font-light">Acharaf</span>
                 </span>
               </Link>
-              <p className="text-[#3B5661] text-sm font-light leading-relaxed max-w-xs mb-10">
+              <p className="text-[#082634] text-sm font-light leading-relaxed max-w-xs mb-10">
                 Créateur d'espaces de vie d'exception au Maroc. L'alliance entre héritage architectural et vision contemporaine.
               </p>
               <div className="flex gap-3">
-                <a href="#" aria-label="Instagram" className="w-8 h-8 border border-[#8EA4AF]/20 flex items-center justify-center text-[#5C7480] hover:text-[#082634] hover:border-[#8EA4AF]/45 transition-all duration-300">
+                <a href="#" aria-label="Instagram" className="w-8 h-8 border border-[#8EA4AF]/20 flex items-center justify-center text-[#8EA4AF] hover:text-[#082634] hover:border-[#8EA4AF]/45 transition-all duration-300">
                   <Instagram size={13} />
                 </a>
-                <a href="#" aria-label="LinkedIn" className="w-8 h-8 border border-[#8EA4AF]/20 flex items-center justify-center text-[#5C7480] hover:text-[#082634] hover:border-[#8EA4AF]/45 transition-all duration-300">
+                <a href="#" aria-label="LinkedIn" className="w-8 h-8 border border-[#8EA4AF]/20 flex items-center justify-center text-[#8EA4AF] hover:text-[#082634] hover:border-[#8EA4AF]/45 transition-all duration-300">
                   <Linkedin size={13} />
                 </a>
               </div>
@@ -100,11 +100,11 @@ export function Footer() {
 
             {/* Nav columns */}
             <div className="md:col-span-3">
-              <h4 className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-7">Découvrir</h4>
+              <h4 className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-7">Découvrir</h4>
               <ul className="space-y-4">
                 {col1.map((l) => (
                   <li key={l.label}>
-                    <Link href={l.href} className="group flex items-center gap-2 text-[#3B5661] hover:text-[#082634] transition-colors text-sm font-light">
+                    <Link href={l.href} className="group flex items-center gap-2 text-[#082634] hover:text-[#082634] transition-colors text-sm font-light">
                       <span className="w-0 group-hover:w-3 h-px bg-[#8EA4AF] transition-all duration-300 overflow-hidden" />
                       {l.label}
                     </Link>
@@ -114,11 +114,11 @@ export function Footer() {
             </div>
 
             <div className="md:col-span-2">
-              <h4 className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-7">Accès</h4>
+              <h4 className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-7">Accès</h4>
               <ul className="space-y-4">
                 {col2.map((l) => (
                   <li key={l.label}>
-                    <Link href={l.href} className="group flex items-center gap-2 text-[#3B5661] hover:text-[#082634] transition-colors text-sm font-light">
+                    <Link href={l.href} className="group flex items-center gap-2 text-[#082634] hover:text-[#082634] transition-colors text-sm font-light">
                       <span className="w-0 group-hover:w-3 h-px bg-[#8EA4AF] transition-all duration-300 overflow-hidden" />
                       {l.label}
                     </Link>
@@ -128,8 +128,8 @@ export function Footer() {
             </div>
 
             <div className="md:col-span-2">
-              <h4 className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-7">Contact</h4>
-              <ul className="space-y-5 text-sm text-[#3B5661] font-light">
+              <h4 className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-7">Contact</h4>
+              <ul className="space-y-5 text-sm text-[#082634] font-light">
                 <li className="flex flex-col gap-1 leading-relaxed">Boulevard d'Anfa<br />Casablanca, Maroc</li>
                 <li>contact@groupeacharaf.ma</li>
                 <li>+212 522 00 00 00</li>
@@ -140,7 +140,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-[#8EA4AF]/10">
-          <div className="container mx-auto px-6 md:px-12 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#5C7480] font-light">
+          <div className="container mx-auto px-6 md:px-12 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#8EA4AF] font-light">
             <span>&copy; {new Date().getFullYear()} Groupe Acharaf — Tous droits réservés</span>
             <div className="flex gap-6">
               <Link href="/mentions-legales" className="hover:text-[#082634]/50 transition-colors tracking-wide">Mentions légales</Link>

@@ -38,9 +38,9 @@ export default function Actualites() {
         <div className="absolute inset-0 z-0">
           <img src={heroBg} alt="" className="w-full h-full object-cover scale-105 brightness-[0.72]" />
         </div>
-        <div className="absolute inset-0 bg-black/22" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/50" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[#082634]/22" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#082634]/55 via-transparent to-[#082634]/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#082634]/20 via-transparent to-transparent" />
 
         <div className="relative z-10 container mx-auto px-6">
           <motion.div
@@ -87,7 +87,7 @@ export default function Actualites() {
                     className={`px-5 py-4 text-xs tracking-[0.15em] uppercase whitespace-nowrap transition-all duration-300 border-b-2 ${
                       activeCategory === cat
                         ? "border-[#8EA4AF] text-[#082634]"
-                        : "border-transparent text-[#5C7480] hover:text-[#3B5661]"
+                        : "border-transparent text-[#8EA4AF] hover:text-[#082634]"
                     }`}
                   >
                     {cat}
@@ -129,7 +129,7 @@ export default function Actualites() {
               <p className="text-[#082634] font-serif text-xl font-light mb-3">
                 Aucun article publié pour le moment.
               </p>
-              <p className="text-[#5C7480] font-light text-sm max-w-sm mx-auto">
+              <p className="text-[#8EA4AF] font-light text-sm max-w-sm mx-auto">
                 Revenez prochainement pour découvrir nos publications.
               </p>
             </motion.div>
@@ -139,7 +139,7 @@ export default function Actualites() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-24 text-[#5C7480]"
+              className="text-center py-24 text-[#8EA4AF]"
             >
               <p className="text-2xl font-serif font-light">
                 Aucun article dans cette catégorie.
@@ -189,7 +189,7 @@ export default function Actualites() {
                         )}
                       </div>
                       <div className="p-10 md:p-14 flex flex-col justify-center bg-white border-l border-[#DCE0E7]">
-                        <div className="flex items-center gap-2 text-[#5C7480] text-xs tracking-wider mb-6">
+                        <div className="flex items-center gap-2 text-[#8EA4AF] text-xs tracking-wider mb-6">
                           <Calendar size={11} />
                           <time dateTime={featured.publishedAt ?? ""}>
                             {featured.publishedAt
@@ -197,15 +197,15 @@ export default function Actualites() {
                               : ""}
                           </time>
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-serif text-[#082634] mb-5 group-hover:text-[#5C7480] transition-colors duration-500 leading-snug font-light">
+                        <h2 className="text-3xl md:text-4xl font-serif text-[#082634] mb-5 group-hover:text-[#8EA4AF] transition-colors duration-500 leading-snug font-light">
                           {featured.title}
                         </h2>
                         {featured.excerpt && (
-                          <p className="text-[#3B5661] font-light leading-relaxed mb-8 line-clamp-3 text-sm">
+                          <p className="text-[#082634] font-light leading-relaxed mb-8 line-clamp-3 text-sm">
                             {featured.excerpt}
                           </p>
                         )}
-                        <div className="flex items-center gap-2 text-[#5C7480] text-xs tracking-[0.15em] uppercase">
+                        <div className="flex items-center gap-2 text-[#8EA4AF] text-xs tracking-[0.15em] uppercase">
                           Lire l'article{" "}
                           <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
                         </div>
@@ -241,7 +241,7 @@ export default function Actualites() {
                                 <Newspaper size={24} className="text-[#8EA4AF]/40" strokeWidth={1} />
                               </div>
                             )}
-                            <div className="absolute inset-0 bg-black/8 group-hover:bg-transparent transition-colors duration-700" />
+                            <div className="absolute inset-0 bg-[#082634]/8 group-hover:bg-transparent transition-colors duration-700" />
                             {article.category && (
                               <div className="absolute top-4 left-4">
                                 <span className="bg-white/85 backdrop-blur-sm border border-white/50 text-[#082634] text-xs tracking-[0.15em] uppercase px-3 py-1">
@@ -250,7 +250,7 @@ export default function Actualites() {
                               </div>
                             )}
                           </div>
-                          <div className="flex items-center gap-2 text-[#5C7480] text-xs tracking-wider mb-3">
+                          <div className="flex items-center gap-2 text-[#8EA4AF] text-xs tracking-wider mb-3">
                             <Calendar size={11} />
                             <time dateTime={article.publishedAt ?? ""}>
                               {article.publishedAt
@@ -258,15 +258,15 @@ export default function Actualites() {
                                 : ""}
                             </time>
                           </div>
-                          <h3 className="text-xl font-serif text-[#082634] mb-3 group-hover:text-[#5C7480] transition-colors duration-500 line-clamp-2 leading-snug font-light">
+                          <h3 className="text-xl font-serif text-[#082634] mb-3 group-hover:text-[#8EA4AF] transition-colors duration-500 line-clamp-2 leading-snug font-light">
                             {article.title}
                           </h3>
                           {article.excerpt && (
-                            <p className="text-[#3B5661] text-sm font-light line-clamp-2 mb-4 leading-relaxed">
+                            <p className="text-[#082634] text-sm font-light line-clamp-2 mb-4 leading-relaxed">
                               {article.excerpt}
                             </p>
                           )}
-                          <div className="flex items-center gap-2 text-[#5C7480] text-xs tracking-[0.15em] uppercase">
+                          <div className="flex items-center gap-2 text-[#8EA4AF] text-xs tracking-[0.15em] uppercase">
                             Lire{" "}
                             <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
                           </div>

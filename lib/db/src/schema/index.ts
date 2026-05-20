@@ -4,3 +4,4 @@ export * from "./articles";
 export * from "./careers";
 export * from "./leads";
 export * from "./subscribers";
+export * from "./homepageHeroSettings";

@@ -229,31 +229,6 @@ paths:
         "204":
           description: Deleted
 
-  /uploads:
-    post:
-      operationId: uploadFile
-      tags: [projects]
-      summary: Upload a file
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-      responses:
-        "200":
-          description: Upload success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  url:
-                    type: string
-
   # ── Articles ─────────────────────────────────────────────────────────────
   /articles:
     get:
@@ -629,19 +604,47 @@ components:
           type: string
         slug:
           type: string
+        projectType:
+          type: string
+        tagline:
+          type: string
+        shortDescription:
+          type: string
         description:
+          type: string
+        longDescription:
           type: string
         location:
           type: string
         city:
           type: string
+        addressText:
+          type: string
         status:
           type: string
           enum: [upcoming, ongoing, completed]
+        heroTitle:
+          type: string
+        heroSubtitle:
+          type: string
+        heroLocationText:
+          type: string
+        primaryCtaLabel:
+          type: string
+        secondaryCtaLabel:
+          type: string
         priceMin:
           type: number
         priceMax:
           type: number
+        showPrice:
+          type: boolean
+        priceLabel:
+          type: string
+        priceNote:
+          type: string
+        availabilityNote:
+          type: string
         surfaceMin:
           type: number
         surfaceMax:
@@ -650,7 +653,26 @@ components:
           type: string
         featured:
           type: boolean
+        isOpportunity:
+          type: boolean
+        opportunityType:
+          type: string
+          enum: [promotion, reduction, limited_offer, investment, last_units]
+        opportunityTitle:
+          type: string
+        opportunityDescription:
+          type: string
+        opportunityHighlight:
+          type: string
+        opportunityValidUntil:
+          type: string
+        opportunityCtaLabel:
+          type: string
         coverImageUrl:
+          type: string
+        secondaryImageUrl:
+          type: string
+        lifestyleImageUrl:
           type: string
         images:
           type: array
@@ -660,45 +682,46 @@ components:
           type: array
           items:
             type: string
-        tagline:
+        galleryTitle:
           type: string
-          nullable: true
-        shortDescription:
+        featuresTitle:
           type: string
-          nullable: true
-        storyTitle:
+        projectSectionTitle:
           type: string
-          nullable: true
-        storyText:
+        projectSectionDescription:
           type: string
-          nullable: true
         lifestyleTitle:
           type: string
-          nullable: true
-        lifestyleText:
+        lifestyleDescription:
           type: string
-          nullable: true
+        locationSectionTitle:
+          type: string
+        locationDescription:
+          type: string
         locationAdvantages:
           type: array
           items:
             type: string
-          nullable: true
-        mapLocation:
+        mapEmbedUrl:
           type: string
-          nullable: true
-        financingDetails:
+        mapIframeCode:
           type: string
-          nullable: true
-        ctaText:
+        mapShareUrl:
           type: string
-          nullable: true
-        seoTitle:
+        contactTitle:
           type: string
-          nullable: true
-        seoDescription:
+        contactSubtitle:
           type: string
-          nullable: true
+        metaTitle:
+          type: string
+        metaDescription:
+          type: string
+        ogImageUrl:
+          type: string
         createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
       required:
@@ -719,19 +742,47 @@ components:
           type: string
         slug:
           type: string
+        projectType:
+          type: string
+        tagline:
+          type: string
+        shortDescription:
+          type: string
         description:
+          type: string
+        longDescription:
           type: string
         location:
           type: string
         city:
           type: string
+        addressText:
+          type: string
         status:
           type: string
           enum: [upcoming, ongoing, completed]
+        heroTitle:
+          type: string
+        heroSubtitle:
+          type: string
+        heroLocationText:
+          type: string
+        primaryCtaLabel:
+          type: string
+        secondaryCtaLabel:
+          type: string
         priceMin:
           type: number
         priceMax:
           type: number
+        showPrice:
+          type: boolean
+        priceLabel:
+          type: string
+        priceNote:
+          type: string
+        availabilityNote:
+          type: string
         surfaceMin:
           type: number
         surfaceMax:
@@ -740,7 +791,26 @@ components:
           type: string
         featured:
           type: boolean
+        isOpportunity:
+          type: boolean
+        opportunityType:
+          type: string
+          enum: [promotion, reduction, limited_offer, investment, last_units]
+        opportunityTitle:
+          type: string
+        opportunityDescription:
+          type: string
+        opportunityHighlight:
+          type: string
+        opportunityValidUntil:
+          type: string
+        opportunityCtaLabel:
+          type: string
         coverImageUrl:
+          type: string
+        secondaryImageUrl:
+          type: string
+        lifestyleImageUrl:
           type: string
         images:
           type: array
@@ -750,31 +820,41 @@ components:
           type: array
           items:
             type: string
-        tagline:
+        galleryTitle:
           type: string
-        shortDescription:
+        featuresTitle:
           type: string
-        storyTitle:
+        projectSectionTitle:
           type: string
-        storyText:
+        projectSectionDescription:
           type: string
         lifestyleTitle:
           type: string
-        lifestyleText:
+        lifestyleDescription:
+          type: string
+        locationSectionTitle:
+          type: string
+        locationDescription:
           type: string
         locationAdvantages:
           type: array
           items:
             type: string
-        mapLocation:
+        mapEmbedUrl:
           type: string
-        financingDetails:
+        mapIframeCode:
           type: string
-        ctaText:
+        mapShareUrl:
           type: string
-        seoTitle:
+        contactTitle:
           type: string
-        seoDescription:
+        contactSubtitle:
+          type: string
+        metaTitle:
+          type: string
+        metaDescription:
+          type: string
+        ogImageUrl:
           type: string
       required:
         - brandId
@@ -858,8 +938,6 @@ components:
           type: integer
         title:
           type: string
-        slug:
-          type: string
         department:
           type: string
         location:
@@ -873,21 +951,14 @@ components:
           type: array
           items:
             type: string
-        coverImageUrl:
-          type: string
         active:
           type: boolean
-        metaTitle:
-          type: string
-        metaDescription:
-          type: string
         createdAt:
           type: string
           format: date-time
       required:
         - id
         - title
-        - slug
         - department
         - type
         - active
@@ -898,8 +969,6 @@ components:
       properties:
         title:
           type: string
-        slug:
-          type: string
         department:
           type: string
         location:
@@ -913,17 +982,10 @@ components:
           type: array
           items:
             type: string
-        coverImageUrl:
-          type: string
         active:
           type: boolean
-        metaTitle:
-          type: string
-        metaDescription:
-          type: string
       required:
         - title
-        - slug
         - department
         - type
 
@@ -945,8 +1007,6 @@ components:
         phone:
           type: string
         message:
-          type: string
-        cvUrl:
           type: string
         createdAt:
           type: string
@@ -972,8 +1032,6 @@ components:
           type: string
         message:
           type: string
-        cvUrl:
-          type: string
       required:
         - firstName
         - lastName
@@ -997,6 +1055,8 @@ components:
         message:
           type: string
         projectInterest:
+          type: string
+        source:
           type: string
         createdAt:
           type: string
@@ -1024,6 +1084,8 @@ components:
         message:
           type: string
         projectInterest:
+          type: string
+        source:
           type: string
       required:
         - firstName

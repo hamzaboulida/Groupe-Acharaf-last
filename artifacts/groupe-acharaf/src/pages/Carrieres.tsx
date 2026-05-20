@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { useListCareers, useApplyForCareer, Career } from "@workspace/api-client-react";
+import { useListCareers, useApplyForCareer } from "@workspace/api-client-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { MapPin, Briefcase } from "lucide-react";
@@ -14,7 +14,6 @@ type ApplicationForm = {
   email: string;
   phone: string;
   message: string;
-  cvUrl: string;
 };
 
 const TYPE_LABEL: Record<string, string> = {
@@ -29,7 +28,7 @@ function CareerCard({
   career,
   onApply,
 }: {
-  career: Career;
+  career: NonNullable<ReturnType<typeof useListCareers>["data"]>[0];
   onApply: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -46,14 +45,14 @@ function CareerCard({
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             {career.department && (
-              <span className="text-[#5C7480] text-[10px] tracking-[0.18em] uppercase">
+              <span className="text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase">
                 {career.department}
               </span>
             )}
             {career.type && (
               <>
                 <span className="text-[#8EA4AF]/50">·</span>
-                <span className="text-[#5C7480] text-[10px] tracking-[0.15em] uppercase">
+                <span className="text-[#8EA4AF] text-[10px] tracking-[0.15em] uppercase">
                   {TYPE_LABEL[career.type] ?? career.type}
                 </span>
               </>
@@ -61,14 +60,14 @@ function CareerCard({
             {career.location && (
               <>
                 <span className="text-[#8EA4AF]/50">·</span>
-                <span className="flex items-center gap-1 text-[#5C7480] text-[10px]">
+                <span className="flex items-center gap-1 text-[#8EA4AF] text-[10px]">
                   <MapPin size={10} strokeWidth={1.5} />
                   {career.location}
                 </span>
               </>
             )}
           </div>
-          <h3 className="text-[#082634] text-lg md:text-xl font-serif font-light group-hover:text-[#3B5661] transition-colors duration-300">
+          <h3 className="text-[#082634] text-lg md:text-xl font-serif font-light group-hover:text-[#082634] transition-colors duration-300">
             {career.title}
           </h3>
         </div>
@@ -90,20 +89,20 @@ function CareerCard({
           >
             <div className="pb-8">
               {career.description && (
-                <p className="text-[#3B5661] leading-relaxed mb-6 font-light text-sm max-w-2xl">
+                <p className="text-[#082634] leading-relaxed mb-6 font-light text-sm max-w-2xl">
                   {career.description}
                 </p>
               )}
               {career.requirements && career.requirements.length > 0 && (
                 <div className="mb-7">
-                  <h4 className="text-[#3B5661] text-[10px] tracking-[0.18em] uppercase mb-4">
+                  <h4 className="text-[#082634] text-[10px] tracking-[0.18em] uppercase mb-4">
                     Profil recherché
                   </h4>
                   <ul className="space-y-2">
-                    {career.requirements.map((r: string, i: number) => (
+                    {career.requirements.map((r, i) => (
                       <li
                         key={i}
-                        className="flex items-start gap-3 text-[#3B5661] text-sm font-light"
+                        className="flex items-start gap-3 text-[#082634] text-sm font-light"
                       >
                         <span className="w-1 h-1 bg-[#8EA4AF] flex-shrink-0 mt-2 rounded-full" />
                         {r}
@@ -114,7 +113,7 @@ function CareerCard({
               )}
               <button
                 onClick={onApply}
-                className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#082634] text-white text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#0a3245] transition-colors duration-300"
+                className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#082634] text-white text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#082634] transition-colors duration-300"
               >
                 Postuler
               </button>
@@ -140,8 +139,6 @@ function ApplicationModal({
   const {
     register,
     handleSubmit,
-    setValue,
-    watch,
     formState: { errors },
   } = useForm<ApplicationForm>();
   const [sent, setSent] = useState(false);
@@ -159,7 +156,7 @@ function ApplicationModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-[#080629]/90 backdrop-blur-md z-50 flex items-center justify-center p-6"
+      className="fixed inset-0 bg-[#082634]/90 backdrop-blur-md z-50 flex items-center justify-center p-6"
       onClick={onClose}
     >
       <motion.div
@@ -187,7 +184,7 @@ function ApplicationModal({
                     className={inputClass}
                   />
                   {errors.firstName && (
-                    <span className="text-red-400 text-xs mt-1 block">Requis</span>
+                    <span className="ga-error mt-1 block">Requis</span>
                   )}
                 </div>
                 <div>
@@ -197,7 +194,7 @@ function ApplicationModal({
                     className={inputClass}
                   />
                   {errors.lastName && (
-                    <span className="text-red-400 text-xs mt-1 block">Requis</span>
+                    <span className="ga-error mt-1 block">Requis</span>
                   )}
                 </div>
               </div>
@@ -209,7 +206,7 @@ function ApplicationModal({
                   className={inputClass}
                 />
                 {errors.email && (
-                  <span className="text-red-400 text-xs mt-1 block">Requis</span>
+                  <span className="ga-error mt-1 block">Requis</span>
                 )}
               </div>
               <input
@@ -223,45 +220,11 @@ function ApplicationModal({
                 {...register("message")}
                 className={`${inputClass} resize-none`}
               />
-
-              <div className="space-y-2">
-                <label className="text-white/40 text-[10px] uppercase tracking-widest block">Votre CV (PDF) *</label>
-                <div className="relative group">
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const formData = new FormData();
-                      formData.append("file", file);
-                      try {
-                        const res = await fetch("/api/uploads", { method: "POST", body: formData });
-                        const data = await res.json();
-                        if (data.url) {
-                          setValue("cvUrl", data.url);
-                        }
-                      } catch (err) {
-                        console.error("Upload failed", err);
-                      }
-                    }}
-                  />
-                  <div className="w-full bg-white/4 border border-white/10 p-4 text-center group-hover:border-white/25 transition-colors">
-                    <div className="text-white/40 text-xs flex items-center justify-center gap-2">
-                      <span className="text-lg">+</span>
-                      {watch("cvUrl") ? "CV téléchargé avec succès" : "Cliquez pour joindre votre CV"}
-                    </div>
-                  </div>
-                </div>
-                {errors.cvUrl && <span className="text-red-400 text-[10px]">CV requis</span>}
-              </div>
-
               <div className="flex gap-3 pt-2">
                 <button
                   type="submit"
-                  disabled={apply.isPending || !watch("cvUrl")}
-                  className="flex-1 bg-[#8EA4AF] text-[#082634] py-3 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#B2BED0] transition-colors disabled:opacity-50"
+                  disabled={apply.isPending}
+                  className="flex-1 bg-[#8EA4AF] text-[#082634] py-3 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#DCE0E7] transition-colors disabled:opacity-50"
                 >
                   {apply.isPending ? "Envoi…" : "Envoyer ma candidature"}
                 </button>
@@ -308,31 +271,20 @@ export default function Carrieres() {
     title: string;
   } | null>(null);
 
-  /* SEO & Page State */
-  React.useEffect(() => {
-    document.title = "Carrières | Rejoignez le Groupe Acharaf";
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) {
-      metaDesc.setAttribute("content", "Découvrez nos opportunités de carrière et rejoignez une équipe passionnée par l'immobilier d'exception au Maroc.");
-    }
-  }, []);
-
-  const pageHeaderImage = careers.find(c => c.coverImageUrl)?.coverImageUrl || heroBg;
-
   return (
     <Layout>
       {/* ── Hero ── */}
       <section className="relative h-[65vh] w-full flex items-end pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src={pageHeaderImage}
+            src={heroBg}
             alt=""
             className="w-full h-full object-cover scale-105 brightness-[0.72]"
           />
         </div>
-        <div className="absolute inset-0 bg-black/22" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/50" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[#082634]/22" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#082634]/55 via-transparent to-[#082634]/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#082634]/20 via-transparent to-transparent" />
         <div className="relative z-10 container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
@@ -369,7 +321,7 @@ export default function Carrieres() {
             transition={{ duration: 0.8, ease: EC }}
             className="mb-14"
           >
-            <p className="text-[#5C7480] text-[10px] tracking-[0.22em] uppercase mb-4">
+            <p className="text-[#8EA4AF] text-[10px] tracking-[0.22em] uppercase mb-4">
               Offres disponibles
             </p>
             <div className="flex items-baseline gap-3">
@@ -413,7 +365,7 @@ export default function Carrieres() {
               <p className="text-[#082634] font-serif text-xl font-light mb-3">
                 Aucune offre disponible pour le moment.
               </p>
-              <p className="text-[#5C7480] font-light text-sm leading-relaxed max-w-sm mx-auto">
+              <p className="text-[#8EA4AF] font-light text-sm leading-relaxed max-w-sm mx-auto">
                 Nous vous invitons à revenir prochainement pour découvrir
                 nos futures opportunités.
               </p>

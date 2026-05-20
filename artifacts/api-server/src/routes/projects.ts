@@ -15,53 +15,84 @@ import {
 
 const router: IRouter = Router();
 
+const projectSelection = {
+  id: projectsTable.id,
+  brandId: projectsTable.brandId,
+  title: projectsTable.title,
+  slug: projectsTable.slug,
+  projectType: projectsTable.projectType,
+  tagline: projectsTable.tagline,
+  shortDescription: projectsTable.shortDescription,
+  description: projectsTable.description,
+  longDescription: projectsTable.longDescription,
+  location: projectsTable.location,
+  city: projectsTable.city,
+  addressText: projectsTable.addressText,
+  status: projectsTable.status,
+  heroTitle: projectsTable.heroTitle,
+  heroSubtitle: projectsTable.heroSubtitle,
+  heroLocationText: projectsTable.heroLocationText,
+  primaryCtaLabel: projectsTable.primaryCtaLabel,
+  secondaryCtaLabel: projectsTable.secondaryCtaLabel,
+  priceMin: projectsTable.priceMin,
+  priceMax: projectsTable.priceMax,
+  showPrice: projectsTable.showPrice,
+  priceLabel: projectsTable.priceLabel,
+  priceNote: projectsTable.priceNote,
+  availabilityNote: projectsTable.availabilityNote,
+  surfaceMin: projectsTable.surfaceMin,
+  surfaceMax: projectsTable.surfaceMax,
+  deliveryDate: projectsTable.deliveryDate,
+  featured: projectsTable.featured,
+  isOpportunity: projectsTable.isOpportunity,
+  opportunityType: projectsTable.opportunityType,
+  opportunityTitle: projectsTable.opportunityTitle,
+  opportunityDescription: projectsTable.opportunityDescription,
+  opportunityHighlight: projectsTable.opportunityHighlight,
+  opportunityValidUntil: projectsTable.opportunityValidUntil,
+  opportunityCtaLabel: projectsTable.opportunityCtaLabel,
+  coverImageUrl: projectsTable.coverImageUrl,
+  secondaryImageUrl: projectsTable.secondaryImageUrl,
+  lifestyleImageUrl: projectsTable.lifestyleImageUrl,
+  images: projectsTable.images,
+  amenities: projectsTable.amenities,
+  galleryTitle: projectsTable.galleryTitle,
+  featuresTitle: projectsTable.featuresTitle,
+  projectSectionTitle: projectsTable.projectSectionTitle,
+  projectSectionDescription: projectsTable.projectSectionDescription,
+  lifestyleTitle: projectsTable.lifestyleTitle,
+  lifestyleDescription: projectsTable.lifestyleDescription,
+  locationSectionTitle: projectsTable.locationSectionTitle,
+  locationDescription: projectsTable.locationDescription,
+  locationAdvantages: projectsTable.locationAdvantages,
+  mapEmbedUrl: projectsTable.mapEmbedUrl,
+  mapIframeCode: projectsTable.mapIframeCode,
+  mapShareUrl: projectsTable.mapShareUrl,
+  contactTitle: projectsTable.contactTitle,
+  contactSubtitle: projectsTable.contactSubtitle,
+  metaTitle: projectsTable.metaTitle,
+  metaDescription: projectsTable.metaDescription,
+  ogImageUrl: projectsTable.ogImageUrl,
+  createdAt: projectsTable.createdAt,
+  updatedAt: projectsTable.updatedAt,
+  brand: {
+    id: brandsTable.id,
+    name: brandsTable.name,
+    slug: brandsTable.slug,
+    tagline: brandsTable.tagline,
+    description: brandsTable.description,
+    segment: brandsTable.segment,
+    logoUrl: brandsTable.logoUrl,
+    coverImageUrl: brandsTable.coverImageUrl,
+    accentColor: brandsTable.accentColor,
+    createdAt: brandsTable.createdAt,
+  },
+};
+
 router.get("/projects", async (req, res): Promise<void> => {
   const queryParams = ListProjectsQueryParams.safeParse(req.query);
   const projects = await db
-    .select({
-      id: projectsTable.id,
-      brandId: projectsTable.brandId,
-      title: projectsTable.title,
-      slug: projectsTable.slug,
-      description: projectsTable.description,
-      location: projectsTable.location,
-      city: projectsTable.city,
-      status: projectsTable.status,
-      priceMin: projectsTable.priceMin,
-      priceMax: projectsTable.priceMax,
-      surfaceMin: projectsTable.surfaceMin,
-      surfaceMax: projectsTable.surfaceMax,
-      deliveryDate: projectsTable.deliveryDate,
-      featured: projectsTable.featured,
-      coverImageUrl: projectsTable.coverImageUrl,
-      images: projectsTable.images,
-      tagline: projectsTable.tagline,
-      shortDescription: projectsTable.shortDescription,
-      storyTitle: projectsTable.storyTitle,
-      storyText: projectsTable.storyText,
-      lifestyleTitle: projectsTable.lifestyleTitle,
-      lifestyleText: projectsTable.lifestyleText,
-      locationAdvantages: projectsTable.locationAdvantages,
-      mapLocation: projectsTable.mapLocation,
-      financingDetails: projectsTable.financingDetails,
-      ctaText: projectsTable.ctaText,
-      seoTitle: projectsTable.seoTitle,
-      seoDescription: projectsTable.seoDescription,
-      amenities: projectsTable.amenities,
-      createdAt: projectsTable.createdAt,
-      brand: {
-        id: brandsTable.id,
-        name: brandsTable.name,
-        slug: brandsTable.slug,
-        tagline: brandsTable.tagline,
-        description: brandsTable.description,
-        segment: brandsTable.segment,
-        logoUrl: brandsTable.logoUrl,
-        coverImageUrl: brandsTable.coverImageUrl,
-        accentColor: brandsTable.accentColor,
-        createdAt: brandsTable.createdAt,
-      },
-    })
+    .select(projectSelection)
     .from(projectsTable)
     .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id))
     .orderBy(projectsTable.createdAt);
@@ -91,38 +122,7 @@ router.post("/projects", async (req, res): Promise<void> => {
   const [project] = await db.insert(projectsTable).values(parsed.data).returning();
 
   const [full] = await db
-    .select({
-      id: projectsTable.id,
-      brandId: projectsTable.brandId,
-      title: projectsTable.title,
-      slug: projectsTable.slug,
-      description: projectsTable.description,
-      location: projectsTable.location,
-      city: projectsTable.city,
-      status: projectsTable.status,
-      priceMin: projectsTable.priceMin,
-      priceMax: projectsTable.priceMax,
-      surfaceMin: projectsTable.surfaceMin,
-      surfaceMax: projectsTable.surfaceMax,
-      deliveryDate: projectsTable.deliveryDate,
-      featured: projectsTable.featured,
-      coverImageUrl: projectsTable.coverImageUrl,
-      images: projectsTable.images,
-      amenities: projectsTable.amenities,
-      createdAt: projectsTable.createdAt,
-      brand: {
-        id: brandsTable.id,
-        name: brandsTable.name,
-        slug: brandsTable.slug,
-        tagline: brandsTable.tagline,
-        description: brandsTable.description,
-        segment: brandsTable.segment,
-        logoUrl: brandsTable.logoUrl,
-        coverImageUrl: brandsTable.coverImageUrl,
-        accentColor: brandsTable.accentColor,
-        createdAt: brandsTable.createdAt,
-      },
-    })
+    .select(projectSelection)
     .from(projectsTable)
     .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id))
     .where(eq(projectsTable.id, project.id));
@@ -137,38 +137,7 @@ router.get("/projects/:id", async (req, res): Promise<void> => {
     return;
   }
   const [project] = await db
-    .select({
-      id: projectsTable.id,
-      brandId: projectsTable.brandId,
-      title: projectsTable.title,
-      slug: projectsTable.slug,
-      description: projectsTable.description,
-      location: projectsTable.location,
-      city: projectsTable.city,
-      status: projectsTable.status,
-      priceMin: projectsTable.priceMin,
-      priceMax: projectsTable.priceMax,
-      surfaceMin: projectsTable.surfaceMin,
-      surfaceMax: projectsTable.surfaceMax,
-      deliveryDate: projectsTable.deliveryDate,
-      featured: projectsTable.featured,
-      coverImageUrl: projectsTable.coverImageUrl,
-      images: projectsTable.images,
-      amenities: projectsTable.amenities,
-      createdAt: projectsTable.createdAt,
-      brand: {
-        id: brandsTable.id,
-        name: brandsTable.name,
-        slug: brandsTable.slug,
-        tagline: brandsTable.tagline,
-        description: brandsTable.description,
-        segment: brandsTable.segment,
-        logoUrl: brandsTable.logoUrl,
-        coverImageUrl: brandsTable.coverImageUrl,
-        accentColor: brandsTable.accentColor,
-        createdAt: brandsTable.createdAt,
-      },
-    })
+    .select(projectSelection)
     .from(projectsTable)
     .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id))
     .where(eq(projectsTable.id, params.data.id));
@@ -191,41 +160,13 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  await db.update(projectsTable).set(parsed.data).where(eq(projectsTable.id, params.data.id));
+  await db
+    .update(projectsTable)
+    .set({ ...parsed.data, updatedAt: new Date() })
+    .where(eq(projectsTable.id, params.data.id));
 
   const [full] = await db
-    .select({
-      id: projectsTable.id,
-      brandId: projectsTable.brandId,
-      title: projectsTable.title,
-      slug: projectsTable.slug,
-      description: projectsTable.description,
-      location: projectsTable.location,
-      city: projectsTable.city,
-      status: projectsTable.status,
-      priceMin: projectsTable.priceMin,
-      priceMax: projectsTable.priceMax,
-      surfaceMin: projectsTable.surfaceMin,
-      surfaceMax: projectsTable.surfaceMax,
-      deliveryDate: projectsTable.deliveryDate,
-      featured: projectsTable.featured,
-      coverImageUrl: projectsTable.coverImageUrl,
-      images: projectsTable.images,
-      amenities: projectsTable.amenities,
-      createdAt: projectsTable.createdAt,
-      brand: {
-        id: brandsTable.id,
-        name: brandsTable.name,
-        slug: brandsTable.slug,
-        tagline: brandsTable.tagline,
-        description: brandsTable.description,
-        segment: brandsTable.segment,
-        logoUrl: brandsTable.logoUrl,
-        coverImageUrl: brandsTable.coverImageUrl,
-        accentColor: brandsTable.accentColor,
-        createdAt: brandsTable.createdAt,
-      },
-    })
+    .select(projectSelection)
     .from(projectsTable)
     .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id))
     .where(eq(projectsTable.id, params.data.id));

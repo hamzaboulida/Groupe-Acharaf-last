@@ -24,79 +24,10 @@ import {
   getListApplicationsQueryKey,
 } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
-import { X, Plus, Image as ImageIcon, Trash2, MapPin, Info, Layout as LayoutIcon, Search, Download, Briefcase } from "lucide-react";
+import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
+import { ArrowDown, ArrowUp, Image as ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
 
 type Tab = "projects" | "leads" | "articles" | "careers" | "applications";
-
-
-
-function FileUpload({ 
-  value, 
-  onChange, 
-  label 
-}: { 
-  value: string; 
-  onChange: (url: string) => void; 
-  label: string 
-}) {
-  const [uploading, setUploading] = useState(false);
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/uploads", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.url) {
-        onChange(data.url);
-      }
-    } catch (err) {
-      console.error("Upload failed", err);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      <label className="block text-[10px] font-medium text-[#8EA4AF] uppercase tracking-[0.2em]">{label}</label>
-      <div className="flex items-center gap-4">
-        {value && (
-          <div className="relative w-24 h-24 border border-white/10 overflow-hidden bg-white/5">
-            <img src={value} alt="Preview" className="w-full h-full object-cover" />
-            <button 
-              type="button"
-              onClick={() => onChange("")}
-              className="absolute top-0 right-0 bg-[#082634] text-[#D8C7A3] p-1.5 hover:bg-[#D8C7A3] hover:text-[#082634] transition-colors"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        )}
-        <label className="cursor-pointer bg-white/5 border border-white/10 px-5 py-3 text-[10px] uppercase tracking-[0.15em] text-[#D8C7A3] hover:bg-[#D8C7A3] hover:text-[#082634] transition-all">
-          {uploading ? "Chargement..." : value ? "Changer" : "Choisir une image"}
-          <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
-        </label>
-      </div>
-    </div>
-  );
-}
-
-
-
-
-const BRAND_DEEP = "#082634";
-const BRAND_GOLD = "#D8C7A3";
-const BRAND_MEDIUM = "#8EA4AF";
-const BRAND_LIGHT = "#DCE0E7";
 
 const NAV_ITEMS: { id: Tab; label: string }[] = [
   { id: "projects", label: "Projets" },
@@ -112,14 +43,14 @@ function formatDate(d: string) {
 
 function Badge({ children, color = "gold" }: { children: React.ReactNode; color?: "gold" | "blue" | "green" | "red" | "gray" }) {
   const colors = {
-    gold: "bg-[#D8C7A3]/10 text-[#D8C7A3] border border-[#D8C7A3]/20",
-    blue: "bg-[#8EA4AF]/10 text-[#8EA4AF] border border-[#8EA4AF]/20",
-    green: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-    red: "bg-red-500/10 text-red-400 border border-red-500/20",
-    gray: "bg-white/5 text-white/40 border border-white/10",
+    gold: "ga-badge-medium",
+    blue: "ga-badge-light",
+    green: "ga-badge-light",
+    red: "ga-badge-medium",
+    gray: "bg-white/10 text-white/60 border border-white/10",
   };
   return (
-    <span className={`px-2.5 py-1 text-[10px] font-medium tracking-[0.15em] uppercase ${colors[color]}`}>{children}</span>
+    <span className={`ga-badge ${colors[color]}`}>{children}</span>
   );
 }
 
@@ -129,33 +60,930 @@ function ConfirmButton({ onConfirm, label = "Supprimer" }: { onConfirm: () => vo
     return (
       <button
         onClick={() => setStep(1)}
-        className="text-white/40 hover:text-red-400 text-[10px] uppercase tracking-widest transition-colors px-2 py-1"
+        className="text-[#8EA4AF] hover:text-white text-sm px-2 py-1 hover:bg-white/5 transition-colors"
       >
         {label}
       </button>
     );
   }
   return (
-    <div className="flex items-center gap-2">
+    <span className="flex gap-2">
       <button
-        onClick={onConfirm}
-        className="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] uppercase tracking-widest px-3 py-1 hover:bg-red-500 hover:text-white transition-all"
+        onClick={() => { onConfirm(); setStep(0); }}
+        className="text-[#8EA4AF] text-sm font-semibold"
       >
         Confirmer
       </button>
-      <button
-        onClick={() => setStep(0)}
-        className="text-white/40 hover:text-white text-[10px] uppercase tracking-widest px-2"
-      >
+      <button onClick={() => setStep(0)} className="text-white/40 text-sm">
         Annuler
       </button>
-    </div>
+    </span>
   );
 }
 
 // ──────────────────────────────────────────────────────────
 // PROJECTS TAB
 // ──────────────────────────────────────────────────────────
+type ProjectForm = {
+  brandId: number;
+  title: string;
+  slug: string;
+  projectType: string;
+  tagline: string;
+  shortDescription: string;
+  description: string;
+  longDescription: string;
+  location: string;
+  city: string;
+  addressText: string;
+  status: "upcoming" | "ongoing" | "completed";
+  heroTitle: string;
+  heroSubtitle: string;
+  heroLocationText: string;
+  primaryCtaLabel: string;
+  secondaryCtaLabel: string;
+  priceMin: string;
+  priceMax: string;
+  showPrice: boolean;
+  priceLabel: string;
+  priceNote: string;
+  availabilityNote: string;
+  surfaceMin: string;
+  surfaceMax: string;
+  deliveryDate: string;
+  featured: boolean;
+  isOpportunity: boolean;
+  opportunityType: "promotion" | "reduction" | "limited_offer" | "investment" | "last_units";
+  opportunityTitle: string;
+  opportunityDescription: string;
+  opportunityHighlight: string;
+  opportunityValidUntil: string;
+  opportunityCtaLabel: string;
+  coverImageUrl: string;
+  secondaryImageUrl: string;
+  lifestyleImageUrl: string;
+  images: string[];
+  amenities: string[];
+  galleryTitle: string;
+  featuresTitle: string;
+  projectSectionTitle: string;
+  projectSectionDescription: string;
+  lifestyleTitle: string;
+  lifestyleDescription: string;
+  locationSectionTitle: string;
+  locationDescription: string;
+  locationAdvantages: string[];
+  mapEmbedUrl: string;
+  mapIframeCode: string;
+  mapShareUrl: string;
+  contactTitle: string;
+  contactSubtitle: string;
+  metaTitle: string;
+  metaDescription: string;
+  ogImageUrl: string;
+};
+
+function emptyProjectForm(brandId = 1): ProjectForm {
+  return {
+    brandId,
+    title: "",
+    slug: "",
+    projectType: "",
+    tagline: "",
+    shortDescription: "",
+    description: "",
+    longDescription: "",
+    location: "",
+    city: "",
+    addressText: "",
+    status: "upcoming",
+    heroTitle: "",
+    heroSubtitle: "",
+    heroLocationText: "",
+    primaryCtaLabel: "Découvrir le projet",
+    secondaryCtaLabel: "Prendre rendez-vous",
+    priceMin: "",
+    priceMax: "",
+    showPrice: true,
+    priceLabel: "Prix de départ",
+    priceNote: "",
+    availabilityNote: "",
+    surfaceMin: "",
+    surfaceMax: "",
+    deliveryDate: "",
+    featured: false,
+    isOpportunity: false,
+    opportunityType: "promotion",
+    opportunityTitle: "",
+    opportunityDescription: "",
+    opportunityHighlight: "",
+    opportunityValidUntil: "",
+    opportunityCtaLabel: "Découvrir l’opportunité",
+    coverImageUrl: "",
+    secondaryImageUrl: "",
+    lifestyleImageUrl: "",
+    images: [],
+    amenities: [],
+    galleryTitle: "Visuels du projet",
+    featuresTitle: "Points forts du projet",
+    projectSectionTitle: "Le projet",
+    projectSectionDescription: "",
+    lifestyleTitle: "",
+    lifestyleDescription: "",
+    locationSectionTitle: "Emplacement",
+    locationDescription: "",
+    locationAdvantages: [],
+    mapEmbedUrl: "",
+    mapIframeCode: "",
+    mapShareUrl: "",
+    contactTitle: "Intéressé par ce projet ?",
+    contactSubtitle: "Notre équipe vous recontacte dans les 24 heures pour organiser une visite ou répondre à toutes vos questions.",
+    metaTitle: "",
+    metaDescription: "",
+    ogImageUrl: "",
+  };
+}
+
+const inputClass = "ga-input ga-input-dark";
+const labelClass = "ga-label ga-label-dark";
+
+function FormGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="ga-card-dark p-4 space-y-4">
+      <h4 className="ga-kicker text-white/80">{title}</h4>
+      {children}
+    </section>
+  );
+}
+
+function ArrayEditor({
+  label,
+  values,
+  placeholder,
+  onChange,
+}: {
+  label: string;
+  values: string[];
+  placeholder: string;
+  onChange: (values: string[]) => void;
+}) {
+  const normalized = values.length ? values : [""];
+  return (
+    <div>
+      <label className={labelClass}>{label}</label>
+      <div className="space-y-2">
+        {normalized.map((value, index) => (
+          <div key={index} className="grid grid-cols-[1fr_auto_auto_auto] gap-2">
+            <input
+              value={value}
+              placeholder={placeholder}
+              onChange={(e) => {
+                const next = [...normalized];
+                next[index] = e.target.value;
+                onChange(next);
+              }}
+              className={inputClass}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (index === 0) return;
+                const next = [...normalized];
+                [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                onChange(next);
+              }}
+              disabled={index === 0}
+              className="px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs disabled:opacity-20"
+              aria-label="Monter"
+            >
+              <ArrowUp size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (index === normalized.length - 1) return;
+                const next = [...normalized];
+                [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                onChange(next);
+              }}
+              disabled={index === normalized.length - 1}
+              className="px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs disabled:opacity-20"
+              aria-label="Descendre"
+            >
+              <ArrowDown size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => onChange(normalized.filter((_, i) => i !== index))}
+              className="px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs"
+            >
+              Retirer
+            </button>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => onChange([...normalized, ""])}
+        className="mt-2 text-[#8EA4AF] hover:text-white text-xs tracking-[0.12em] uppercase"
+      >
+        + Ajouter
+      </button>
+    </div>
+  );
+}
+
+const acceptedImageTypes = ["image/jpeg", "image/png", "image/webp"];
+const acceptedImageExtensions = ".jpg,.jpeg,.png,.webp";
+const maxImageSize = 8 * 1024 * 1024;
+const acceptedVideoTypes = ["video/mp4", "video/webm"];
+const acceptedVideoExtensions = ".mp4,.webm";
+const maxVideoSize = 20 * 1024 * 1024;
+
+type UploadedImage = {
+  url: string;
+  originalName: string;
+  size: number;
+};
+
+function formatBytes(bytes: number) {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+}
+
+function validateImageFiles(files: File[]) {
+  for (const file of files) {
+    if (!acceptedImageTypes.includes(file.type)) {
+      return "Formats acceptés : JPG, JPEG, PNG ou WEBP.";
+    }
+    if (file.size > maxImageSize) {
+      return `Chaque image doit faire moins de ${formatBytes(maxImageSize)}.`;
+    }
+  }
+  return "";
+}
+
+function validateVideoFile(file: File) {
+  if (!acceptedVideoTypes.includes(file.type)) {
+    return "Formats vidéo acceptés : MP4 ou WEBM.";
+  }
+  if (file.size > maxVideoSize) {
+    return `La vidéo doit faire moins de ${formatBytes(maxVideoSize)}.`;
+  }
+  return "";
+}
+
+async function uploadProjectImages(files: File[]): Promise<UploadedImage[]> {
+  const validationError = validateImageFiles(files);
+  if (validationError) {
+    throw new Error(validationError);
+  }
+
+  const data = new FormData();
+  files.forEach((file) => data.append("files", file));
+
+  const response = await fetch("/api/uploads/images", {
+    method: "POST",
+    body: data,
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error ?? "Impossible d'uploader l'image.");
+  }
+
+  return payload.files ?? [];
+}
+
+type UploadedVideo = UploadedImage;
+
+async function uploadHeroVideo(file: File): Promise<UploadedVideo> {
+  const validationError = validateVideoFile(file);
+  if (validationError) {
+    throw new Error(validationError);
+  }
+
+  const data = new FormData();
+  data.append("files", file);
+
+  const response = await fetch("/api/uploads/videos", {
+    method: "POST",
+    body: data,
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error ?? "Impossible d'uploader la vidéo.");
+  }
+
+  return payload.files?.[0];
+}
+
+type HomepageHeroSettings = {
+  mediaType: "slideshow" | "video" | "mixed";
+  images: string[];
+  videoUrl: string;
+  fallbackImageUrl: string;
+  enableVideoOnMobile: boolean;
+};
+
+const defaultHomepageHeroSettings: HomepageHeroSettings = {
+  mediaType: "slideshow",
+  images: [],
+  videoUrl: "",
+  fallbackImageUrl: "",
+  enableVideoOnMobile: false,
+};
+
+function HomepageHeroAdminSection() {
+  const [settings, setSettings] = useState<HomepageHeroSettings>(defaultHomepageHeroSettings);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [uploadingFallback, setUploadingFallback] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  async function load() {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch("/api/homepage-hero");
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Impossible de charger les réglages hero.");
+      }
+      setSettings({
+        mediaType: payload.mediaType ?? "slideshow",
+        images: Array.isArray(payload.images) ? payload.images : [],
+        videoUrl: payload.videoUrl ?? "",
+        fallbackImageUrl: payload.fallbackImageUrl ?? "",
+        enableVideoOnMobile: payload.enableVideoOnMobile === true,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur de chargement.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  React.useEffect(() => {
+    load();
+  }, []);
+
+  async function save() {
+    setSaving(true);
+    setError("");
+    setMessage("");
+    try {
+      const response = await fetch("/api/homepage-hero", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mediaType: settings.mediaType,
+          images: settings.images.filter(Boolean),
+          videoUrl: settings.videoUrl.trim(),
+          fallbackImageUrl: settings.fallbackImageUrl.trim(),
+          enableVideoOnMobile: settings.enableVideoOnMobile,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Sauvegarde impossible.");
+      }
+      setMessage("Réglages Homepage Hero enregistrés.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sauvegarde impossible.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleImagesUpload(files: FileList | null) {
+    const selectedFiles = Array.from(files ?? []);
+    if (!selectedFiles.length) return;
+    setUploadingImages(true);
+    setError("");
+    setMessage("");
+    try {
+      const uploaded = await uploadProjectImages(selectedFiles);
+      setSettings((prev) => ({
+        ...prev,
+        images: [...prev.images.filter(Boolean), ...uploaded.map((item) => item.url)],
+      }));
+      setMessage(`${uploaded.length} image${uploaded.length > 1 ? "s" : ""} ajoutée${uploaded.length > 1 ? "s" : ""}.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload images impossible.");
+    } finally {
+      setUploadingImages(false);
+    }
+  }
+
+  async function handleVideoUpload(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+    setUploadingVideo(true);
+    setError("");
+    setMessage("");
+    try {
+      const uploaded = await uploadHeroVideo(file);
+      setSettings((prev) => ({ ...prev, videoUrl: uploaded.url }));
+      setMessage("Vidéo hero uploadée.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload vidéo impossible.");
+    } finally {
+      setUploadingVideo(false);
+    }
+  }
+
+  async function handleFallbackUpload(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+    setUploadingFallback(true);
+    setError("");
+    setMessage("");
+    try {
+      const [uploaded] = await uploadProjectImages([file]);
+      setSettings((prev) => ({ ...prev, fallbackImageUrl: uploaded.url }));
+      setMessage("Image fallback uploadée.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload fallback impossible.");
+    } finally {
+      setUploadingFallback(false);
+    }
+  }
+
+  function moveImage(index: number, direction: -1 | 1) {
+    const target = index + direction;
+    if (target < 0 || target >= settings.images.length) return;
+    const next = [...settings.images];
+    [next[index], next[target]] = [next[target], next[index]];
+    setSettings((prev) => ({ ...prev, images: next }));
+  }
+
+  function removeImage(index: number) {
+    setSettings((prev) => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+  }
+
+  if (loading) {
+    return (
+      <section className="ga-admin-panel p-6 mb-8">
+        <div className="text-white/60 text-sm flex items-center gap-2">
+          <Loader2 size={14} className="animate-spin" /> Chargement Homepage Hero...
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="ga-admin-panel p-6 mb-8 space-y-5">
+      <div>
+        <h3 className="text-white font-serif text-xl">Homepage Hero</h3>
+        <p className="text-white/45 text-xs mt-1">Upload optimized night/luxury visuals for best homepage performance.</p>
+      </div>
+
+      <div>
+        <label className={labelClass}>Type de média</label>
+        <select
+          value={settings.mediaType}
+          onChange={(e) => setSettings((prev) => ({ ...prev, mediaType: e.target.value as HomepageHeroSettings["mediaType"] }))}
+          className={inputClass}
+        >
+          <option value="slideshow">Image slideshow</option>
+          <option value="video">Video</option>
+          <option value="mixed">Mixed media</option>
+        </select>
+      </div>
+
+      {(settings.mediaType === "slideshow" || settings.mediaType === "mixed") && (
+        <div className="space-y-3">
+          <label className={labelClass}>Images hero</label>
+          <div className="flex items-center gap-2">
+            <label htmlFor="homepage-hero-images" className="inline-flex items-center gap-2 px-3 py-2 border border-[#8EA4AF]/40 text-[#DCE0E7] hover:border-[#8EA4AF] hover:bg-white/5 text-xs tracking-[0.12em] uppercase cursor-pointer transition-colors">
+              {uploadingImages ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+              Upload images
+            </label>
+            <input
+              id="homepage-hero-images"
+              type="file"
+              multiple
+              accept={acceptedImageExtensions}
+              className="sr-only"
+              disabled={uploadingImages}
+              onChange={(e) => {
+                handleImagesUpload(e.target.files);
+                e.target.value = "";
+              }}
+            />
+          </div>
+          <div className="space-y-3">
+            {settings.images.map((url, index) => (
+              <div key={`${url}-${index}`} className="grid grid-cols-[96px_1fr_auto] gap-3 items-center border border-white/10 bg-white/[0.03] p-3">
+                <div className="w-full aspect-[4/3] bg-white/[0.05] border border-white/10 overflow-hidden">
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                </div>
+                <input
+                  value={url}
+                  onChange={(e) => {
+                    const next = [...settings.images];
+                    next[index] = e.target.value;
+                    setSettings((prev) => ({ ...prev, images: next }));
+                  }}
+                  className={inputClass}
+                />
+                <div className="flex items-center gap-2">
+                  <button type="button" onClick={() => moveImage(index, -1)} disabled={index === 0} className="p-2 border border-white/15 text-white/45 hover:text-white disabled:opacity-20">
+                    <ArrowUp size={14} />
+                  </button>
+                  <button type="button" onClick={() => moveImage(index, 1)} disabled={index === settings.images.length - 1} className="p-2 border border-white/15 text-white/45 hover:text-white disabled:opacity-20">
+                    <ArrowDown size={14} />
+                  </button>
+                  <button type="button" onClick={() => removeImage(index)} className="inline-flex items-center gap-2 px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs">
+                    <Trash2 size={13} /> Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+            {settings.images.length === 0 && (
+              <div className="border border-white/10 bg-white/[0.03] px-4 py-6 text-center text-white/35 text-sm">
+                Aucune image configurée.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {(settings.mediaType === "video" || settings.mediaType === "mixed") && (
+        <div className="space-y-3">
+          <label className={labelClass}>Vidéo hero</label>
+          <label className="flex items-center gap-3 text-white/70 text-sm">
+            <input
+              type="checkbox"
+              checked={settings.enableVideoOnMobile}
+              onChange={(e) => setSettings((prev) => ({ ...prev, enableVideoOnMobile: e.target.checked }))}
+            />
+            Enable video on mobile
+          </label>
+          <p className="text-white/35 text-xs leading-relaxed">
+            For better mobile speed, we recommend using fallback image instead of video.
+          </p>
+          <div className="flex items-center gap-2">
+            <label htmlFor="homepage-hero-video" className="inline-flex items-center gap-2 px-3 py-2 border border-[#8EA4AF]/40 text-[#DCE0E7] hover:border-[#8EA4AF] hover:bg-white/5 text-xs tracking-[0.12em] uppercase cursor-pointer transition-colors">
+              {uploadingVideo ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+              {settings.videoUrl ? "Remplacer vidéo" : "Uploader vidéo"}
+            </label>
+            <input
+              id="homepage-hero-video"
+              type="file"
+              accept={acceptedVideoExtensions}
+              className="sr-only"
+              disabled={uploadingVideo}
+              onChange={(e) => {
+                handleVideoUpload(e.target.files);
+                e.target.value = "";
+              }}
+            />
+            {settings.videoUrl && (
+              <button type="button" onClick={() => setSettings((prev) => ({ ...prev, videoUrl: "" }))} className="inline-flex items-center gap-2 px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs">
+                <Trash2 size={13} /> Retirer
+              </button>
+            )}
+          </div>
+          <input
+            value={settings.videoUrl}
+            onChange={(e) => setSettings((prev) => ({ ...prev, videoUrl: e.target.value }))}
+            className={inputClass}
+            placeholder="URL vidéo (option manuelle)"
+          />
+          {settings.videoUrl && (
+            <video src={settings.videoUrl} controls className="w-full max-h-64 border border-white/10 bg-black/40" />
+          )}
+        </div>
+      )}
+
+      <div className="space-y-3">
+        <label className={labelClass}>Image fallback</label>
+        <p className="text-white/35 text-xs leading-relaxed">
+          This image is used on mobile and as a fallback while the video loads.
+        </p>
+        <div className="flex items-center gap-2">
+          <label htmlFor="homepage-fallback-image" className="inline-flex items-center gap-2 px-3 py-2 border border-[#8EA4AF]/40 text-[#DCE0E7] hover:border-[#8EA4AF] hover:bg-white/5 text-xs tracking-[0.12em] uppercase cursor-pointer transition-colors">
+            {uploadingFallback ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+            {settings.fallbackImageUrl ? "Remplacer fallback" : "Uploader fallback"}
+          </label>
+          <input
+            id="homepage-fallback-image"
+            type="file"
+            accept={acceptedImageExtensions}
+            className="sr-only"
+            disabled={uploadingFallback}
+            onChange={(e) => {
+              handleFallbackUpload(e.target.files);
+              e.target.value = "";
+            }}
+          />
+        </div>
+        <input
+          value={settings.fallbackImageUrl}
+          onChange={(e) => setSettings((prev) => ({ ...prev, fallbackImageUrl: e.target.value }))}
+          className={inputClass}
+          placeholder="URL image fallback (option manuelle)"
+        />
+        <div className="aspect-[16/7] border border-white/10 bg-white/[0.04] overflow-hidden">
+          {settings.fallbackImageUrl ? (
+            <img src={settings.fallbackImageUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white/25 text-xs tracking-[0.14em] uppercase">Aucune image fallback</div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={save} disabled={saving} className="ga-btn btn-medium px-6 py-2 inline-flex items-center gap-2">
+          {saving ? <Loader2 size={14} className="animate-spin" /> : null}
+          Enregistrer Homepage Hero
+        </button>
+        <button type="button" onClick={load} className="ga-btn ga-btn-light px-4 py-2">
+          Recharger
+        </button>
+      </div>
+      <UploadStatus message={message} error={error} />
+    </section>
+  );
+}
+
+function UploadStatus({ message, error }: { message: string; error: string }) {
+  if (!message && !error) return null;
+  return (
+    <p className={`text-xs mt-2 ${error ? "text-[#8EA4AF]" : "text-[#DCE0E7]"}`}>
+      {error || message}
+    </p>
+  );
+}
+
+function ImageUploadField({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleUpload(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const [uploaded] = await uploadProjectImages([file]);
+      onChange(uploaded.url);
+      setMessage("Image uploadée. Enregistrez le projet pour publier ce changement.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload impossible.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <label className={labelClass}>{label}</label>
+      <div className="aspect-[4/3] border border-white/10 bg-white/[0.04] overflow-hidden flex items-center justify-center">
+        {value ? (
+          <img src={value} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <div className="text-white/25 flex flex-col items-center gap-2">
+            <ImageIcon size={22} strokeWidth={1.4} />
+            <span className="text-[10px] tracking-[0.16em] uppercase">Aucune image</span>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <label
+          htmlFor={id}
+          className="inline-flex items-center gap-2 px-3 py-2 border border-[#8EA4AF]/40 text-[#DCE0E7] hover:border-[#8EA4AF] hover:bg-white/5 text-xs tracking-[0.12em] uppercase cursor-pointer transition-colors"
+        >
+          {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+          {value ? "Remplacer" : "Uploader"}
+        </label>
+        <input
+          id={id}
+          type="file"
+          accept={acceptedImageExtensions}
+          className="sr-only"
+          disabled={uploading}
+          onChange={(e) => {
+            handleUpload(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        {value && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="inline-flex items-center gap-2 px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs transition-colors"
+          >
+            <Trash2 size={13} /> Effacer
+          </button>
+        )}
+      </div>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={inputClass}
+        placeholder="URL manuelle avancée"
+      />
+      <UploadStatus message={message} error={error} />
+    </div>
+  );
+}
+
+function GalleryEditor({
+  values,
+  onChange,
+}: {
+  values: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleUpload(files: FileList | null) {
+    const selectedFiles = Array.from(files ?? []);
+    if (!selectedFiles.length) return;
+
+    setUploading(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const uploaded = await uploadProjectImages(selectedFiles);
+      onChange([...values.filter(Boolean), ...uploaded.map((file) => file.url)]);
+      setMessage(`${uploaded.length} image${uploaded.length > 1 ? "s" : ""} uploadée${uploaded.length > 1 ? "s" : ""}. Enregistrez le projet pour publier.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload impossible.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function updateAt(index: number, value: string) {
+    const next = [...values];
+    next[index] = value;
+    onChange(next);
+  }
+
+  function removeAt(index: number) {
+    onChange(values.filter((_, i) => i !== index));
+  }
+
+  function move(index: number, direction: -1 | 1) {
+    const target = index + direction;
+    if (target < 0 || target >= values.length) return;
+    const next = [...values];
+    [next[index], next[target]] = [next[target], next[index]];
+    onChange(next);
+  }
+
+  return (
+    <div>
+      <label className={labelClass}>Images de galerie</label>
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <label
+          htmlFor="project-gallery-upload"
+          className="inline-flex items-center gap-2 px-3 py-2 border border-[#8EA4AF]/40 text-[#DCE0E7] hover:border-[#8EA4AF] hover:bg-white/5 text-xs tracking-[0.12em] uppercase cursor-pointer transition-colors"
+        >
+          {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+          Upload images
+        </label>
+        <input
+          id="project-gallery-upload"
+          type="file"
+          multiple
+          accept={acceptedImageExtensions}
+          className="sr-only"
+          disabled={uploading}
+          onChange={(e) => {
+            handleUpload(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => onChange([...values, ""])}
+          className="px-3 py-2 border border-white/15 text-white/50 hover:text-white hover:border-white/35 text-xs tracking-[0.12em] uppercase transition-colors"
+        >
+          + URL manuelle
+        </button>
+      </div>
+      <UploadStatus message={message} error={error} />
+
+      <div className="space-y-3 mt-3">
+        {values.map((value, index) => (
+          <div key={`${value}-${index}`} className="grid grid-cols-[84px_1fr] md:grid-cols-[96px_1fr_auto] gap-3 items-center border border-white/10 bg-white/[0.03] p-3">
+            <div className="w-full aspect-[4/3] bg-white/[0.05] border border-white/10 overflow-hidden flex items-center justify-center">
+              {value ? (
+                <img src={value} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <ImageIcon size={18} className="text-white/25" strokeWidth={1.4} />
+              )}
+            </div>
+            <input
+              value={value}
+              placeholder="URL image"
+              onChange={(e) => updateAt(index, e.target.value)}
+              className={inputClass}
+            />
+            <div className="col-span-2 md:col-span-1 flex items-center justify-end gap-2">
+              <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className="p-2 border border-white/15 text-white/45 hover:text-white disabled:opacity-20">
+                <ArrowUp size={14} />
+              </button>
+              <button type="button" onClick={() => move(index, 1)} disabled={index === values.length - 1} className="p-2 border border-white/15 text-white/45 hover:text-white disabled:opacity-20">
+                <ArrowDown size={14} />
+              </button>
+              <button type="button" onClick={() => removeAt(index)} className="inline-flex items-center gap-2 px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs">
+                <Trash2 size={13} /> Remove
+              </button>
+            </div>
+          </div>
+        ))}
+        {values.length === 0 && (
+          <div className="border border-white/10 bg-white/[0.03] px-4 py-8 text-center text-white/35 text-sm">
+            Aucune image de galerie.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function cleanMapValue(value: string) {
+  return value.trim();
+}
+
+function extractTrustedGoogleMapUrl(iframeCode: string, embedUrl: string) {
+  const raw = cleanMapValue(iframeCode) || cleanMapValue(embedUrl);
+  if (!raw) return "";
+  const iframeSrc = raw.match(/src=["']([^"']+)["']/i)?.[1] ?? raw;
+  const decodedSrc = iframeSrc.replace(/&amp;/g, "&").trim();
+
+  try {
+    const url = new URL(decodedSrc);
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    const trusted =
+      (hostname === "google.com" && url.pathname.startsWith("/maps")) ||
+      hostname === "maps.google.com" ||
+      hostname === "googleusercontent.com" ||
+      hostname.endsWith(".googleusercontent.com");
+
+    return trusted && (url.protocol === "https:" || url.protocol === "http:") ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+
+function MapPreview({ iframeCode, embedUrl, address }: { iframeCode: string; embedUrl: string; address: string }) {
+  const src = extractTrustedGoogleMapUrl(iframeCode, embedUrl);
+
+  return (
+    <div className="border border-white/10 bg-white/[0.03] p-3">
+      <p className={labelClass}>Aperçu carte</p>
+      <div className="relative aspect-[16/9] overflow-hidden bg-white/[0.05] border border-white/10">
+        {src ? (
+          <iframe
+            src={src}
+            title="Aperçu Google Maps"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="absolute inset-0 h-full w-full"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-center px-6">
+            <div>
+              <p className="text-white/50 text-xs tracking-[0.16em] uppercase">{address || "Adresse non renseignée"}</p>
+              <p className="text-white/30 text-[10px] tracking-[0.14em] uppercase mt-2">Carte bientôt disponible</p>
+            </div>
+          </div>
+        )}
+      </div>
+      {(iframeCode || embedUrl) && !src && (
+        <p className="ga-error mt-2">Le lien doit venir de Google Maps.</p>
+      )}
+    </div>
+  );
+}
+
 function ProjectsTab() {
   const qc = useQueryClient();
   const { data: projects = [] } = useListProjects();
@@ -165,47 +993,12 @@ function ProjectsTab() {
   const deleteProject = useDeleteProject();
   const [editing, setEditing] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    brandId: 1,
-    title: "",
-    slug: "",
-    description: "",
-    location: "",
-    city: "",
-    status: "upcoming" as "upcoming" | "ongoing" | "completed",
-    priceMin: 0,
-    priceMax: 0,
-    surfaceMin: 0,
-    surfaceMax: 0,
-    deliveryDate: "",
-    featured: false,
-    coverImageUrl: "",
-    tagline: "",
-    shortDescription: "",
-    storyTitle: "",
-    storyText: "",
-    lifestyleTitle: "",
-    lifestyleText: "",
-    locationAdvantages: "" as string | string[],
-    mapLocation: "",
-    financingDetails: "",
-    ctaText: "",
-    seoTitle: "",
-    seoDescription: "",
-    amenities: "" as string | string[],
-    images: [] as string[],
-  });
+  const [formError, setFormError] = useState("");
+  const [form, setForm] = useState<ProjectForm>(() => emptyProjectForm());
 
   function resetForm() {
-    setForm({ 
-      brandId: 1, title: "", slug: "", description: "", location: "", city: "", 
-      status: "upcoming", priceMin: 0, priceMax: 0, surfaceMin: 0, surfaceMax: 0, 
-      deliveryDate: "", featured: false, coverImageUrl: "",
-      tagline: "", shortDescription: "", storyTitle: "", storyText: "",
-      lifestyleTitle: "", lifestyleText: "", locationAdvantages: "", 
-      mapLocation: "", financingDetails: "", ctaText: "",
-      seoTitle: "", seoDescription: "", amenities: "", images: []
-    });
+    setForm(emptyProjectForm(brands[0]?.id ?? 1));
+    setFormError("");
     setEditing(null);
     setShowForm(false);
   }
@@ -215,42 +1008,98 @@ function ProjectsTab() {
       brandId: p.brandId,
       title: p.title,
       slug: p.slug,
-      description: p.description ?? "",
-      location: p.location ?? "",
-      city: p.city ?? "",
-      status: (p.status as "upcoming" | "ongoing" | "completed") ?? "upcoming",
-      priceMin: p.priceMin ?? 0,
-      priceMax: p.priceMax ?? 0,
-      surfaceMin: p.surfaceMin ?? 0,
-      surfaceMax: p.surfaceMax ?? 0,
-      deliveryDate: p.deliveryDate ?? "",
-      featured: p.featured,
-      coverImageUrl: p.coverImageUrl ?? "",
+      projectType: p.projectType ?? "",
       tagline: p.tagline ?? "",
       shortDescription: p.shortDescription ?? "",
-      storyTitle: p.storyTitle ?? "",
-      storyText: p.storyText ?? "",
-      lifestyleTitle: p.lifestyleTitle ?? "",
-      lifestyleText: p.lifestyleText ?? "",
-      locationAdvantages: p.locationAdvantages?.join("\n") ?? "",
-      mapLocation: p.mapLocation ?? "",
-      financingDetails: p.financingDetails ?? "",
-      ctaText: p.ctaText ?? "",
-      seoTitle: p.seoTitle ?? "",
-      seoDescription: p.seoDescription ?? "",
-      amenities: p.amenities?.join("\n") ?? "",
+      description: p.description ?? "",
+      longDescription: p.longDescription ?? "",
+      location: p.location ?? "",
+      city: p.city ?? "",
+      addressText: p.addressText ?? "",
+      status: (p.status as "upcoming" | "ongoing" | "completed") ?? "upcoming",
+      heroTitle: p.heroTitle ?? "",
+      heroSubtitle: p.heroSubtitle ?? "",
+      heroLocationText: p.heroLocationText ?? "",
+      primaryCtaLabel: p.primaryCtaLabel ?? "Découvrir le projet",
+      secondaryCtaLabel: p.secondaryCtaLabel ?? "Prendre rendez-vous",
+      priceMin: p.priceMin ? String(p.priceMin) : "",
+      priceMax: p.priceMax ? String(p.priceMax) : "",
+      showPrice: p.showPrice !== false,
+      priceLabel: p.priceLabel ?? "Prix de départ",
+      priceNote: p.priceNote ?? "",
+      availabilityNote: p.availabilityNote ?? "",
+      surfaceMin: p.surfaceMin ? String(p.surfaceMin) : "",
+      surfaceMax: p.surfaceMax ? String(p.surfaceMax) : "",
+      deliveryDate: p.deliveryDate ?? "",
+      featured: p.featured,
+      isOpportunity: p.isOpportunity ?? false,
+      opportunityType: (p.opportunityType as ProjectForm["opportunityType"]) ?? "promotion",
+      opportunityTitle: p.opportunityTitle ?? "",
+      opportunityDescription: p.opportunityDescription ?? "",
+      opportunityHighlight: p.opportunityHighlight ?? "",
+      opportunityValidUntil: p.opportunityValidUntil ?? "",
+      opportunityCtaLabel: p.opportunityCtaLabel ?? "Découvrir l’opportunité",
+      coverImageUrl: p.coverImageUrl ?? "",
+      secondaryImageUrl: p.secondaryImageUrl ?? "",
+      lifestyleImageUrl: p.lifestyleImageUrl ?? "",
       images: p.images ?? [],
+      amenities: p.amenities ?? [],
+      galleryTitle: p.galleryTitle ?? "Visuels du projet",
+      featuresTitle: p.featuresTitle ?? "Points forts du projet",
+      projectSectionTitle: p.projectSectionTitle ?? "Le projet",
+      projectSectionDescription: p.projectSectionDescription ?? "",
+      lifestyleTitle: p.lifestyleTitle ?? "",
+      lifestyleDescription: p.lifestyleDescription ?? "",
+      locationSectionTitle: p.locationSectionTitle ?? "Emplacement",
+      locationDescription: p.locationDescription ?? "",
+      locationAdvantages: p.locationAdvantages ?? [],
+      mapEmbedUrl: p.mapEmbedUrl ?? "",
+      mapIframeCode: p.mapIframeCode ?? "",
+      mapShareUrl: p.mapShareUrl ?? "",
+      contactTitle: p.contactTitle ?? "Intéressé par ce projet ?",
+      contactSubtitle: p.contactSubtitle ?? "Notre équipe vous recontacte dans les 24 heures pour organiser une visite ou répondre à toutes vos questions.",
+      metaTitle: p.metaTitle ?? "",
+      metaDescription: p.metaDescription ?? "",
+      ogImageUrl: p.ogImageUrl ?? "",
     });
+    setFormError("");
     setEditing(p.id);
     setShowForm(true);
   }
 
+  function toNumber(value: string) {
+    return value.trim() ? Number(value) : 0;
+  }
+
+  function cleanList(values: string[]) {
+    return values.map((v) => v.trim()).filter(Boolean);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { 
-      ...form, 
-      amenities: typeof form.amenities === 'string' ? form.amenities.split("\n").filter(Boolean) : form.amenities,
-      locationAdvantages: typeof form.locationAdvantages === 'string' ? form.locationAdvantages.split("\n").filter(Boolean) : form.locationAdvantages,
+    if (!form.title.trim() || !form.slug.trim() || !form.brandId || !form.status) {
+      setFormError("Titre, slug, marque et statut sont obligatoires.");
+      return;
+    }
+    if (form.showPrice && !form.priceMin.trim()) {
+      setFormError("Ajoutez un prix min ou désactivez l'affichage public du prix.");
+      return;
+    }
+    setFormError("");
+    const payload = {
+      ...form,
+      title: form.title.trim(),
+      slug: form.slug.trim(),
+      priceLabel: form.priceLabel.trim() || "Prix de départ",
+      galleryTitle: form.galleryTitle.trim() || "Visuels du projet",
+      featuresTitle: form.featuresTitle.trim() || "Points forts du projet",
+      priceMin: toNumber(form.priceMin),
+      priceMax: toNumber(form.priceMax),
+      surfaceMin: toNumber(form.surfaceMin),
+      surfaceMax: toNumber(form.surfaceMax),
+      images: cleanList(form.images),
+      amenities: cleanList(form.amenities),
+      locationAdvantages: cleanList(form.locationAdvantages),
     };
     if (editing !== null) {
       await updateProject.mutateAsync({ id: editing, data: payload });
@@ -261,456 +1110,365 @@ function ProjectsTab() {
     resetForm();
   }
 
-  const statusColor = (s: string) => s === "completed" ? "green" : s === "ongoing" ? "gold" : "blue";
-  const statusLabel = (s: string) => s === "completed" ? "Livré" : s === "ongoing" ? "En cours" : "À venir";
-
   return (
     <div>
+      <HomepageHeroAdminSection />
+
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-serif text-white">Projets <span className="text-white/30 text-lg ml-2">({projects.length})</span></h2>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-[#c9a84c] text-[#0e1327] px-4 py-2 text-sm font-semibold tracking-wider hover:bg-[#b8973b] transition-colors"
+          className="ga-btn btn-medium px-4 py-2"
         >
           + Ajouter
         </button>
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-[#082634]/40 backdrop-blur-md z-[60] flex items-center justify-end">
-          <div className="w-full max-w-4xl h-full bg-white shadow-2xl overflow-y-auto">
-            <div className="p-12">
-              <div className="flex items-center justify-between mb-12 border-b border-[#DCE0E7] pb-8">
-                <div>
-                  <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mb-2 font-medium">Edition Catalogue</p>
-                  <h2 className="text-3xl font-serif text-[#082634] font-light">
-                    {editing !== null ? "Modifier le projet" : "Nouveau projet immobilier"}
-                  </h2>
-                </div>
-                <button 
-                  onClick={resetForm} 
-                  className="p-3 hover:bg-[#F8F9FA] transition-colors text-[#8EA4AF] hover:text-[#082634]"
-                >
-                  <X size={24} strokeWidth={1.5} />
-                </button>
+        <form onSubmit={handleSubmit} className="ga-admin-panel p-6 mb-6 space-y-5">
+          <h3 className="text-white font-serif text-lg mb-4">{editing !== null ? "Modifier le projet" : "Nouveau projet"}</h3>
+          {formError && <div className="border border-[#8EA4AF]/35 bg-white/5 text-[#DCE0E7] text-sm px-4 py-3">{formError}</div>}
+
+          <FormGroup title="1. Informations de base">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Titre *</label>
+                <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
               </div>
-
-              <form onSubmit={handleSubmit} className="space-y-16 pb-32">
-                {/* Section 1: Informations de base */}
-                <div className="space-y-8">
-                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
-                    <LayoutIcon size={16} className="text-[#D8C7A3]" />
-                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Informations Générales</h3>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Marque</label>
-                      <select
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none appearance-none"
-                        value={form.brandId}
-                        onChange={(e) => setForm({ ...form, brandId: Number(e.target.value) })}
-                      >
-                        {brands?.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-                      </select>
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Titre du projet</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        value={form.title}
-                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        placeholder="Ex: Les Terrasses d'Acharaf"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Slug (URL)</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        value={form.slug}
-                        onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                        placeholder="Ex: les-terrasses-acharaf"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Accroche (Tagline)</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        value={form.tagline as string}
-                        onChange={(e) => setForm({ ...form, tagline: e.target.value })}
-                        placeholder="Ex: Un panorama d'exception sur la ville"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Description Principale (Intro)</label>
-                    <textarea
-                      className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none placeholder:text-[#8EA4AF]/50"
-                      value={form.description as string}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                {/* Section 2: Médias */}
-                <div className="space-y-8">
-                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
-                    <ImageIcon size={16} className="text-[#D8C7A3]" />
-                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Images & Album</h3>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <FileUpload 
-                      label="Image de Couverture" 
-                      value={form.coverImageUrl as string} 
-                      onChange={(url) => setForm({ ...form, coverImageUrl: url })} 
-                    />
-                    
-                    <div className="space-y-4">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Galerie / Album Photos</label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {form.images.map((img, i) => (
-                          <div key={i} className="relative aspect-square border border-[#DCE0E7] overflow-hidden group bg-[#F8F9FA]">
-                            <img src={img} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" />
-                            <button 
-                              type="button" 
-                              onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })}
-                              className="absolute top-0 right-0 bg-[#082634] text-[#D8C7A3] p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
-                        ))}
-                        <label className="aspect-square border border-dashed border-[#DCE0E7] flex flex-col items-center justify-center cursor-pointer hover:border-[#D8C7A3] hover:bg-[#F8F9FA] transition-all text-[#8EA4AF]">
-                          <Plus size={24} strokeWidth={1.5} />
-                          <span className="text-[9px] mt-2 font-bold uppercase tracking-widest">Ajouter</span>
-                          <input 
-                            type="file" 
-                            className="hidden" 
-                            multiple 
-                            onChange={async (e) => {
-                              const files = Array.from(e.target.files || []);
-                              for (const file of files) {
-                                const formData = new FormData();
-                                formData.append("file", file);
-                                const res = await fetch("/api/uploads", { method: "POST", body: formData });
-                                const data = await res.json();
-                                if (data.url) {
-                                  setForm(prev => ({ ...prev, images: [...prev.images, data.url] }));
-                                }
-                              }
-                            }} 
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 3: Statut & Prix */}
-                <div className="space-y-8">
-                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
-                    <Info size={16} className="text-[#D8C7A3]" />
-                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Disponibilités & Tarifs</h3>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Statut</label>
-                      <select
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none appearance-none"
-                        value={form.status}
-                        onChange={(e) => setForm({ ...form, status: e.target.value as any })}
-                      >
-                        <option value="upcoming">À venir</option>
-                        <option value="ongoing">En cours</option>
-                        <option value="completed">Livré</option>
-                      </select>
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Prix Min (DH)</label>
-                      <input
-                        type="number"
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.priceMin}
-                        onChange={(e) => setForm({ ...form, priceMin: Number(e.target.value) })}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Prix Max (DH)</label>
-                      <input
-                        type="number"
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.priceMax}
-                        onChange={(e) => setForm({ ...form, priceMax: Number(e.target.value) })}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Surface Min (m²)</label>
-                      <input
-                        type="number"
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.surfaceMin}
-                        onChange={(e) => setForm({ ...form, surfaceMin: Number(e.target.value) })}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Surface Max (m²)</label>
-                      <input
-                        type="number"
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.surfaceMax}
-                        onChange={(e) => setForm({ ...form, surfaceMax: Number(e.target.value) })}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Date de livraison</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.deliveryDate as string}
-                        onChange={(e) => setForm({ ...form, deliveryDate: e.target.value })}
-                        placeholder="Ex: Fin 2025"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 bg-[#F8F9FA] p-6 border border-[#DCE0E7]">
-                    <input
-                      type="checkbox"
-                      id="featured"
-                      className="w-5 h-5 text-[#082634] border-[#DCE0E7] focus:ring-[#D8C7A3] cursor-pointer"
-                      checked={form.featured}
-                      onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                    />
-                    <label htmlFor="featured" className="text-xs font-bold text-[#082634] uppercase tracking-widest select-none cursor-pointer">
-                      Mettre en avant sur la page d'accueil
-                    </label>
-                  </div>
-                </div>
-
-                {/* Section 4: Story & Lifestyle */}
-                <div className="space-y-8">
-                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
-                    <Search size={16} className="text-[#D8C7A3]" />
-                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Story & Lifestyle</h3>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="space-y-5">
-                      <h4 className="text-[10px] font-bold text-[#8EA4AF] uppercase tracking-widest border-l-2 border-[#D8C7A3] pl-3">Section "Le Projet"</h4>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Titre (défaut: Le Projet)"
-                        value={form.storyTitle as string}
-                        onChange={(e) => setForm({ ...form, storyTitle: e.target.value })}
-                      />
-                      <textarea
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-40 resize-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Texte détaillé de la section story"
-                        value={form.storyText as string}
-                        onChange={(e) => setForm({ ...form, storyText: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-5">
-                      <h4 className="text-[10px] font-bold text-[#8EA4AF] uppercase tracking-widest border-l-2 border-[#D8C7A3] pl-3">Section "Art de Vivre"</h4>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Titre (défaut: Art de vivre)"
-                        value={form.lifestyleTitle as string}
-                        onChange={(e) => setForm({ ...form, lifestyleTitle: e.target.value })}
-                      />
-                      <textarea
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-40 resize-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Texte de la section lifestyle"
-                        value={form.lifestyleText as string}
-                        onChange={(e) => setForm({ ...form, lifestyleText: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 5: Localisation & Prestations */}
-                <div className="space-y-8">
-                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
-                    <MapPin size={16} className="text-[#D8C7A3]" />
-                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Localisation & Prestations</h3>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="space-y-5">
-                      <h4 className="text-[10px] font-bold text-[#8EA4AF] uppercase tracking-widest border-l-2 border-[#D8C7A3] pl-3">Localisation</h4>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Ville"
-                        value={form.city as string}
-                        onChange={(e) => setForm({ ...form, city: e.target.value })}
-                      />
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Quartier / Adresse"
-                        value={form.location as string}
-                        onChange={(e) => setForm({ ...form, location: e.target.value })}
-                      />
-                      <textarea
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Points forts de l'emplacement (un par ligne)"
-                        value={form.locationAdvantages as string}
-                        onChange={(e) => setForm({ ...form, locationAdvantages: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-5">
-                      <h4 className="text-[10px] font-bold text-[#8EA4AF] uppercase tracking-widest border-l-2 border-[#D8C7A3] pl-3">Prestations & CTA</h4>
-                      <textarea
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Prestations (Points forts du projet, un par ligne)"
-                        value={form.amenities as string}
-                        onChange={(e) => setForm({ ...form, amenities: e.target.value })}
-                      />
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Note financement (ex: Financement à 100% possible)"
-                        value={form.financingDetails as string}
-                        onChange={(e) => setForm({ ...form, financingDetails: e.target.value })}
-                      />
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        placeholder="Texte du bouton CTA (défaut: Prendre rendez-vous)"
-                        value={form.ctaText as string}
-                        onChange={(e) => setForm({ ...form, ctaText: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 6: SEO */}
-                <div className="space-y-8 pb-12">
-                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
-                    <Search size={16} className="text-[#D8C7A3]" />
-                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Optimisation SEO</h3>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Titre</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none placeholder:text-[#8EA4AF]/50"
-                        value={form.seoTitle as string}
-                        onChange={(e) => setForm({ ...form, seoTitle: e.target.value })}
-                        placeholder="Titre pour Google"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Description</label>
-                      <textarea
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none placeholder:text-[#8EA4AF]/50"
-                        value={form.seoDescription as string}
-                        onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
-                        placeholder="Description pour les résultats de recherche"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </form>
-
-              <div className="fixed bottom-0 right-0 w-full max-w-4xl bg-white border-t border-[#DCE0E7] p-8 flex items-center justify-end gap-6 z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="text-[#8EA4AF] text-[10px] font-bold uppercase tracking-[0.2em] hover:text-[#082634] transition-colors"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={createProject.isPending || updateProject.isPending}
-                  className="bg-[#082634] text-[#D8C7A3] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all disabled:opacity-50 shadow-xl shadow-[#082634]/10"
-                >
-                  {createProject.isPending || updateProject.isPending ? "Enregistrement..." : "Enregistrer le projet"}
-                </button>
+              <div>
+                <label className={labelClass}>Slug *</label>
+                <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Type</label>
+                <input value={form.projectType} onChange={(e) => setForm({ ...form, projectType: e.target.value })} className={inputClass} placeholder="Villa, Résidence, Lotissement..." />
+              </div>
+              <div>
+                <label className={labelClass}>Tagline courte</label>
+                <input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} className={inputClass} />
               </div>
             </div>
+            <div>
+              <label className={labelClass}>Description courte</label>
+              <textarea rows={2} value={form.shortDescription} onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Description longue</label>
+              <textarea rows={5} value={form.longDescription} onChange={(e) => setForm({ ...form, longDescription: e.target.value })} className={inputClass} />
+            </div>
+          </FormGroup>
+
+          <FormGroup title="2. Marque & statut">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className={labelClass}>Marque *</label>
+              <select
+                required
+                value={form.brandId}
+                onChange={(e) => setForm({ ...form, brandId: Number(e.target.value) })}
+                className={inputClass}
+              >
+                {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className={labelClass}>Statut *</label>
+              <select
+                required
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value as "upcoming" | "ongoing" | "completed" })}
+                className={inputClass}
+              >
+                <option value="upcoming">À venir</option>
+                <option value="ongoing">En cours</option>
+                <option value="completed">Livré</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelClass}>Livraison</label>
+              <input value={form.deliveryDate} onChange={(e) => setForm({ ...form, deliveryDate: e.target.value })} className={inputClass} placeholder="ex: T4 2025" />
+            </div>
+            </div>
+            <label className="flex items-center gap-3 text-white/70 text-sm">
+              <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
+              Projet mis en avant
+            </label>
+          </FormGroup>
+
+          <FormGroup title="2bis. Opportunités">
+            <label className="flex items-center gap-3 text-white/70 text-sm">
+              <input type="checkbox" checked={form.isOpportunity} onChange={(e) => setForm({ ...form, isOpportunity: e.target.checked })} />
+              Afficher dans Opportunités
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Type d’opportunité</label>
+                <select
+                  value={form.opportunityType}
+                  onChange={(e) => setForm({ ...form, opportunityType: e.target.value as ProjectForm["opportunityType"] })}
+                  className={inputClass}
+                >
+                  <option value="promotion">Promotion</option>
+                  <option value="reduction">Réduction</option>
+                  <option value="limited_offer">Offre limitée</option>
+                  <option value="investment">Opportunité d’investissement</option>
+                  <option value="last_units">Dernières unités</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Valable jusqu’au (optionnel)</label>
+                <input value={form.opportunityValidUntil} onChange={(e) => setForm({ ...form, opportunityValidUntil: e.target.value })} className={inputClass} placeholder="31/12/2026" />
+              </div>
+              <div>
+                <label className={labelClass}>Titre d’opportunité</label>
+                <input value={form.opportunityTitle} onChange={(e) => setForm({ ...form, opportunityTitle: e.target.value })} className={inputClass} placeholder="Offre spéciale lancement" />
+              </div>
+              <div>
+                <label className={labelClass}>Highlight</label>
+                <input value={form.opportunityHighlight} onChange={(e) => setForm({ ...form, opportunityHighlight: e.target.value })} className={inputClass} placeholder="-10% / Frais offerts / Dernières unités" />
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>Description courte</label>
+              <textarea rows={3} value={form.opportunityDescription} onChange={(e) => setForm({ ...form, opportunityDescription: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Libellé CTA opportunité</label>
+              <input value={form.opportunityCtaLabel} onChange={(e) => setForm({ ...form, opportunityCtaLabel: e.target.value })} className={inputClass} />
+            </div>
+          </FormGroup>
+
+          <FormGroup title="3. Pricing">
+            <label className="flex items-center gap-3 text-white/70 text-sm">
+              <input type="checkbox" checked={form.showPrice} onChange={(e) => setForm({ ...form, showPrice: e.target.checked })} />
+              Afficher le prix sur le site
+            </label>
+            <p className="text-white/35 text-xs leading-relaxed">
+              Si cette option est désactivée, le public verra uniquement “Prix à consulter”. Les montants restent stockés en interne.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div>
+                <label className={labelClass}>Libellé prix</label>
+                <input value={form.priceLabel} onChange={(e) => setForm({ ...form, priceLabel: e.target.value })} className={inputClass} placeholder="Prix de départ" />
+              </div>
+              <div>
+                <label className={labelClass}>Prix min (MAD)</label>
+                <input type="number" required={form.showPrice} value={form.priceMin} onChange={(e) => setForm({ ...form, priceMin: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Prix max (MAD)</label>
+                <input type="number" value={form.priceMax} onChange={(e) => setForm({ ...form, priceMax: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Surface min (m²)</label>
+                <input type="number" value={form.surfaceMin} onChange={(e) => setForm({ ...form, surfaceMin: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Surface max (m²)</label>
+                <input type="number" value={form.surfaceMax} onChange={(e) => setForm({ ...form, surfaceMax: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Note financement</label>
+                <textarea rows={2} value={form.priceNote} onChange={(e) => setForm({ ...form, priceNote: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Note disponibilité</label>
+                <textarea rows={2} value={form.availabilityNote} onChange={(e) => setForm({ ...form, availabilityNote: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+          </FormGroup>
+
+          <FormGroup title="4. Location & map">
+            <p className="text-white/40 text-xs leading-relaxed">
+              Collez ici le lien d’intégration Google Maps ou le code iframe.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Ville</label>
+                <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Localisation courte</label>
+                <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>Adresse complète</label>
+              <input value={form.addressText} onChange={(e) => setForm({ ...form, addressText: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Titre section emplacement</label>
+              <input value={form.locationSectionTitle} onChange={(e) => setForm({ ...form, locationSectionTitle: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Description emplacement</label>
+              <textarea rows={3} value={form.locationDescription} onChange={(e) => setForm({ ...form, locationDescription: e.target.value })} className={inputClass} />
+            </div>
+            <ArrayEditor label="Avantages à proximité" values={form.locationAdvantages} placeholder="Écoles à proximité" onChange={(locationAdvantages) => setForm({ ...form, locationAdvantages })} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Google Maps embed URL</label>
+                <input value={form.mapEmbedUrl} onChange={(e) => setForm({ ...form, mapEmbedUrl: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Lien Google Maps</label>
+                <input value={form.mapShareUrl} onChange={(e) => setForm({ ...form, mapShareUrl: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>Google Maps iframe code</label>
+              <textarea
+                rows={3}
+                value={form.mapIframeCode}
+                onChange={(e) => setForm({ ...form, mapIframeCode: e.target.value })}
+                className={inputClass}
+                placeholder="<iframe src=&quot;https://www.google.com/maps/embed?...&quot;></iframe>"
+              />
+            </div>
+            <MapPreview iframeCode={form.mapIframeCode} embedUrl={form.mapEmbedUrl} address={form.addressText || form.location || form.city} />
+          </FormGroup>
+
+          <FormGroup title="5. Hero section">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Hero title</label>
+                <input value={form.heroTitle} onChange={(e) => setForm({ ...form, heroTitle: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Hero subtitle</label>
+                <input value={form.heroSubtitle} onChange={(e) => setForm({ ...form, heroSubtitle: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Hero location text</label>
+                <input value={form.heroLocationText} onChange={(e) => setForm({ ...form, heroLocationText: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>CTA principal</label>
+                <input value={form.primaryCtaLabel} onChange={(e) => setForm({ ...form, primaryCtaLabel: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>CTA contact</label>
+                <input value={form.secondaryCtaLabel} onChange={(e) => setForm({ ...form, secondaryCtaLabel: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+          </FormGroup>
+
+          <FormGroup title="6. Project story/content">
+            <div>
+              <label className={labelClass}>Titre section “Le projet”</label>
+              <input value={form.projectSectionTitle} onChange={(e) => setForm({ ...form, projectSectionTitle: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Description section “Le projet”</label>
+              <textarea rows={4} value={form.projectSectionDescription} onChange={(e) => setForm({ ...form, projectSectionDescription: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Description historique / compatibilité</label>
+              <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputClass} />
+            </div>
+          </FormGroup>
+
+          <FormGroup title="7. Media & gallery">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <ImageUploadField id="project-hero-upload" label="Image hero" value={form.coverImageUrl} onChange={(coverImageUrl) => setForm({ ...form, coverImageUrl })} />
+              <ImageUploadField id="project-secondary-upload" label="Image secondaire" value={form.secondaryImageUrl} onChange={(secondaryImageUrl) => setForm({ ...form, secondaryImageUrl })} />
+              <ImageUploadField id="project-lifestyle-upload" label="Image art de vivre" value={form.lifestyleImageUrl} onChange={(lifestyleImageUrl) => setForm({ ...form, lifestyleImageUrl })} />
+            </div>
+            <div>
+              <label className={labelClass}>Titre galerie</label>
+              <input value={form.galleryTitle} onChange={(e) => setForm({ ...form, galleryTitle: e.target.value })} className={inputClass} />
+            </div>
+            <GalleryEditor values={form.images} onChange={(images) => setForm({ ...form, images })} />
+          </FormGroup>
+
+          <FormGroup title="8. Prestations / features">
+            <div>
+              <label className={labelClass}>Titre prestations</label>
+              <input value={form.featuresTitle} onChange={(e) => setForm({ ...form, featuresTitle: e.target.value })} className={inputClass} />
+            </div>
+            <ArrayEditor label="Prestations" values={form.amenities} placeholder="Piscine, parking sécurisé..." onChange={(amenities) => setForm({ ...form, amenities })} />
+          </FormGroup>
+
+          <FormGroup title="9. Art de vivre">
+            <div>
+              <label className={labelClass}>Titre art de vivre</label>
+              <input value={form.lifestyleTitle} onChange={(e) => setForm({ ...form, lifestyleTitle: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Description art de vivre</label>
+              <textarea rows={3} value={form.lifestyleDescription} onChange={(e) => setForm({ ...form, lifestyleDescription: e.target.value })} className={inputClass} />
+            </div>
+          </FormGroup>
+
+          <FormGroup title="10. Contact & lead settings">
+            <p className="text-white/35 text-xs leading-relaxed">
+              Les leads envoyés depuis la fiche projet enregistrent automatiquement le nom du projet et la source project:id.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Titre contact</label>
+                <input value={form.contactTitle} onChange={(e) => setForm({ ...form, contactTitle: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Sous-titre contact</label>
+                <input value={form.contactSubtitle} onChange={(e) => setForm({ ...form, contactSubtitle: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+          </FormGroup>
+
+          <FormGroup title="11. SEO">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Meta title</label>
+                <input value={form.metaTitle} onChange={(e) => setForm({ ...form, metaTitle: e.target.value })} className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Meta description</label>
+                <input value={form.metaDescription} onChange={(e) => setForm({ ...form, metaDescription: e.target.value })} className={inputClass} />
+              </div>
+            </div>
+            <ImageUploadField id="project-og-upload" label="Image OG / partage social" value={form.ogImageUrl} onChange={(ogImageUrl) => setForm({ ...form, ogImageUrl })} />
+          </FormGroup>
+
+          <div className="flex gap-3 pt-2">
+            <button type="submit" className="ga-btn btn-medium px-6 py-2">
+              {editing !== null ? "Enregistrer" : "Créer"}
+            </button>
+            <button type="button" onClick={resetForm} className="ga-btn ga-btn-light px-4 py-2">
+              Annuler
+            </button>
           </div>
-        </div>
+        </form>
       )}
 
-      {/* Projects Tab Re-design */}
-      {(() => {
-        const statusColor = (s: string) => s === "completed" ? "green" : s === "ongoing" ? "gold" : "blue";
-        const statusLabel = (s: string) => s === "completed" ? "Livré" : s === "ongoing" ? "En cours" : "À venir";
-
-        return (
-          <div className="space-y-10">
-            <div className="flex items-center justify-between">
+      <div className="space-y-2">
+        {projects.map((p) => (
+          <div key={p.id} className="ga-card-dark p-4 flex items-center justify-between hover:border-white/20 transition-colors">
+            <div className="flex items-center gap-4">
+              {p.coverImageUrl && <img src={p.coverImageUrl} alt="" className="w-16 h-12 object-cover opacity-70" />}
               <div>
-                <h2 className="text-xl font-serif text-[#082634] tracking-tight">Liste des Projets</h2>
-                <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Gérez votre catalogue immobilier</p>
+                <div className="text-white font-medium">{p.title}</div>
+                <div className="text-white/40 text-sm">{p.city} · {p.brand?.name} · {projectPriceLabel(p)}</div>
               </div>
-              <button
-                onClick={() => { resetForm(); setShowForm(true); }}
-                className="bg-[#082634] text-[#D8C7A3] px-8 py-3.5 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all flex items-center gap-2 shadow-lg shadow-[#082634]/10"
-              >
-                <Plus size={14} />
-                Ajouter un Projet
-              </button>
             </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              {projects.map((p) => (
-                <div 
-                  key={p.id} 
-                  className="group bg-white border border-[#DCE0E7] p-6 flex items-center justify-between hover:border-[#D8C7A3] hover:shadow-xl hover:shadow-[#082634]/5 transition-all duration-500"
-                >
-                  <div className="flex items-center gap-8">
-                    <div className="relative w-24 h-24 overflow-hidden bg-[#F8F9FA]">
-                      {p.coverImageUrl ? (
-                        <img src={p.coverImageUrl} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#8EA4AF]/30">
-                          <ImageIcon size={24} />
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <Badge color={statusColor(p.status) as any}>{statusLabel(p.status)}</Badge>
-                        {p.featured && <Badge color="gold">Vedette</Badge>}
-                      </div>
-                      <h3 className="text-[#082634] font-serif text-xl font-light">{p.title}</h3>
-                      <div className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
-                        <MapPin size={10} className="text-[#D8C7A3]" />
-                        {p.city} <span className="opacity-30">|</span> {p.brand?.name}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-8">
-                    <div className="text-right hidden md:block">
-                      <div className="text-[#8EA4AF] text-[10px] uppercase tracking-widest mb-1 opacity-60">Créé le</div>
-                      <div className="text-[#082634] text-xs font-medium">{formatDate(p.createdAt)}</div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button 
-                        onClick={() => startEdit(p)} 
-                        className="bg-[#F8F9FA] text-[#082634] px-5 py-2.5 text-[10px] uppercase tracking-widest font-bold hover:bg-[#082634] hover:text-white transition-all"
-                      >
-                        Modifier
-                      </button>
-                      <ConfirmButton onConfirm={async () => {
-                        await deleteProject.mutateAsync({ id: p.id });
-                        qc.invalidateQueries({ queryKey: getListProjectsQueryKey() });
-                      }} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {projects.length === 0 && (
-                <div className="py-20 text-center border-2 border-dashed border-[#DCE0E7] bg-white">
-                  <p className="text-[#8EA4AF] text-sm font-light">Aucun projet trouvé dans votre catalogue.</p>
-                </div>
-              )}
+            <div className="flex items-center gap-4">
+              <span className={`px-2 py-0.5 rounded text-xs font-medium tracking-wide border ${statusBadgeClass(p.status)}`}>{statusLabel(p.status)}</span>
+              {p.featured && <Badge color="gold">En vedette</Badge>}
+              <div className="text-white/30 text-xs">{formatDate(p.createdAt)}</div>
+              <button onClick={() => startEdit(p)} className="text-white/50 hover:text-white text-sm px-2 py-1 hover:bg-white/10 transition-colors">
+                Modifier
+              </button>
+              <ConfirmButton onConfirm={async () => {
+                await deleteProject.mutateAsync({ id: p.id });
+                qc.invalidateQueries({ queryKey: getListProjectsQueryKey() });
+              }} />
             </div>
           </div>
-        );
-      })()}
+        ))}
+        {projects.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucun projet.</p>}
+      </div>
     </div>
   );
 }
@@ -724,59 +1482,31 @@ function LeadsTab() {
   const deleteLead = useDeleteLead();
 
   return (
-    <div className="space-y-10">
-      <div>
-        <h2 className="text-xl font-serif text-[#082634] tracking-tight">Gestion des Leads</h2>
-        <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Suivez les demandes de renseignements</p>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-serif text-white">Leads <span className="text-white/30 text-lg ml-2">({leads.length})</span></h2>
       </div>
-
-      <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-2">
         {leads.map((l) => (
-          <div key={l.id} className="bg-white border border-[#DCE0E7] p-8 hover:border-[#D8C7A3] hover:shadow-xl transition-all duration-500">
+          <div key={l.id} className="ga-card-dark p-4 hover:border-white/20 transition-colors">
             <div className="flex items-start justify-between">
-              <div className="space-y-4">
-                <div>
-                  <div className="text-[#082634] font-serif text-2xl font-light">{l.firstName} {l.lastName}</div>
-                  <div className="text-[#D8C7A3] text-[10px] uppercase tracking-[0.2em] font-bold mt-1">
-                    {l.email} {l.phone && <span className="mx-2 opacity-30">·</span>} {l.phone}
-                  </div>
-                </div>
-                
-                {l.projectInterest && (
-                  <div className="inline-flex items-center gap-2 bg-[#F8F9FA] px-3 py-1.5 border border-[#DCE0E7]">
-                    <span className="text-[#8EA4AF] text-[9px] uppercase tracking-widest font-bold">Intérêt:</span>
-                    <span className="text-[#082634] text-xs font-medium">{l.projectInterest}</span>
-                  </div>
-                )}
-                
-                {l.message && (
-                  <div className="text-[#3B5661] text-sm font-light leading-relaxed max-w-3xl italic">
-                    "{l.message}"
-                  </div>
-                )}
+              <div>
+                <div className="text-white font-medium">{l.firstName} {l.lastName}</div>
+                <div className="text-[#8EA4AF] text-sm">{l.email} {l.phone && `· ${l.phone}`}</div>
+                {l.projectInterest && <div className="text-white/50 text-sm mt-1">Intérêt: {l.projectInterest}</div>}
+                {l.message && <div className="text-white/40 text-sm mt-2 max-w-2xl">{l.message}</div>}
               </div>
-              
-              <div className="flex flex-col items-end gap-6">
-                <div className="text-right">
-                  <div className="text-[#8EA4AF] text-[10px] uppercase tracking-widest mb-1 opacity-60">Reçu le</div>
-                  <div className="text-[#082634] text-xs font-medium">{formatDate(l.createdAt)}</div>
-                </div>
-                <ConfirmButton 
-                  label="Supprimer le lead"
-                  onConfirm={async () => {
-                    await deleteLead.mutateAsync({ id: l.id });
-                    qc.invalidateQueries({ queryKey: getListLeadsQueryKey() });
-                  }} 
-                />
+              <div className="flex items-center gap-4">
+                <div className="text-white/30 text-xs">{formatDate(l.createdAt)}</div>
+                <ConfirmButton onConfirm={async () => {
+                  await deleteLead.mutateAsync({ id: l.id });
+                  qc.invalidateQueries({ queryKey: getListLeadsQueryKey() });
+                }} />
               </div>
             </div>
           </div>
         ))}
-        {leads.length === 0 && (
-          <div className="py-20 text-center border-2 border-dashed border-[#DCE0E7] bg-white">
-            <p className="text-[#8EA4AF] text-sm font-light">Aucun lead n'a été enregistré pour le moment.</p>
-          </div>
-        )}
+        {leads.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucun lead.</p>}
       </div>
     </div>
   );
@@ -793,17 +1523,7 @@ function ArticlesTab() {
   const deleteArticle = useDeleteArticle();
   const [editing, setEditing] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ 
-    title: "", 
-    slug: "", 
-    excerpt: "", 
-    content: "", 
-    coverImageUrl: "", 
-    category: "", 
-    metaTitle: "", 
-    metaDescription: "", 
-    published: false 
-  });
+  const [form, setForm] = useState({ title: "", slug: "", excerpt: "", content: "", coverImageUrl: "", category: "", metaTitle: "", metaDescription: "", published: false });
 
   function resetForm() {
     setForm({ title: "", slug: "", excerpt: "", content: "", coverImageUrl: "", category: "", metaTitle: "", metaDescription: "", published: false });
@@ -812,17 +1532,7 @@ function ArticlesTab() {
   }
 
   function startEdit(a: (typeof articles)[0]) {
-    setForm({ 
-      title: a.title, 
-      slug: a.slug, 
-      excerpt: a.excerpt ?? "", 
-      content: a.content ?? "", 
-      coverImageUrl: a.coverImageUrl ?? "", 
-      category: a.category ?? "", 
-      metaTitle: a.metaTitle ?? "", 
-      metaDescription: a.metaDescription ?? "", 
-      published: a.published 
-    });
+    setForm({ title: a.title, slug: a.slug, excerpt: a.excerpt ?? "", content: a.content ?? "", coverImageUrl: a.coverImageUrl ?? "", category: a.category ?? "", metaTitle: a.metaTitle ?? "", metaDescription: a.metaDescription ?? "", published: a.published });
     setEditing(a.id);
     setShowForm(true);
   }
@@ -840,180 +1550,76 @@ function ArticlesTab() {
   }
 
   return (
-    <div className="space-y-10">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-serif text-[#082634] tracking-tight">Articles & Actualités</h2>
-          <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Gérez le blog et les publications</p>
-        </div>
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-[#082634] text-[#D8C7A3] px-8 py-3.5 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all flex items-center gap-2 shadow-lg shadow-[#082634]/10"
-        >
-          <Plus size={14} />
-          Nouvel Article
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-serif text-white">Articles <span className="text-white/30 text-lg ml-2">({articles.length})</span></h2>
+        <button onClick={() => { resetForm(); setShowForm(true); }} className="ga-btn btn-medium px-4 py-2">
+          + Ajouter
         </button>
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-[#082634]/40 backdrop-blur-md z-[60] flex items-center justify-end">
-          <div className="w-full max-w-4xl h-full bg-white shadow-2xl overflow-y-auto">
-            <div className="p-12">
-              <div className="flex items-center justify-between mb-12 border-b border-[#DCE0E7] pb-8">
-                <div>
-                  <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mb-2 font-medium">Contenu Éditorial</p>
-                  <h2 className="text-3xl font-serif text-[#082634] font-light">
-                    {editing !== null ? "Modifier l'article" : "Rédiger un nouvel article"}
-                  </h2>
-                </div>
-                <button 
-                  onClick={resetForm} 
-                  className="p-3 hover:bg-[#F8F9FA] transition-colors text-[#8EA4AF] hover:text-[#082634]"
-                >
-                  <X size={24} strokeWidth={1.5} />
-                </button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-16 pb-32">
-                <div className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Titre de l'article</label>
-                      <input
-                        required
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.title}
-                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        placeholder="Ex: L'avenir de l'immobilier de luxe à Casablanca"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Slug (URL)</label>
-                      <input
-                        required
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.slug}
-                        onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                        placeholder="avenir-immobilier-luxe-casablanca"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Catégorie</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.category}
-                        onChange={(e) => setForm({ ...form, category: e.target.value })}
-                        placeholder="Ex: Actualités, Lifestyle..."
-                      />
-                    </div>
-                  </div>
-
-                  <FileUpload 
-                    label="Image de Couverture" 
-                    value={form.coverImageUrl} 
-                    onChange={(url) => setForm({ ...form, coverImageUrl: url })} 
-                  />
-
-                  <div className="space-y-3">
-                    <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Résumé (Extrait)</label>
-                    <textarea
-                      className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-24 resize-none"
-                      value={form.excerpt}
-                      onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Contenu de l'article</label>
-                    <textarea
-                      className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-[400px] resize-none"
-                      value={form.content}
-                      onChange={(e) => setForm({ ...form, content: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-4 bg-[#F8F9FA] p-6 border border-[#DCE0E7]">
-                    <input
-                      type="checkbox"
-                      id="published"
-                      className="w-5 h-5 text-[#082634] border-[#DCE0E7] focus:ring-[#D8C7A3] cursor-pointer"
-                      checked={form.published}
-                      onChange={(e) => setForm({ ...form, published: e.target.checked })}
-                    />
-                    <label htmlFor="published" className="text-xs font-bold text-[#082634] uppercase tracking-widest select-none cursor-pointer">
-                      Publier l'article immédiatement
-                    </label>
-                  </div>
-                </div>
-
-                {/* SEO */}
-                <div className="space-y-8 pb-12">
-                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
-                    <Search size={16} className="text-[#D8C7A3]" />
-                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Optimisation SEO</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Titre</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.metaTitle}
-                        onChange={(e) => setForm({ ...form, metaTitle: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Description</label>
-                      <textarea
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none"
-                        value={form.metaDescription}
-                        onChange={(e) => setForm({ ...form, metaDescription: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </form>
-
-              <div className="fixed bottom-0 right-0 w-full max-w-4xl bg-white border-t border-[#DCE0E7] p-8 flex items-center justify-end gap-6 z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-                <button type="button" onClick={resetForm} className="text-[#8EA4AF] text-[10px] font-bold uppercase tracking-[0.2em] hover:text-[#082634] transition-colors">Annuler</button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={createArticle.isPending || updateArticle.isPending}
-                  className="bg-[#082634] text-[#D8C7A3] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all disabled:opacity-50 shadow-xl shadow-[#082634]/10"
-                >
-                  {createArticle.isPending || updateArticle.isPending ? "Enregistrement..." : "Enregistrer l'article"}
-                </button>
-              </div>
+        <form onSubmit={handleSubmit} className="ga-admin-panel p-6 mb-6 space-y-4">
+          <h3 className="text-white font-serif text-lg mb-4">{editing !== null ? "Modifier l'article" : "Nouvel article"}</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>Titre *</label>
+              <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Slug *</label>
+              <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Catégorie</label>
+              <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Image de couverture (URL)</label>
+              <input value={form.coverImageUrl} onChange={(e) => setForm({ ...form, coverImageUrl: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Meta Title (SEO)</label>
+              <input value={form.metaTitle} onChange={(e) => setForm({ ...form, metaTitle: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Meta Description (SEO)</label>
+              <input value={form.metaDescription} onChange={(e) => setForm({ ...form, metaDescription: e.target.value })} className={inputClass} />
             </div>
           </div>
-        </div>
+          <div>
+            <label className={labelClass}>Extrait</label>
+            <textarea rows={2} value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Contenu</label>
+            <textarea rows={6} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className={inputClass} />
+          </div>
+          <div className="flex items-center gap-3">
+            <input type="checkbox" id="published" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
+            <label htmlFor="published" className="text-white/70 text-sm">Publié</label>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="submit" className="ga-btn btn-medium px-6 py-2">{editing !== null ? "Enregistrer" : "Créer"}</button>
+            <button type="button" onClick={resetForm} className="ga-btn ga-btn-light px-4 py-2">Annuler</button>
+          </div>
+        </form>
       )}
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-2">
         {articles.map((a) => (
-          <div key={a.id} className="group bg-white border border-[#DCE0E7] p-6 flex items-center justify-between hover:border-[#D8C7A3] hover:shadow-xl transition-all duration-500">
-            <div className="flex items-center gap-8">
-              <div className="relative w-32 h-20 overflow-hidden bg-[#F8F9FA]">
-                {a.coverImageUrl ? (
-                  <img src={a.coverImageUrl} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[#8EA4AF]/30">
-                    <ImageIcon size={20} />
-                  </div>
-                )}
-              </div>
+          <div key={a.id} className="ga-card-dark p-4 flex items-center justify-between hover:border-white/20 transition-colors">
+            <div className="flex items-center gap-4">
+              {a.coverImageUrl && <img src={a.coverImageUrl} alt="" className="w-16 h-12 object-cover opacity-70" />}
               <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <Badge color={a.published ? "green" : "gray"}>{a.published ? "Publié" : "Brouillon"}</Badge>
-                  {a.category && <Badge color="blue">{a.category}</Badge>}
-                </div>
-                <h3 className="text-[#082634] font-serif text-lg font-light">{a.title}</h3>
-                <div className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">
-                  Par l'équipe Acharaf <span className="mx-2 opacity-30">·</span> {formatDate(a.createdAt)}
-                </div>
+                <div className="text-white font-medium">{a.title}</div>
+                <div className="text-white/40 text-sm">{a.category}</div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button onClick={() => startEdit(a)} className="bg-[#F8F9FA] text-[#082634] px-5 py-2.5 text-[10px] uppercase tracking-widest font-bold hover:bg-[#082634] hover:text-white transition-all">Modifier</button>
+            <div className="flex items-center gap-4">
+              <Badge color={a.published ? "green" : "gray"}>{a.published ? "Publié" : "Brouillon"}</Badge>
+              <div className="text-white/30 text-xs">{formatDate(a.createdAt)}</div>
+              <button onClick={() => startEdit(a)} className="text-white/50 hover:text-white text-sm px-2 py-1 hover:bg-white/10 transition-colors">Modifier</button>
               <ConfirmButton onConfirm={async () => {
                 await deleteArticle.mutateAsync({ id: a.id });
                 qc.invalidateQueries({ queryKey: getListArticlesQueryKey() });
@@ -1038,41 +1644,16 @@ function CareersTab() {
   const deleteCareer = useDeleteCareer();
   const [editing, setEditing] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ 
-    title: "", 
-    slug: "",
-    department: "", 
-    location: "", 
-    type: "full-time" as "full-time" | "part-time" | "internship" | "freelance", 
-    description: "", 
-    coverImageUrl: "",
-    metaTitle: "",
-    metaDescription: "",
-    active: true 
-  });
+  const [form, setForm] = useState({ title: "", department: "", location: "", type: "full-time" as "full-time" | "part-time" | "internship" | "freelance", description: "", active: true });
 
   function resetForm() {
-    setForm({ 
-      title: "", slug: "", department: "", location: "", type: "full-time", 
-      description: "", coverImageUrl: "", metaTitle: "", metaDescription: "", active: true 
-    });
+    setForm({ title: "", department: "", location: "", type: "full-time", description: "", active: true });
     setEditing(null);
     setShowForm(false);
   }
 
   function startEdit(c: (typeof careers)[0]) {
-    setForm({ 
-      title: c.title, 
-      slug: c.slug,
-      department: c.department, 
-      location: c.location ?? "", 
-      type: (c.type as "full-time" | "part-time" | "internship" | "freelance") ?? "full-time", 
-      description: c.description ?? "", 
-      coverImageUrl: c.coverImageUrl ?? "",
-      metaTitle: c.metaTitle ?? "",
-      metaDescription: c.metaDescription ?? "",
-      active: c.active 
-    });
+    setForm({ title: c.title, department: c.department, location: c.location ?? "", type: (c.type as "full-time" | "part-time" | "internship" | "freelance") ?? "full-time", description: c.description ?? "", active: c.active });
     setEditing(c.id);
     setShowForm(true);
   }
@@ -1092,206 +1673,75 @@ function CareersTab() {
   const typeLabel = (t: string) => ({ "full-time": "CDI", "part-time": "Temps partiel", internship: "Stage", freelance: "Freelance" }[t] ?? t);
 
   return (
-    <div className="space-y-10">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-serif text-[#082634] tracking-tight">Offres d'Emploi</h2>
-          <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Gérez vos opportunités de carrière</p>
-        </div>
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-[#082634] text-[#D8C7A3] px-8 py-3.5 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all flex items-center gap-2 shadow-lg shadow-[#082634]/10"
-        >
-          <Plus size={14} />
-          Nouvelle Offre
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-serif text-white">Offres d'emploi <span className="text-white/30 text-lg ml-2">({careers.length})</span></h2>
+        <button onClick={() => { resetForm(); setShowForm(true); }} className="ga-btn btn-medium px-4 py-2">
+          + Ajouter
         </button>
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-[#082634]/40 backdrop-blur-md z-[60] flex items-center justify-end">
-          <div className="w-full max-w-4xl h-full bg-white shadow-2xl overflow-y-auto">
-            <div className="p-12">
-              <div className="flex items-center justify-between mb-12 border-b border-[#DCE0E7] pb-8">
-                <div>
-                  <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mb-2 font-medium">Gestion RH</p>
-                  <h2 className="text-3xl font-serif text-[#082634] font-light">
-                    {editing !== null ? "Modifier l'offre" : "Publier une nouvelle offre"}
-                  </h2>
-                </div>
-                <button 
-                  onClick={resetForm} 
-                  className="p-3 hover:bg-[#F8F9FA] transition-colors text-[#8EA4AF] hover:text-[#082634]"
-                >
-                  <X size={24} strokeWidth={1.5} />
-                </button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-16 pb-32">
-                <div className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Titre du poste *</label>
-                      <input
-                        required
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.title}
-                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        placeholder="Ex: Architecte d'intérieur Senior"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Slug (URL) *</label>
-                      <input
-                        required
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.slug}
-                        onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                        placeholder="architecte-interieur-senior"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Département *</label>
-                      <input
-                        required
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.department}
-                        onChange={(e) => setForm({ ...form, department: e.target.value })}
-                        placeholder="Ex: Design & Architecture"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Ville</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.location}
-                        onChange={(e) => setForm({ ...form, location: e.target.value })}
-                        placeholder="Ex: Casablanca"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Type de contrat</label>
-                      <select
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none appearance-none"
-                        value={form.type}
-                        onChange={(e) => setForm({ ...form, type: e.target.value as any })}
-                      >
-                        <option value="full-time">CDI</option>
-                        <option value="part-time">Temps partiel</option>
-                        <option value="internship">Stage</option>
-                        <option value="freelance">Freelance</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <FileUpload 
-                    label="Image d'en-tête (Optionnel)" 
-                    value={form.coverImageUrl} 
-                    onChange={(url) => setForm({ ...form, coverImageUrl: url })} 
-                  />
-
-                  <div className="space-y-3">
-                    <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Description du poste</label>
-                    <textarea
-                      className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-64 resize-none"
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-4 bg-[#F8F9FA] p-6 border border-[#DCE0E7]">
-                    <input
-                      type="checkbox"
-                      id="active"
-                      className="w-5 h-5 text-[#082634] border-[#DCE0E7] focus:ring-[#D8C7A3] cursor-pointer"
-                      checked={form.active}
-                      onChange={(e) => setForm({ ...form, active: e.target.checked })}
-                    />
-                    <label htmlFor="active" className="text-xs font-bold text-[#082634] uppercase tracking-widest select-none cursor-pointer">
-                      Offre active (visible sur le site)
-                    </label>
-                  </div>
-                </div>
-
-                {/* SEO */}
-                <div className="space-y-8 pb-12">
-                  <div className="flex items-center gap-3 border-b border-[#DCE0E7] pb-3">
-                    <Search size={16} className="text-[#D8C7A3]" />
-                    <h3 className="text-[10px] font-bold text-[#082634] uppercase tracking-[0.2em]">Optimisation SEO</h3>
-                  </div>
-                  <div className="grid grid-cols-1 gap-8">
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Titre</label>
-                      <input
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                        value={form.metaTitle}
-                        onChange={(e) => setForm({ ...form, metaTitle: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Méta Description</label>
-                      <textarea
-                        className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none h-32 resize-none"
-                        value={form.metaDescription}
-                        onChange={(e) => setForm({ ...form, metaDescription: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </form>
-
-              <div className="fixed bottom-0 right-0 w-full max-w-4xl bg-white border-t border-[#DCE0E7] p-8 flex items-center justify-end gap-6 z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-                <button type="button" onClick={resetForm} className="text-[#8EA4AF] text-[10px] font-bold uppercase tracking-[0.2em] hover:text-[#082634] transition-colors">Annuler</button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={createCareer.isPending || updateCareer.isPending}
-                  className="bg-[#082634] text-[#D8C7A3] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all disabled:opacity-50 shadow-xl shadow-[#082634]/10"
-                >
-                  {createCareer.isPending || updateCareer.isPending ? "Enregistrement..." : "Enregistrer l'offre"}
-                </button>
-              </div>
+        <form onSubmit={handleSubmit} className="ga-admin-panel p-6 mb-6 space-y-4">
+          <h3 className="text-white font-serif text-lg mb-4">{editing !== null ? "Modifier l'offre" : "Nouvelle offre"}</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>Titre *</label>
+              <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Département *</label>
+              <input required value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Ville</label>
+              <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Type</label>
+              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as "full-time" | "part-time" | "internship" | "freelance" })} className={inputClass}>
+                <option value="full-time">CDI</option>
+                <option value="part-time">Temps partiel</option>
+                <option value="internship">Stage</option>
+                <option value="freelance">Freelance</option>
+              </select>
             </div>
           </div>
-        </div>
+          <div>
+            <label className={labelClass}>Description</label>
+            <textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputClass} />
+          </div>
+          <div className="flex items-center gap-3">
+            <input type="checkbox" id="active" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+            <label htmlFor="active" className="text-white/70 text-sm">Offre active</label>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="submit" className="ga-btn btn-medium px-6 py-2">{editing !== null ? "Enregistrer" : "Créer"}</button>
+            <button type="button" onClick={resetForm} className="ga-btn ga-btn-light px-4 py-2">Annuler</button>
+          </div>
+        </form>
       )}
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-2">
         {careers.map((c) => (
-          <div key={c.id} className="bg-white border border-[#DCE0E7] p-6 flex items-center justify-between hover:border-[#D8C7A3] hover:shadow-xl transition-all duration-500">
-            <div className="flex items-center gap-6">
-              <div className="w-12 h-12 bg-[#F8F9FA] flex items-center justify-center text-[#D8C7A3]">
-                <Briefcase size={20} strokeWidth={1.5} />
-              </div>
-              <div>
-                <div className="flex items-center gap-3 mb-1.5">
-                  <Badge color="blue">{typeLabel(c.type)}</Badge>
-                  <Badge color={c.active ? "green" : "gray"}>{c.active ? "Active" : "Brouillon"}</Badge>
-                </div>
-                <h3 className="text-[#082634] font-serif text-lg font-light">{c.title}</h3>
-                <div className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">
-                  {c.department} <span className="mx-2 opacity-30">·</span> {c.location}
-                </div>
-              </div>
+          <div key={c.id} className="ga-card-dark p-4 flex items-center justify-between hover:border-white/20 transition-colors">
+            <div>
+              <div className="text-white font-medium">{c.title}</div>
+              <div className="text-white/40 text-sm">{c.department} · {c.location}</div>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="text-right hidden md:block">
-                <div className="text-[#8EA4AF] text-[10px] uppercase tracking-widest mb-1 opacity-60">Publiée le</div>
-                <div className="text-[#082634] text-xs font-medium">{formatDate(c.createdAt)}</div>
-              </div>
-              <div className="flex items-center gap-3">
-                <button onClick={() => startEdit(c)} className="bg-[#F8F9FA] text-[#082634] px-5 py-2.5 text-[10px] uppercase tracking-widest font-bold hover:bg-[#082634] hover:text-white transition-all">Modifier</button>
-                <ConfirmButton onConfirm={async () => {
-                  await deleteCareer.mutateAsync({ id: c.id });
-                  qc.invalidateQueries({ queryKey: getListCareersQueryKey() });
-                }} />
-              </div>
+            <div className="flex items-center gap-4">
+              <Badge color="blue">{typeLabel(c.type)}</Badge>
+              <Badge color={c.active ? "green" : "gray"}>{c.active ? "Active" : "Inactive"}</Badge>
+              <div className="text-white/30 text-xs">{formatDate(c.createdAt)}</div>
+              <button onClick={() => startEdit(c)} className="text-white/50 hover:text-white text-sm px-2 py-1 hover:bg-white/10 transition-colors">Modifier</button>
+              <ConfirmButton onConfirm={async () => {
+                await deleteCareer.mutateAsync({ id: c.id });
+                qc.invalidateQueries({ queryKey: getListCareersQueryKey() });
+              }} />
             </div>
           </div>
         ))}
-        {careers.length === 0 && (
-          <div className="py-20 text-center border-2 border-dashed border-[#DCE0E7] bg-white">
-            <p className="text-[#8EA4AF] text-sm font-light">Aucune offre d'emploi disponible.</p>
-          </div>
-        )}
+        {careers.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucune offre.</p>}
       </div>
     </div>
   );
@@ -1304,63 +1754,25 @@ function ApplicationsTab() {
   const { data: applications = [] } = useListApplications();
 
   return (
-    <div className="space-y-10">
-      <div>
-        <h2 className="text-xl font-serif text-[#082634] tracking-tight">Candidatures Reçues</h2>
-        <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-1">Consultez les dossiers des candidats</p>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-serif text-white">Candidatures <span className="text-white/30 text-lg ml-2">({applications.length})</span></h2>
       </div>
-
-      <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-2">
         {applications.map((a) => (
-          <div key={a.id} className="bg-white border border-[#DCE0E7] p-8 hover:border-[#D8C7A3] hover:shadow-xl transition-all duration-500">
+          <div key={a.id} className="ga-card-dark p-4 hover:border-white/20 transition-colors">
             <div className="flex items-start justify-between">
-              <div className="space-y-6">
-                <div>
-                  <div className="text-[#082634] font-serif text-2xl font-light">{a.firstName} {a.lastName}</div>
-                  <div className="text-[#D8C7A3] text-[10px] uppercase tracking-[0.2em] font-bold mt-1">
-                    {a.email} {a.phone && <span className="mx-2 opacity-30">·</span>} {a.phone}
-                  </div>
-                </div>
-
-                {a.career && (
-                  <div className="inline-flex items-center gap-2 bg-[#082634]/5 px-3 py-1.5 border border-[#082634]/10">
-                    <span className="text-[#8EA4AF] text-[9px] uppercase tracking-widest font-bold">Poste:</span>
-                    <span className="text-[#082634] text-xs font-medium">{a.career.title}</span>
-                  </div>
-                )}
-
-                {a.message && (
-                  <div className="text-[#3B5661] text-sm font-light leading-relaxed max-w-2xl italic border-l-2 border-[#D8C7A3]/30 pl-4">
-                    "{a.message}"
-                  </div>
-                )}
-
-                {a.cvUrl && (
-                  <div className="pt-2">
-                    <a 
-                      href={a.cvUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 bg-[#082634] text-[#D8C7A3] px-6 py-3 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#0a3245] transition-all shadow-lg shadow-[#082634]/10"
-                    >
-                      <Download size={14} />
-                      Télécharger le CV (PDF)
-                    </a>
-                  </div>
-                )}
+              <div>
+                <div className="text-white font-medium">{a.firstName} {a.lastName}</div>
+                <div className="text-[#8EA4AF] text-sm">{a.email} {a.phone && `· ${a.phone}`}</div>
+                {a.career && <div className="text-white/50 text-sm mt-1">Poste: {a.career.title}</div>}
+                {a.message && <div className="text-white/40 text-sm mt-2 max-w-2xl">{a.message}</div>}
               </div>
-              <div className="text-right">
-                <div className="text-[#8EA4AF] text-[10px] uppercase tracking-widest mb-1 opacity-60">Candidature du</div>
-                <div className="text-[#082634] text-xs font-medium">{formatDate(a.createdAt)}</div>
-              </div>
+              <div className="text-white/30 text-xs">{formatDate(a.createdAt)}</div>
             </div>
           </div>
         ))}
-        {applications.length === 0 && (
-          <div className="py-20 text-center border-2 border-dashed border-[#DCE0E7] bg-white">
-            <p className="text-[#8EA4AF] text-sm font-light">Aucune candidature reçue pour le moment.</p>
-          </div>
-        )}
+        {applications.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucune candidature.</p>}
       </div>
     </div>
   );
@@ -1371,159 +1783,49 @@ function ApplicationsTab() {
 // ──────────────────────────────────────────────────────────
 export default function Admin() {
   const [activeTab, setActiveTab] = useState<Tab>("projects");
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem("admin_auth") === "true";
-  });
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simple hardcoded authentication for demonstration
-    if (username === "admin" && password === "admin") {
-      sessionStorage.setItem("admin_auth", "true");
-      setIsAuthenticated(true);
-      setError("");
-    } else {
-      setError("Identifiants incorrects. Veuillez réessayer.");
-    }
-  };
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#082634] flex flex-col items-center justify-center font-sans p-4 relative overflow-hidden">
-        {/* Background elements for luxury feel */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
-          <div className="absolute top-[-10%] right-[-5%] w-[50%] aspect-square rounded-full border border-[#D8C7A3]/30" />
-          <div className="absolute bottom-[-20%] left-[-10%] w-[60%] aspect-square rounded-full border border-[#D8C7A3]/20" />
-        </div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-md bg-white p-12 shadow-2xl relative z-10"
-        >
-          <div className="text-center mb-10">
-            <div className="text-[#D8C7A3] font-serif text-3xl tracking-[0.15em] leading-none mb-1">GROUPE</div>
-            <div className="text-[#082634] font-serif text-3xl tracking-[0.15em] leading-none">ACHARAF</div>
-            <div className="text-[#8EA4AF] text-[9px] tracking-[0.3em] uppercase mt-4 font-bold opacity-60">
-              Espace Administration
-            </div>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-3">
-              <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Identifiant</label>
-              <input
-                type="text"
-                className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Entrez votre identifiant"
-              />
-            </div>
-            
-            <div className="space-y-3">
-              <label className="block text-[10px] font-bold text-[#8EA4AF] uppercase tracking-[0.2em]">Mot de passe</label>
-              <input
-                type="password"
-                className="w-full bg-[#F8F9FA] border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:border-[#D8C7A3] transition-all outline-none"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-              />
-            </div>
-
-            {error && (
-              <div className="text-red-500 text-xs text-center font-medium bg-red-50 py-3 px-4 border border-red-100">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              className="w-full bg-[#082634] text-[#D8C7A3] px-12 py-4 mt-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#0a3245] transition-all shadow-xl shadow-[#082634]/10"
-            >
-              Se connecter
-            </button>
-          </form>
-
-          <div className="mt-8 text-center">
-            <a href="/" className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] hover:text-[#082634] transition-colors">
-              &larr; Retour au site
-            </a>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] flex font-sans">
+    <div className="ga-admin-shell flex">
       {/* Sidebar */}
-      <aside className="w-72 bg-[#082634] flex-shrink-0 flex flex-col sticky top-0 h-screen">
-        <div className="p-10">
-          <div className="text-[#D8C7A3] font-serif text-2xl tracking-[0.15em] leading-none mb-1">GROUPE</div>
-          <div className="text-white font-serif text-2xl tracking-[0.15em] leading-none">ACHARAF</div>
-          <div className="text-[#8EA4AF] text-[10px] tracking-[0.3em] uppercase mt-4 font-medium opacity-60">Back-Office</div>
+      <aside className="w-64 bg-[#082634]/96 border-r border-white/10 flex-shrink-0">
+        <div className="p-6 border-b border-white/10">
+          <div className="text-[#8EA4AF] font-serif text-xl tracking-widest">GROUPE</div>
+          <div className="text-white font-serif text-xl tracking-widest">ACHARAF</div>
+          <div className="text-white/30 text-xs tracking-widest mt-1">BACK-OFFICE</div>
         </div>
-
-        <nav className="flex-1 px-6 space-y-2">
+        <nav className="p-4 space-y-1">
           {NAV_ITEMS.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full text-left px-6 py-4 text-[10px] uppercase tracking-[0.2em] transition-all duration-300 ${
+              className={`ga-admin-nav-item w-full text-left px-4 py-3 text-sm tracking-wide ${
                 activeTab === item.id
-                  ? "bg-[#D8C7A3] text-[#082634] font-semibold"
-                  : "text-white/50 hover:text-white hover:bg-white/5"
+                  ? "ga-admin-nav-item-active border-l-2 border-[#8EA4AF]"
+                  : ""
               }`}
             >
               {item.label}
             </button>
           ))}
         </nav>
-
-        <div className="p-10">
-          <a 
-            href="/" 
-            className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] hover:text-[#D8C7A3] transition-colors"
-          >
+        <div className="absolute bottom-6 left-0 w-64 px-6">
+          <a href="/" className="text-white/30 text-xs hover:text-white/60 transition-colors tracking-wide">
             &larr; Retour au site
           </a>
         </div>
       </aside>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-[#DCE0E7] px-12 py-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-[#082634] font-serif text-3xl font-light tracking-tight">
-              {NAV_ITEMS.find((n) => n.id === activeTab)?.label}
-            </h1>
-            <p className="text-[#8EA4AF] text-[10px] uppercase tracking-[0.2em] mt-2">
-              Gestion de la plateforme
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <div className="text-[#082634] text-xs font-medium">Administrateur</div>
-              <div className="text-[#8EA4AF] text-[10px] uppercase tracking-wider">Accès Complet</div>
-            </div>
-            <div className="w-10 h-10 bg-[#082634] text-[#D8C7A3] flex items-center justify-center font-serif text-lg">
-              A
-            </div>
-          </div>
+      <main className="flex-1 overflow-auto">
+        <header className="bg-[#082634]/92 border-b border-white/10 px-8 py-4">
+          <h1 className="text-white/60 text-sm tracking-widest uppercase">{NAV_ITEMS.find((n) => n.id === activeTab)?.label}</h1>
         </header>
-
-        <div className="p-12 max-w-7xl">
+        <div className="p-8">
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.3 }}
           >
             {activeTab === "projects" && <ProjectsTab />}
             {activeTab === "leads" && <LeadsTab />}
