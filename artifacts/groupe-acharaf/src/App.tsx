@@ -12,7 +12,7 @@ import APropos from "@/pages/APropos";
 import NosMarques from "@/pages/NosMarques";
 import NosProjets from "@/pages/NosProjets";
 import ProjectDetail from "@/pages/ProjectDetail";
-import Actualites from "@/pages/Actualites";
+import Opportunites from "@/pages/Opportunites";
 import ArticleDetail from "@/pages/ArticleDetail";
 import Carrieres from "@/pages/Carrieres";
 import Contact from "@/pages/Contact";
@@ -35,6 +35,14 @@ function ScrollToTop() {
   return null;
 }
 
+function RedirectToOpportunites() {
+  const [, navigate] = useLocation();
+  useEffect(() => {
+    navigate("/opportunites", { replace: true });
+  }, [navigate]);
+  return null;
+}
+
 function Router() {
   return (
     <>
@@ -46,7 +54,8 @@ function Router() {
           <Route path="/nos-marques" component={NosMarques} />
           <Route path="/nos-projets" component={NosProjets} />
           <Route path="/nos-projets/:id" component={ProjectDetail} />
-          <Route path="/actualites" component={Actualites} />
+          <Route path="/opportunites" component={Opportunites} />
+          <Route path="/actualites" component={RedirectToOpportunites} />
           <Route path="/actualites/:id" component={ArticleDetail} />
           <Route path="/carrieres" component={Carrieres} />
           <Route path="/contact" component={Contact} />

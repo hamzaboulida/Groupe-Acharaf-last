@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useCreateLead } from "@workspace/api-client-react";
+import { useListProjects } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,12 @@ const formSchema = z.object({
 export default function Contact() {
   const { toast } = useToast();
   const createLead = useCreateLead();
+  const { data: projects = [] } = useListProjects();
+
+  const ongoingProjects = React.useMemo(
+    () => projects.filter((project) => project.status === "ongoing"),
+    [projects]
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,9 +72,9 @@ export default function Contact() {
         <div className="absolute inset-0 z-0">
           <img src={heroBg} alt="" className="w-full h-full object-cover scale-105 brightness-[0.72]" />
         </div>
-        <div className="absolute inset-0 bg-black/22" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/50" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[#082634]/22" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#082634]/55 via-transparent to-[#082634]/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#082634]/20 via-transparent to-transparent" />
         <div className="relative z-10 container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}>
             <p className="text-[#8EA4AF] text-xs tracking-[0.2em] uppercase mb-6 opacity-80">Parlons-en</p>
@@ -104,10 +111,10 @@ export default function Contact() {
                 rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 className="flex items-center gap-4 px-7 py-5 hover:bg-[#8EA4AF]/10 transition-colors group"
               >
-                <div className="text-[#5C7480] group-hover:text-[#082634] transition-colors">{item.icon}</div>
+                <div className="text-[#8EA4AF] group-hover:text-[#082634] transition-colors">{item.icon}</div>
                 <div>
-                  <div className="text-[#5C7480] text-xs tracking-[0.15em] uppercase mb-0.5 font-light">{item.label}</div>
-                  <div className="text-[#3B5661] text-sm font-light group-hover:text-[#082634] transition-colors">{item.value}</div>
+                  <div className="text-[#8EA4AF] text-xs tracking-[0.15em] uppercase mb-0.5 font-light">{item.label}</div>
+                  <div className="text-[#082634] text-sm font-light group-hover:text-[#082634] transition-colors">{item.value}</div>
                 </div>
               </a>
             ))}
@@ -121,21 +128,21 @@ export default function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
             {/* Form */}
             <div>
-              <p className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-4">Formulaire</p>
+              <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-4">Formulaire</p>
               <h2 className="text-3xl font-serif text-[#082634] mb-10 font-light">Envoyez-nous un message</h2>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <FormField control={form.control} name="firstName" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#5C7480] font-normal">Prénom</FormLabel>
+                        <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#8EA4AF] font-normal">Prénom</FormLabel>
                         <FormControl><Input placeholder="Votre prénom" {...field} className={inputDark} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="lastName" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#5C7480] font-normal">Nom</FormLabel>
+                        <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#8EA4AF] font-normal">Nom</FormLabel>
                         <FormControl><Input placeholder="Votre nom" {...field} className={inputDark} /></FormControl>
                         <FormMessage />
                       </FormItem>
@@ -144,14 +151,14 @@ export default function Contact() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <FormField control={form.control} name="email" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#5C7480] font-normal">Email</FormLabel>
+                        <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#8EA4AF] font-normal">Email</FormLabel>
                         <FormControl><Input type="email" placeholder="votre@email.com" {...field} className={inputDark} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="phone" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#5C7480] font-normal">Téléphone</FormLabel>
+                        <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#8EA4AF] font-normal">Téléphone</FormLabel>
                         <FormControl><Input placeholder="+212 600 000 000" {...field} className={inputDark} /></FormControl>
                         <FormMessage />
                       </FormItem>
@@ -159,17 +166,19 @@ export default function Contact() {
                   </div>
                   <FormField control={form.control} name="projectInterest" render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#5C7480] font-normal">Projet d'intérêt</FormLabel>
+                      <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#8EA4AF] font-normal">Projet d'intérêt</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <SelectTrigger className="bg-transparent border-[#8EA4AF]/20 rounded-none focus:ring-[#8EA4AF]/40 text-[#3B5661] font-light">
+                          <SelectTrigger className="bg-transparent border-[#8EA4AF]/20 rounded-none focus:ring-[#8EA4AF]/40 text-[#082634] font-light">
                             <SelectValue placeholder="Sélectionnez un projet" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-white border-[#8EA4AF]/20 rounded-none">
-                          <SelectItem value="le-sommet-anfa">Le Sommet Anfa (Estya)</SelectItem>
-                          <SelectItem value="villa-majorelle">Villa Majorelle (Estya)</SelectItem>
-                          <SelectItem value="jardins-acharaf">Les Jardins d'Acharaf</SelectItem>
+                          {ongoingProjects.map((project) => (
+                            <SelectItem key={project.id} value={project.slug || String(project.id)}>
+                              {project.title} {project.brand?.name ? `(${project.brand.name})` : ""}
+                            </SelectItem>
+                          ))}
                           <SelectItem value="other">Autre / Renseignements</SelectItem>
                         </SelectContent>
                       </Select>
@@ -178,7 +187,7 @@ export default function Contact() {
                   )} />
                   <FormField control={form.control} name="message" render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#5C7480] font-normal">Message</FormLabel>
+                      <FormLabel className="text-xs tracking-[0.15em] uppercase text-[#8EA4AF] font-normal">Message</FormLabel>
                       <FormControl>
                         <Textarea placeholder="Comment pouvons-nous vous aider ?" className={`${inputDark} min-h-[110px] resize-none`} {...field} />
                       </FormControl>
@@ -187,7 +196,7 @@ export default function Contact() {
                   )} />
                   <Button
                     type="submit"
-                    className="w-full bg-[#8EA4AF] text-[#082634] hover:bg-[#B2BED0] transition-colors rounded-none py-5 tracking-[0.15em] uppercase text-xs font-medium"
+                    className="w-full bg-[#8EA4AF] text-[#082634] hover:bg-[#DCE0E7] transition-colors rounded-none py-5 tracking-[0.15em] uppercase text-xs font-medium"
                     disabled={createLead.isPending}
                   >
                     {createLead.isPending ? "Envoi en cours..." : "Envoyer le message"}
@@ -198,7 +207,7 @@ export default function Contact() {
 
             {/* Map + info */}
             <div>
-              <p className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-4">Localisation</p>
+              <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-4">Localisation</p>
               <h2 className="text-3xl font-serif text-[#082634] mb-10 font-light">Nos bureaux</h2>
               <div id="map" className="w-full h-60 mb-8 overflow-hidden border border-[#8EA4AF]/15">
                 <iframe
@@ -212,13 +221,13 @@ export default function Contact() {
               </div>
               <div className="space-y-7">
                 <div>
-                  <p className="text-[#5C7480] text-xs tracking-[0.18em] uppercase mb-2">Adresse</p>
-                  <p className="text-[#3B5661] font-light text-sm">Boulevard d'Anfa, Casablanca 20050</p>
+                  <p className="text-[#8EA4AF] text-xs tracking-[0.18em] uppercase mb-2">Adresse</p>
+                  <p className="text-[#082634] font-light text-sm">Boulevard d'Anfa, Casablanca 20050</p>
                 </div>
                 <div>
-                  <p className="text-[#5C7480] text-xs tracking-[0.18em] uppercase mb-2">Heures d'ouverture</p>
-                  <p className="text-[#3B5661] font-light text-sm">Lundi – Vendredi : 9h – 18h</p>
-                  <p className="text-[#3B5661] font-light text-sm">Samedi : 10h – 14h</p>
+                  <p className="text-[#8EA4AF] text-xs tracking-[0.18em] uppercase mb-2">Heures d'ouverture</p>
+                  <p className="text-[#082634] font-light text-sm">Lundi – Vendredi : 9h – 18h</p>
+                  <p className="text-[#082634] font-light text-sm">Samedi : 10h – 14h</p>
                 </div>
                 <a href="tel:+212600000000" className="btn-outline-dark">
                   <Phone size={12} /> Appeler directement

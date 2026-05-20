@@ -64,7 +64,7 @@ export default function ArticleDetail() {
             </h1>
             <Link
               href="/actualites"
-              className="inline-flex items-center gap-2 text-[#5C7480] text-xs tracking-[0.15em] uppercase hover:text-[#082634] transition-colors"
+              className="inline-flex items-center gap-2 text-[#8EA4AF] text-xs tracking-[0.15em] uppercase hover:text-[#082634] transition-colors"
             >
               <ArrowLeft size={12} /> Retour aux actualités
             </Link>
@@ -88,7 +88,7 @@ export default function ArticleDetail() {
               {/* Back link */}
               <Link
                 href="/actualites"
-                className="inline-flex items-center gap-2 text-[#5C7480] text-[10px] tracking-[0.18em] uppercase hover:text-[#082634] transition-colors mb-10 group"
+                className="inline-flex items-center gap-2 text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase hover:text-[#082634] transition-colors mb-10 group"
               >
                 <ArrowLeft size={11} className="group-hover:-translate-x-0.5 transition-transform" />
                 Actualités
@@ -97,12 +97,12 @@ export default function ArticleDetail() {
               {/* Meta */}
               <div className="flex flex-wrap items-center gap-3 mb-7">
                 {article.category && (
-                  <span className="inline-flex items-center gap-1.5 bg-[#DCE0E7] text-[#3B5661] text-[10px] font-medium tracking-[0.15em] uppercase px-3 py-1.5">
+                  <span className="inline-flex items-center gap-1.5 bg-[#DCE0E7] text-[#082634] text-[10px] font-medium tracking-[0.15em] uppercase px-3 py-1.5">
                     <Tag size={9} strokeWidth={2} />
                     {article.category}
                   </span>
                 )}
-                <span className="flex items-center gap-1.5 text-[#5C7480] text-xs">
+                <span className="flex items-center gap-1.5 text-[#8EA4AF] text-xs">
                   <Calendar size={11} strokeWidth={1.5} />
                   <time dateTime={article.publishedAt ?? ""}>
                     {article.publishedAt
@@ -119,7 +119,7 @@ export default function ArticleDetail() {
 
               {/* Excerpt */}
               {article.excerpt && (
-                <p className="text-[#3B5661] font-light text-lg leading-relaxed max-w-2xl border-l-2 border-[#8EA4AF]/40 pl-5">
+                <p className="text-[#082634] font-light text-lg leading-relaxed max-w-2xl border-l-2 border-[#8EA4AF]/40 pl-5">
                   {article.excerpt}
                 </p>
               )}
@@ -154,13 +154,13 @@ export default function ArticleDetail() {
               prose max-w-none
               prose-headings:font-serif prose-headings:font-light prose-headings:text-[#082634]
               prose-h2:text-3xl prose-h3:text-2xl
-              prose-p:text-[#3B5661] prose-p:font-light prose-p:leading-[1.9] prose-p:text-base
-              prose-a:text-[#082634] prose-a:underline prose-a:underline-offset-4 hover:prose-a:text-[#5C7480]
+              prose-p:text-[#082634] prose-p:font-light prose-p:leading-[1.9] prose-p:text-base
+              prose-a:text-[#082634] prose-a:underline prose-a:underline-offset-4 hover:prose-a:text-[#8EA4AF]
               prose-strong:text-[#082634] prose-strong:font-medium
-              prose-ul:text-[#3B5661] prose-ol:text-[#3B5661]
+              prose-ul:text-[#082634] prose-ol:text-[#082634]
               prose-li:font-light prose-li:leading-relaxed
-              prose-blockquote:border-l-[#8EA4AF] prose-blockquote:text-[#5C7480] prose-blockquote:font-light prose-blockquote:italic
-              prose-img:shadow-[0_10px_40px_rgba(0,0,0,0.08)]
+              prose-blockquote:border-l-[#8EA4AF] prose-blockquote:text-[#8EA4AF] prose-blockquote:font-light prose-blockquote:italic
+              prose-img:shadow-[0_10px_40px_rgba(8,38,52,0.08)]
               prose-hr:border-[#DCE0E7]
             `}
             dangerouslySetInnerHTML={{ __html: article.content ?? "" }}
@@ -170,7 +170,7 @@ export default function ArticleDetail() {
           <div className="mt-20 pt-8 border-t border-[#DCE0E7]">
             <Link
               href="/actualites"
-              className="inline-flex items-center gap-2.5 text-[#5C7480] text-xs tracking-[0.15em] uppercase hover:text-[#082634] transition-colors group"
+              className="inline-flex items-center gap-2.5 text-[#8EA4AF] text-xs tracking-[0.15em] uppercase hover:text-[#082634] transition-colors group"
             >
               <ArrowLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
               Retour aux actualités

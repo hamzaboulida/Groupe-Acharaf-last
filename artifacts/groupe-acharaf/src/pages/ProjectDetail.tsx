@@ -2,12 +2,19 @@ import React, { useState, useRef, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { useParams, Link } from "wouter";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useGetProject, useCreateLead, getGetProjectQueryKey } from "@workspace/api-client-react";
+import { useGetProject, useCreateLead } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
 import {
-  MapPin, Ruler, Calendar, ChevronDown, ArrowRight, Phone,
+  projectPriceLabel,
+  projectPriceRangeLabel,
+  shouldShowProjectPrice,
+  statusBadgeClass,
+  statusLabel,
+} from "@/lib/project-display";
+import {
+  MapPin, Ruler, Calendar, ChevronDown, ArrowRight,
   Shield, Trees, Car, Wifi, Star, Building2,
-  Check, X, ZoomIn, ChevronLeft, ChevronRight,
+  Check, X, ZoomIn, ChevronLeft, ChevronRight, ExternalLink,
 } from "lucide-react";
 
 import project1 from "@/assets/project-1.png";
@@ -18,26 +25,46 @@ const FB = [project1, project2, project3];
 const EC = [0.22, 1, 0.36, 1] as const;
 
 /* ── Helpers ────────────────────────────────────────────────── */
-function formatPrice(n: number | null | undefined): string {
-  if (!n) return "";
-  return n.toLocaleString("fr-MA");
+function clean(value: string | null | undefined): string {
+  return value?.trim() ?? "";
 }
 
-function statusLabel(s: string | null | undefined) {
-  if (s === "ongoing") return "En cours";
-  if (s === "completed") return "Livré";
-  return "À venir";
+function upsertMeta(attribute: "name" | "property", key: string, content: string) {
+  if (!content) return;
+  let element = document.querySelector(`meta[${attribute}="${key}"]`);
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute(attribute, key);
+    document.head.appendChild(element);
+  }
+  element.setAttribute("content", content);
 }
 
-function statusColor(s: string | null | undefined) {
-  if (s === "ongoing") return "bg-emerald-500/10 text-emerald-700 border-emerald-500/25";
-  if (s === "completed") return "bg-[#082634]/8 text-[#082634] border-[#082634]/15";
-  return "bg-amber-500/10 text-amber-700 border-amber-500/20";
-}
-
-function segmentLabel(s: string | null | undefined) {
-  if (s === "luxury") return "Villa / Résidence de luxe";
+function segmentLabel(type: string | null | undefined, segment: string | null | undefined) {
+  if (clean(type)) return clean(type);
+  if (segment === "luxury") return "Villa / Résidence de luxe";
   return "Résidence premium";
+}
+
+function normalizeMapEmbedUrl(value: string | null | undefined): string {
+  const raw = clean(value);
+  if (!raw) return "";
+  const iframeSrc = raw.match(/src=["']([^"']+)["']/i)?.[1] ?? raw;
+  const decodedSrc = iframeSrc.replace(/&amp;/g, "&").trim();
+
+  try {
+    const url = new URL(decodedSrc);
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    const isGoogleMaps =
+      (hostname === "google.com" && url.pathname.startsWith("/maps")) ||
+      hostname === "maps.google.com" ||
+      hostname.endsWith(".googleusercontent.com") ||
+      hostname === "googleusercontent.com";
+
+    return (url.protocol === "https:" || url.protocol === "http:") && isGoogleMaps ? url.toString() : "";
+  } catch {
+    return "";
+  }
 }
 
 function AmenityIcon({ label }: { label: string }) {
@@ -77,7 +104,7 @@ function Lightbox({
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-[#080629]/96 backdrop-blur-lg z-50 flex items-center justify-center"
+      className="fixed inset-0 bg-[#082634]/96 backdrop-blur-lg z-50 flex items-center justify-center"
       onClick={onClose}
     >
       <button
@@ -118,31 +145,48 @@ function Lightbox({
 /* ── Lead Form Section ──────────────────────────────────────── */
 type LeadData = { firstName: string; lastName: string; email: string; phone: string; message: string };
 
-function LeadSection({ projectTitle }: { projectTitle: string }) {
+function LeadSection({
+  projectId,
+  projectTitle,
+  title,
+  subtitle,
+  ctaLabel,
+}: {
+  projectId: number;
+  projectTitle: string;
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+}) {
   const createLead = useCreateLead();
   const { register, handleSubmit, formState: { errors }, reset } = useForm<LeadData>();
   const [sent, setSent] = useState(false);
 
   async function onSubmit(data: LeadData) {
     await createLead.mutateAsync({
-      data: { ...data, subject: "Prise de rendez-vous", projectInterest: projectTitle },
+      data: {
+        ...data,
+        subject: "Prise de rendez-vous",
+        projectInterest: projectTitle,
+        source: `project:${projectId}`,
+      },
     });
     setSent(true);
     reset();
   }
 
-  const base = "w-full bg-white border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:outline-none focus:border-[#5C7480] transition-colors placeholder:text-[#8EA4AF] font-light";
+  const base = "w-full bg-white border border-[#DCE0E7] text-[#082634] px-5 py-4 text-sm focus:outline-none focus:border-[#8EA4AF] transition-colors placeholder:text-[#8EA4AF] font-light";
 
   return (
     <section id="contact" className="py-28 bg-white relative overflow-hidden border-t border-[#DCE0E7]">
       <div className="container mx-auto px-6 max-w-3xl">
         <div className="text-center mb-16">
-          <p className="text-[#5C7480] text-xs tracking-[0.22em] uppercase mb-4">Contact direct</p>
+          <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-4">Contact direct</p>
           <h2 className="text-4xl md:text-5xl font-serif font-light text-[#082634] mb-5 leading-tight">
-            Intéressé par<br />ce projet ?
+            {title}
           </h2>
-          <p className="text-[#3B5661] font-light text-sm leading-relaxed max-w-sm mx-auto">
-            Notre équipe vous recontacte dans les 24 heures pour organiser une visite ou répondre à toutes vos questions.
+          <p className="text-[#082634] font-light text-sm leading-relaxed max-w-sm mx-auto">
+            {subtitle}
           </p>
         </div>
 
@@ -151,17 +195,17 @@ function LeadSection({ projectTitle }: { projectTitle: string }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <input placeholder="Prénom *" {...register("firstName", { required: true })} className={base} />
-                {errors.firstName && <span className="text-red-600 text-xs mt-1.5 block">Requis</span>}
+                {errors.firstName && <span className="ga-error mt-1.5 block">Requis</span>}
               </div>
               <div>
                 <input placeholder="Nom *" {...register("lastName", { required: true })} className={base} />
-                {errors.lastName && <span className="text-red-600 text-xs mt-1.5 block">Requis</span>}
+                {errors.lastName && <span className="ga-error mt-1.5 block">Requis</span>}
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <input type="email" placeholder="Email *" {...register("email", { required: true })} className={base} />
-                {errors.email && <span className="text-red-600 text-xs mt-1.5 block">Requis</span>}
+                {errors.email && <span className="ga-error mt-1.5 block">Requis</span>}
               </div>
               <input placeholder="Téléphone" {...register("phone")} className={base} />
             </div>
@@ -171,9 +215,9 @@ function LeadSection({ projectTitle }: { projectTitle: string }) {
               <button
                 type="submit"
                 disabled={createLead.isPending}
-                className="w-full max-w-sm flex items-center justify-center gap-3 bg-[#082634] text-white px-10 py-4 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#0a3245] transition-colors disabled:opacity-50"
+                className="w-full max-w-sm flex items-center justify-center gap-3 bg-[#082634] text-white px-10 py-4 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#082634] transition-colors disabled:opacity-50"
               >
-                {createLead.isPending ? "Envoi…" : "Prendre rendez-vous"}
+                {createLead.isPending ? "Envoi…" : ctaLabel}
                 {!createLead.isPending && <ArrowRight size={13} />}
               </button>
             </div>
@@ -188,7 +232,7 @@ function LeadSection({ projectTitle }: { projectTitle: string }) {
               <Check size={20} className="text-[#082634]" />
             </div>
             <h3 className="text-[#082634] font-serif text-3xl mb-3 font-light">Demande envoyée</h3>
-            <p className="text-[#3B5661] font-light text-sm leading-relaxed">
+            <p className="text-[#082634] font-light text-sm leading-relaxed">
               Notre équipe vous contactera dans les plus brefs délais.
             </p>
           </motion.div>
@@ -205,7 +249,7 @@ export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const projectId = id ? Number(id) : 0;
 
-  const { data: project, isLoading } = useGetProject(projectId, { query: { queryKey: getGetProjectQueryKey(projectId), enabled: !!projectId } });
+  const { data: project, isLoading, isError } = useGetProject(projectId);
 
   const [activeImage, setActiveImage] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -218,24 +262,29 @@ export default function ProjectDetail() {
   const heroImgY = useTransform(heroScroll, [0, 1], ["0%", "25%"]);
   const heroOpacity = useTransform(heroScroll, [0, 0.7], [1, 0]);
 
-  const cover = project?.coverImageUrl ?? FB[projectId % 3];
-  const gallery = project?.images?.length ? project.images : [FB[0], FB[1], FB[2]];
+  const projectImages = project?.images?.filter(Boolean) ?? [];
+  const cover = clean(project?.coverImageUrl) || FB[projectId % 3];
+  const gallery = projectImages.length ? projectImages : [FB[0], FB[1], FB[2]];
 
   /* SEO */
   useEffect(() => {
     if (project) {
-      document.title = project.seoTitle || `${project.title} | Immobilier à ${project.city ?? project.location} | Groupe Acharaf`;
-      if (project.seoDescription) {
-        let meta = document.querySelector('meta[name="description"]');
-        if (!meta) {
-          meta = document.createElement('meta');
-          meta.setAttribute('name', 'description');
-          document.head.appendChild(meta);
-        }
-        meta.setAttribute('content', project.seoDescription);
-      }
+      document.title =
+        clean(project.metaTitle) ||
+        `${project.title} | Immobilier à ${project.city ?? project.location} | Groupe Acharaf`;
+      const seoDescription =
+        clean(project.metaDescription) ||
+        clean(project.shortDescription) ||
+        clean(project.description) ||
+        clean(project.longDescription);
+      const ogImage = clean(project.ogImageUrl) || cover;
+
+      upsertMeta("name", "description", seoDescription);
+      upsertMeta("property", "og:title", document.title);
+      upsertMeta("property", "og:description", seoDescription);
+      upsertMeta("property", "og:image", ogImage);
     }
-  }, [project]);
+  }, [cover, project]);
 
   /* Loading state */
   if (isLoading) {
@@ -250,15 +299,65 @@ export default function ProjectDetail() {
     );
   }
 
-  const priceLabel = project?.priceMin
-    ? `À partir de ${formatPrice(project.priceMin)} DH`
-    : null;
+  if (isError || !project) {
+    return (
+      <Layout>
+        <div className="h-screen bg-white flex items-center justify-center px-6 text-center">
+          <div>
+            <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-4">Projet introuvable</p>
+            <h1 className="text-4xl font-serif font-light text-[#082634] mb-6">
+              Ce projet n'existe pas ou a été retiré.
+            </h1>
+            <Link href="/nos-projets" className="text-[#082634] text-xs tracking-[0.15em] uppercase hover:text-[#082634]">
+              Retour aux projets
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
-  const surfaceLabel = (project?.surfaceMin && project?.surfaceMax)
+  const priceLabel = projectPriceLabel(project);
+  const priceRangeLabel = projectPriceRangeLabel(project);
+  const priceVisible = shouldShowProjectPrice(project);
+  const pricingLabel = priceVisible ? clean(project.priceLabel) || "Prix de départ" : "Prix";
+  const availabilityNote = clean(project.availabilityNote);
+
+  const surfaceLabel = (project.surfaceMin && project.surfaceMax)
     ? `${project.surfaceMin} – ${project.surfaceMax} m²`
-    : project?.surfaceMin
+    : project.surfaceMin
     ? `Dès ${project.surfaceMin} m²`
     : null;
+  const heroTitle = clean(project.heroTitle) || project.title;
+  const heroSubtitle = clean(project.heroSubtitle) || clean(project.tagline) || clean(project.shortDescription) || clean(project.brand?.tagline);
+  const heroLocation = clean(project.heroLocationText) || clean(project.addressText) || [project.location, project.city].filter(Boolean).join(", ");
+  const primaryCtaLabel = clean(project.primaryCtaLabel) || "Découvrir le projet";
+  const secondaryCtaLabel = clean(project.secondaryCtaLabel) || "Prendre rendez-vous";
+  const projectSectionTitle = clean(project.projectSectionTitle) || clean(project.tagline) || project.title;
+  const projectDescription =
+    clean(project.projectSectionDescription) ||
+    clean(project.longDescription) ||
+    clean(project.description) ||
+    clean(project.shortDescription);
+  const introImage = clean(project.secondaryImageUrl) || gallery[1] || cover;
+  const lifestyleImage = clean(project.lifestyleImageUrl) || gallery[2] || gallery[0] || cover;
+  const galleryTitle = clean(project.galleryTitle) || "Visuels du projet";
+  const featuresTitle = clean(project.featuresTitle) || "Points forts du projet";
+  const lifestyleTitle = clean(project.lifestyleTitle) || clean(project.tagline) || clean(project.brand?.tagline) || "Art de vivre";
+  const lifestyleDescription =
+    clean(project.lifestyleDescription) ||
+    clean(project.brand?.description) ||
+    clean(project.longDescription) ||
+    clean(project.description);
+  const locationSectionTitle = clean(project.locationSectionTitle) || "Emplacement";
+  const locationDescription = clean(project.locationDescription);
+  const locationAdvantages = project.locationAdvantages?.filter(Boolean) ?? [];
+  const addressText = clean(project.addressText) || [project.location, project.city].filter(Boolean).join(", ");
+  const mapEmbedUrl = normalizeMapEmbedUrl(project.mapIframeCode) || normalizeMapEmbedUrl(project.mapEmbedUrl);
+  const contactTitle = clean(project.contactTitle) || "Intéressé par ce projet ?";
+  const contactSubtitle =
+    clean(project.contactSubtitle) ||
+    "Notre équipe vous recontacte dans les 24 heures pour organiser une visite ou répondre à toutes vos questions.";
 
   return (
     <Layout>
@@ -274,15 +373,15 @@ export default function ProjectDetail() {
           transition={{ duration: 2.2, ease: EC }}
           style={{ y: heroImgY }}
         >
-          <img src={cover} alt={project?.title ?? "Projet"} className="w-full h-full object-cover" />
+          <img src={cover} alt={project.title} className="w-full h-full object-cover" />
         </motion.div>
 
-        {/* Overlays — cinematic, image stays vivid */}
-        <div className="absolute inset-0 bg-black/15 z-[1]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent z-[1]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/22 via-transparent to-transparent z-[1]" />
-        {/* Navbar scrim — top gradient so transparent header text stays legible */}
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/45 to-transparent z-[1]" />
+        {/* Overlays — stronger around content, still breathable over the image */}
+        <div className="absolute inset-0 bg-[#082634]/12 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#082634]/82 via-[#082634]/24 to-transparent z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#082634]/72 via-[#082634]/28 to-transparent z-[1]" />
+        <div className="absolute bottom-0 left-0 z-[1] h-[62%] w-full md:w-[76%] bg-[radial-gradient(ellipse_at_bottom_left,rgba(8,38,52,0.88)_0%,rgba(8,38,52,0.56)_42%,transparent_74%)]" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#082634]/45 to-transparent z-[1]" />
 
         {/* Content */}
         <motion.div
@@ -295,36 +394,35 @@ export default function ProjectDetail() {
             transition={{ duration: 1.1, delay: 0.3, ease: EC }}
           >
             {/* Badges */}
-            <div className="flex items-center gap-3 mb-7">
-              {project?.brand?.name && (
+            <div className="flex flex-wrap items-center gap-3 mb-7">
+              {project.brand?.name && (
                 <span className="px-4 py-1.5 bg-[#8EA4AF] text-[#082634] text-xs font-medium tracking-[0.15em] uppercase">
                   {project.brand.name}
                 </span>
               )}
-              {project?.status && (
-                <span className={`px-4 py-1.5 border text-xs tracking-[0.15em] uppercase ${statusColor(project.status)}`}>
+              {project.status && (
+                <span className={`px-4 py-1.5 border text-xs tracking-[0.15em] uppercase ${statusBadgeClass(project.status)}`}>
                   {statusLabel(project.status)}
                 </span>
               )}
             </div>
 
             {/* Title */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-light text-white mb-4 leading-none tracking-tight">
-              {project?.title ?? "Projet d'exception"}
+            <h1 className="max-w-5xl text-5xl md:text-7xl lg:text-8xl font-serif font-light text-white mb-5 leading-none tracking-tight drop-shadow-[0_3px_22px_rgba(8,38,52,0.42)]">
+              {heroTitle}
             </h1>
 
-            {/* Tagline */}
-            {(project?.tagline || project?.brand?.tagline) && (
-              <p className="text-white/45 font-light text-base md:text-lg mb-3 max-w-lg italic font-serif">
-                "{project?.tagline || project?.brand?.tagline}"
+            {heroSubtitle && (
+              <p className="text-white/88 font-light text-base md:text-xl mb-4 max-w-2xl leading-relaxed font-serif drop-shadow-[0_2px_14px_rgba(8,38,52,0.44)]">
+                {heroSubtitle}
               </p>
             )}
 
             {/* Location */}
-            {project?.location && (
-              <p className="text-white/40 font-light flex items-center gap-2 text-sm mb-10">
-                <MapPin size={13} className="text-[#8EA4AF] opacity-70" />
-                {project.location}{project.city ? `, ${project.city}` : ""}
+            {heroLocation && (
+              <p className="text-white/82 font-light flex items-center gap-2 text-sm mb-10 drop-shadow-[0_2px_12px_rgba(8,38,52,0.45)]">
+                <MapPin size={13} className="text-[#8EA4AF]" />
+                {heroLocation}
               </p>
             )}
 
@@ -337,7 +435,7 @@ export default function ProjectDetail() {
                 }}
                 className="btn-outline-light group"
               >
-                {project?.ctaText || "Découvrir le projet"}
+                {primaryCtaLabel}
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </button>
               <a
@@ -346,10 +444,10 @@ export default function ProjectDetail() {
                   e.preventDefault();
                   document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="group flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-white/65 hover:text-white/95 transition-colors duration-300 px-4 py-3 sm:ml-3"
+                className="group flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-white/85 hover:text-white transition-colors duration-300 px-4 py-3 sm:ml-3"
               >
                 <span className="relative">
-                  Prendre rendez-vous
+                  {secondaryCtaLabel}
                   <span className="absolute bottom-0 left-0 w-0 group-hover:w-full h-px bg-white/40 transition-all duration-300 ease-out" />
                 </span>
                 <ArrowRight size={11} className="opacity-50 group-hover:opacity-90 group-hover:translate-x-1 transition-all duration-300" />
@@ -388,8 +486,8 @@ export default function ProjectDetail() {
             <div className="flex items-start gap-4 px-6 lg:px-8 py-7">
               <MapPin size={16} className="text-[#8EA4AF] mt-0.5 shrink-0" strokeWidth={1.4} />
               <div className="min-w-0">
-                <p className="text-[#5C7480] text-[10px] tracking-[0.18em] uppercase mb-1.5">Localisation</p>
-                <p className="text-[#082634] font-light text-sm leading-snug">{project?.city ?? project?.location ?? "—"}</p>
+                <p className="text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase mb-1.5">Localisation</p>
+                <p className="text-[#082634] font-light text-sm leading-snug">{project.city || project.location || "—"}</p>
               </div>
             </div>
 
@@ -397,8 +495,8 @@ export default function ProjectDetail() {
             <div className="flex items-start gap-4 px-6 lg:px-8 py-7">
               <Building2 size={16} className="text-[#8EA4AF] mt-0.5 shrink-0" strokeWidth={1.4} />
               <div className="min-w-0">
-                <p className="text-[#5C7480] text-[10px] tracking-[0.18em] uppercase mb-1.5">Type</p>
-                <p className="text-[#082634] font-light text-sm leading-snug">{segmentLabel(project?.brand?.segment)}</p>
+                <p className="text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase mb-1.5">Type</p>
+                <p className="text-[#082634] font-light text-sm leading-snug">{segmentLabel(project.projectType, project.brand?.segment)}</p>
               </div>
             </div>
 
@@ -406,11 +504,11 @@ export default function ProjectDetail() {
             <div className="flex items-start gap-4 px-6 lg:px-8 py-7">
               <Calendar size={16} className="text-[#8EA4AF] mt-0.5 shrink-0" strokeWidth={1.4} />
               <div className="min-w-0">
-                <p className="text-[#5C7480] text-[10px] tracking-[0.18em] uppercase mb-1.5">Statut</p>
+                <p className="text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase mb-1.5">Statut</p>
                 <p className="text-[#082634] font-light text-sm leading-snug">
-                  {statusLabel(project?.status)}
-                  {project?.deliveryDate && (
-                    <span className="block text-[#5C7480] text-xs mt-0.5">{project.deliveryDate}</span>
+                  {statusLabel(project.status)}
+                  {project.deliveryDate && (
+                    <span className="block text-[#8EA4AF] text-xs mt-0.5">{project.deliveryDate}</span>
                   )}
                 </p>
               </div>
@@ -420,7 +518,7 @@ export default function ProjectDetail() {
             <div className="flex items-start gap-4 px-6 lg:px-8 py-7">
               <Ruler size={16} className="text-[#8EA4AF] mt-0.5 shrink-0" strokeWidth={1.4} />
               <div className="min-w-0">
-                <p className="text-[#5C7480] text-[10px] tracking-[0.18em] uppercase mb-1.5">Surfaces</p>
+                <p className="text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase mb-1.5">Surfaces</p>
                 <p className="text-[#082634] font-light text-sm leading-snug">{surfaceLabel ?? "Sur demande"}</p>
               </div>
             </div>
@@ -428,14 +526,10 @@ export default function ProjectDetail() {
             {/* PRICE — dominant */}
             <div className="col-span-2 md:col-span-3 lg:col-span-1 flex items-center gap-5 px-6 lg:px-8 py-7 bg-[#DCE0E7]/50">
               <div className="min-w-0 flex-1">
-                <p className="text-[#5C7480] text-[10px] tracking-[0.2em] uppercase mb-2">Prix de départ</p>
-                {priceLabel ? (
-                  <p className="text-[#082634] font-serif text-2xl lg:text-3xl font-semibold leading-none tracking-tight">
-                    {priceLabel}
-                  </p>
-                ) : (
-                  <p className="text-[#5C7480] font-light text-sm">Prix sur demande</p>
-                )}
+                <p className="text-[#8EA4AF] text-[10px] tracking-[0.2em] uppercase mb-2">{pricingLabel}</p>
+                <p className="text-[#082634] font-serif text-2xl lg:text-3xl font-semibold leading-none tracking-tight">
+                  {priceLabel}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -445,7 +539,7 @@ export default function ProjectDetail() {
       {/* ════════════════════════════════════════════════════
           3 · PROJECT INTRODUCTION
       ════════════════════════════════════════════════════ */}
-      {project?.description && (
+      {projectDescription && (
         <section className="py-28 bg-white">
           <div className="container mx-auto px-6">
             <motion.div
@@ -457,30 +551,30 @@ export default function ProjectDetail() {
             >
               {/* Text */}
               <div>
-                <p className="text-[#5C7480] text-xs tracking-[0.22em] uppercase mb-6">Le projet</p>
+                <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-6">Le projet</p>
                 <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634] mb-8 leading-tight">
-                  {project.storyTitle || project.title}
+                  {projectSectionTitle}
                 </h2>
-                <p className="text-[#3B5661] font-light leading-[1.9] text-base mb-8">
-                  {project.storyText || project.description}
+                <p className="text-[#082634] font-light leading-[1.9] text-base mb-8">
+                  {projectDescription}
                 </p>
                 {/* Micro-stats */}
                 <div className="flex gap-8 pt-6 border-t border-[#DCE0E7]">
                   {project.city && (
                     <div>
-                      <p className="text-[#5C7480] text-[10px] tracking-[0.18em] uppercase mb-1">Ville</p>
+                      <p className="text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase mb-1">Ville</p>
                       <p className="text-[#082634] font-light text-sm">{project.city}</p>
                     </div>
                   )}
                   {project.deliveryDate && (
                     <div>
-                      <p className="text-[#5C7480] text-[10px] tracking-[0.18em] uppercase mb-1">Livraison</p>
+                      <p className="text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase mb-1">Livraison</p>
                       <p className="text-[#082634] font-light text-sm">{project.deliveryDate}</p>
                     </div>
                   )}
                   {project.brand?.name && (
                     <div>
-                      <p className="text-[#5C7480] text-[10px] tracking-[0.18em] uppercase mb-1">Marque</p>
+                      <p className="text-[#8EA4AF] text-[10px] tracking-[0.18em] uppercase mb-1">Marque</p>
                       <p className="text-[#082634] font-light text-sm">{project.brand.name}</p>
                     </div>
                   )}
@@ -488,9 +582,9 @@ export default function ProjectDetail() {
               </div>
 
               {/* Image */}
-              <div className="relative overflow-hidden aspect-[4/3] bg-[#DCE0E7]/40 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+              <div className="relative overflow-hidden aspect-[4/3] bg-[#DCE0E7]/40 shadow-[0_10px_30px_rgba(8,38,52,0.05)]">
                 <motion.img
-                  src={gallery[1] ?? cover}
+                  src={introImage}
                   alt={project.title}
                   className="w-full h-full object-cover"
                   initial={{ scale: 1.05 }}
@@ -507,7 +601,7 @@ export default function ProjectDetail() {
       {/* ════════════════════════════════════════════════════
           4 · VISUAL GALLERY
       ════════════════════════════════════════════════════ */}
-      <section id="gallery" className="pb-28 bg-[#F7F7F7] pt-28">
+      <section id="gallery" className="pb-28 bg-[#FFFFFF] pt-28">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -516,13 +610,13 @@ export default function ProjectDetail() {
             transition={{ duration: 0.9, ease: EC }}
             className="mb-12"
           >
-            <p className="text-[#5C7480] text-xs tracking-[0.22em] uppercase mb-4">Galerie</p>
-            <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634]">Visuels du projet</h2>
+            <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-4">Galerie</p>
+            <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634]">{galleryTitle}</h2>
           </motion.div>
 
           {/* Main image */}
           <div
-            className="relative overflow-hidden aspect-video mb-3 cursor-zoom-in group bg-[#DCE0E7]/50 shadow-[0_10px_30px_rgba(0,0,0,0.06)]"
+            className="relative overflow-hidden aspect-video mb-3 cursor-zoom-in group bg-[#DCE0E7]/50 shadow-[0_10px_30px_rgba(8,38,52,0.06)]"
             onClick={() => setLightbox(activeImage)}
           >
             <AnimatePresence mode="wait">
@@ -537,12 +631,12 @@ export default function ProjectDetail() {
                 transition={{ duration: 0.4 }}
               />
             </AnimatePresence>
-            <div className="absolute inset-0 bg-transparent group-hover:bg-black/8 transition-colors duration-500" />
+            <div className="absolute inset-0 bg-transparent group-hover:bg-[#082634]/8 transition-colors duration-500" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 border border-[#082634]/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm bg-white/75">
               <ZoomIn size={20} className="text-[#082634]" />
             </div>
             {gallery.length > 1 && (
-              <div className="absolute bottom-5 right-5 px-3 py-1.5 bg-white/85 backdrop-blur-sm text-[#5C7480] text-xs tracking-[0.15em] uppercase border border-[#DCE0E7]">
+              <div className="absolute bottom-5 right-5 px-3 py-1.5 bg-white/85 backdrop-blur-sm text-[#8EA4AF] text-xs tracking-[0.15em] uppercase border border-[#DCE0E7]">
                 {activeImage + 1} / {gallery.length}
               </div>
             )}
@@ -572,7 +666,7 @@ export default function ProjectDetail() {
       {/* ════════════════════════════════════════════════════
           5 · KEY FEATURES / AMENITIES
       ════════════════════════════════════════════════════ */}
-      {project?.amenities && project.amenities.length > 0 && (
+      {project.amenities && project.amenities.length > 0 && (
         <section className="py-28 bg-[#DCE0E7]">
           <div className="container mx-auto px-6">
             <motion.div
@@ -582,8 +676,8 @@ export default function ProjectDetail() {
               transition={{ duration: 0.9, ease: EC }}
               className="mb-14"
             >
-              <p className="text-[#3B5661] text-xs tracking-[0.22em] uppercase mb-4">Prestations</p>
-              <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634]">Prestations  du projet</h2>
+              <p className="text-[#082634] text-xs tracking-[0.22em] uppercase mb-4">Prestations</p>
+              <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634]">{featuresTitle}</h2>
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -594,12 +688,12 @@ export default function ProjectDetail() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.06, duration: 0.7, ease: EC }}
-                  className="bg-white px-7 py-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-500 group"
+                  className="bg-white px-7 py-6 shadow-[0_4px_20px_rgba(8,38,52,0.04)] hover:shadow-[0_8px_32px_rgba(8,38,52,0.08)] hover:-translate-y-0.5 transition-all duration-500 group"
                 >
                   <div className="w-10 h-10 border border-[#8EA4AF]/30 flex items-center justify-center text-[#8EA4AF] group-hover:border-[#8EA4AF]/60 transition-all duration-500 mb-5">
                     <AmenityIcon label={item} />
                   </div>
-                  <p className="text-[#3B5661] font-light text-sm leading-snug group-hover:text-[#082634] transition-colors duration-300">
+                  <p className="text-[#082634] font-light text-sm leading-snug group-hover:text-[#082634] transition-colors duration-300">
                     {item}
                   </p>
                 </motion.div>
@@ -621,13 +715,13 @@ export default function ProjectDetail() {
           transition={{ duration: 2, ease: EC }}
         >
           <img
-            src={gallery[2] ?? gallery[0] ?? cover}
+            src={lifestyleImage}
             alt=""
             className="w-full h-full object-cover"
           />
         </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/10 z-[1]" />
-        <div className="absolute inset-0 bg-black/15 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#082634]/80 via-[#082634]/50 to-[#082634]/10 z-[1]" />
+        <div className="absolute inset-0 bg-[#082634]/15 z-[1]" />
 
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -638,12 +732,13 @@ export default function ProjectDetail() {
         >
           <p className="text-[#8EA4AF] text-xs tracking-[0.25em] uppercase mb-6 opacity-80">Art de vivre</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-light text-white leading-tight mb-6">
-            {project?.lifestyleTitle || "Un cadre de vie pensé pour l'essentiel"}
+            {lifestyleTitle}
           </h2>
-          <p className="text-white/45 font-light leading-[1.9] text-base mb-10 max-w-lg">
-            {project?.lifestyleText || project?.brand?.description ||
-              "Chaque espace a été conçu pour offrir le meilleur équilibre entre confort, élégance et fonctionnalité — une vision de l'habitat qui transcende l'ordinaire."}
-          </p>
+          {lifestyleDescription && (
+            <p className="text-white/70 font-light leading-[1.9] text-base mb-10 max-w-lg">
+              {lifestyleDescription}
+            </p>
+          )}
           <a
             href="#contact"
             onClick={(e) => {
@@ -652,7 +747,7 @@ export default function ProjectDetail() {
             }}
             className="group inline-flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-white/60 hover:text-white/90 transition-colors duration-300 border-b border-white/15 hover:border-white/35 pb-1"
           >
-            Prendre rendez-vous
+            {secondaryCtaLabel}
             <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
           </a>
         </motion.div>
@@ -661,7 +756,7 @@ export default function ProjectDetail() {
       {/* ════════════════════════════════════════════════════
           7 · LOCATION
       ════════════════════════════════════════════════════ */}
-      {(project?.location || project?.city) && (
+      {(project.location || project.city || addressText || mapEmbedUrl) && (
         <section className="py-28 bg-white">
           <div className="container mx-auto px-6">
             <motion.div
@@ -673,38 +768,62 @@ export default function ProjectDetail() {
             >
               {/* Text */}
               <div>
-                <p className="text-[#5C7480] text-xs tracking-[0.22em] uppercase mb-6">Emplacement</p>
+                <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-6">Emplacement</p>
                 <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634] mb-6 leading-tight">
-                  {project.location}
-                  {project.city ? `, ${project.city}` : ""}
+                  {locationSectionTitle}
                 </h2>
-                <p className="text-[#3B5661] font-light leading-[1.9] text-sm mb-10">
-                  {project.mapLocation || "Un emplacement stratégique offrant un accès privilégié aux principaux axes de la ville, aux établissements scolaires, aux centres commerciaux et aux zones d'activité."}
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  {(project.locationAdvantages && project.locationAdvantages.length > 0 ? project.locationAdvantages : [
-                    "Écoles à proximité",
-                    "Accès autoroute rapide",
-                    "Commerces & services",
-                    "Transports en commun",
-                  ]).map((item) => (
+                {addressText && (
+                  <p className="text-[#082634] font-serif text-xl font-light mb-4">
+                    {addressText}
+                  </p>
+                )}
+                {locationDescription && (
+                  <p className="text-[#082634] font-light leading-[1.9] text-sm mb-10">
+                    {locationDescription}
+                  </p>
+                )}
+                {locationAdvantages.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {locationAdvantages.map((item) => (
                     <div key={item} className="flex items-center gap-3">
                       <div className="w-1.5 h-1.5 bg-[#8EA4AF] rounded-full shrink-0" />
-                      <span className="text-[#3B5661] font-light text-sm">{item}</span>
+                      <span className="text-[#082634] font-light text-sm">{item}</span>
                     </div>
                   ))}
-                </div>
+                  </div>
+                )}
+                {clean(project.mapShareUrl) && (
+                  <a
+                    href={clean(project.mapShareUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-10 text-[#082634] text-xs tracking-[0.16em] uppercase border-b border-[#8EA4AF]/35 pb-1 hover:text-[#8EA4AF] transition-colors"
+                  >
+                    Voir sur Google Maps <ExternalLink size={12} />
+                  </a>
+                )}
               </div>
 
-              {/* Map placeholder */}
-              <div className="relative overflow-hidden aspect-[4/3] bg-[#DCE0E7]/50 border border-[#DCE0E7] flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
-                <div className="text-center">
-                  <MapPin size={28} className="text-[#8EA4AF] mx-auto mb-4" strokeWidth={1.2} />
-                  <p className="text-[#5C7480] text-xs tracking-[0.18em] uppercase">
-                    {project.city ?? project.location}
-                  </p>
-                  <p className="text-[#8EA4AF] text-[10px] tracking-[0.15em] uppercase mt-1">Carte interactive</p>
-                </div>
+              <div className="relative overflow-hidden aspect-[4/3] bg-[#DCE0E7]/50 border border-[#DCE0E7] shadow-[0_10px_30px_rgba(8,38,52,0.04)]">
+                {mapEmbedUrl ? (
+                  <iframe
+                    src={mapEmbedUrl}
+                    title={`Carte - ${project.title}`}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="absolute inset-0 w-full h-full grayscale-[0.2]"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-center px-8">
+                    <div>
+                      <MapPin size={28} className="text-[#8EA4AF] mx-auto mb-4" strokeWidth={1.2} />
+                      <p className="text-[#8EA4AF] text-xs tracking-[0.18em] uppercase">
+                        {addressText || project.city || project.location}
+                      </p>
+                      <p className="text-[#8EA4AF] text-[10px] tracking-[0.15em] uppercase mt-2">Carte bientôt disponible</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
@@ -714,48 +833,61 @@ export default function ProjectDetail() {
       {/* ════════════════════════════════════════════════════
           8 · PRICE CTA BLOCK — Conversion trigger
       ════════════════════════════════════════════════════ */}
-      {priceLabel && (
-        <section className="py-24 bg-[#082634]">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, ease: EC }}
-            className="container mx-auto px-6 text-center"
-          >
-            <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-5">Tarification</p>
-            <p className="text-white/60 text-sm font-light uppercase tracking-[0.18em] mb-3">Prix de départ</p>
-            <p className="text-5xl md:text-7xl font-serif font-light text-white tracking-tight mb-4">
-              {formatPrice(project?.priceMin ?? 0)} DH
+      <section className="py-24 bg-[#082634]">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: EC }}
+          className="container mx-auto px-6 text-center"
+        >
+          <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-5">Tarification</p>
+          <p className="text-white/60 text-sm font-light uppercase tracking-[0.18em] mb-3">
+            {pricingLabel}
+          </p>
+          <p className="text-5xl md:text-7xl font-serif font-light text-white tracking-tight mb-4">
+            {priceLabel}
+          </p>
+          {priceRangeLabel && (
+            <p className="text-white/50 font-light text-sm mb-8 tracking-wider">
+              {priceRangeLabel}
             </p>
-            {project?.priceMax && project.priceMax !== project.priceMin && (
-              <p className="text-white/50 font-light text-sm mb-8 tracking-wider">
-                Jusqu'à {formatPrice(project.priceMax)} DH
-              </p>
-            )}
-            <p className="text-white/50 text-xs font-light max-w-xs mx-auto leading-relaxed mb-10">
-              {project?.financingDetails || "Financement disponible. Contactez-nous pour connaître les conditions et disponibilités actuelles."}
+          )}
+          {project.priceNote && (
+            <p className="text-white/55 text-xs font-light max-w-xs mx-auto leading-relaxed mb-10">
+              {project.priceNote}
             </p>
-            <div className="flex justify-center">
-              <a
-                href="#contact"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="flex items-center gap-3 bg-white text-[#082634] px-12 py-4 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#DCE0E7] transition-colors"
-              >
-                Prendre rendez-vous <ArrowRight size={13} />
-              </a>
-            </div>
-          </motion.div>
-        </section>
-      )}
+          )}
+          {availabilityNote && (
+            <p className="text-white/45 text-xs font-light max-w-xs mx-auto leading-relaxed mb-10">
+              {availabilityNote}
+            </p>
+          )}
+          <div className="flex justify-center">
+            <a
+              href="#contact"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="flex items-center gap-3 bg-white text-[#082634] px-12 py-4 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#DCE0E7] transition-colors"
+            >
+              {secondaryCtaLabel} <ArrowRight size={13} />
+            </a>
+          </div>
+        </motion.div>
+      </section>
 
       {/* ════════════════════════════════════════════════════
           9 · LEAD FORM
       ════════════════════════════════════════════════════ */}
-      <LeadSection projectTitle={project?.title ?? "ce projet"} />
+      <LeadSection
+        projectId={project.id}
+        projectTitle={project.title}
+        title={contactTitle}
+        subtitle={contactSubtitle}
+        ctaLabel={secondaryCtaLabel}
+      />
 
       {/* Lightbox */}
       <AnimatePresence>

@@ -7,12 +7,11 @@ import { Link } from "wouter";
 import { ArrowRight, Trophy, Target, Users } from "lucide-react";
 import heroBg from "@/assets/hero-bg.png";
 
-const EC_EASE = [0.22, 1, 0.36, 1] as const;
-const fade = (delay = 0, duration = 1) => ({
+const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-80px" } as const,
-  transition: { duration, delay, ease: EC_EASE },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 1, delay, ease: [0.22, 1, 0.36, 1] },
 });
 
 export default function APropos() {
@@ -41,13 +40,13 @@ export default function APropos() {
 
         {/* ── Overlay system — refined cinematic layers ── */}
         {/* 1. Subtle uniform base — lifts overall contrast without crushing image */}
-        <div className="absolute inset-0 bg-black/18" />
+        <div className="absolute inset-0 bg-[#082634]/18" />
         {/* 2. Top-to-bottom vignette — clears in the middle to let image breathe */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#082634]/55 via-transparent to-[#082634]/45" />
         {/* 3. Left-side directional depth for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#082634]/30 via-transparent to-transparent" />
         {/* 4. Radial scrim anchored bottom-left — ensures text always readable */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_25%_95%,rgba(0,0,0,0.40)_0%,transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_25%_95%,rgba(8,38,52,0.40)_0%,transparent_65%)]" />
 
         {/* ── Content ── */}
         <div className="relative z-10 container mx-auto px-6">
@@ -71,7 +70,7 @@ export default function APropos() {
               animate={{ y: 0 }}
               transition={{ duration: 1.35, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
-              Créer les références<br />résidentielles <br />de demain
+              Forger l'avenir<br />de l'immobilier<br />d'exception
             </motion.h1>
           </div>
 
@@ -82,7 +81,7 @@ export default function APropos() {
             transition={{ duration: 1.1, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
             className="text-white/55 font-light text-sm max-w-xs leading-relaxed"
           >
-            Plus de quarante ans d’expertise au service de projets conçus pour marquer durablement leur environnement.
+            Deux décennies d'excellence au service de l'immobilier marocain de prestige.
           </motion.p>
 
         </div>
@@ -98,9 +97,9 @@ export default function APropos() {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-6">Notre Histoire</p>
+              <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-6">Notre Histoire</p>
               <h2 className="text-4xl md:text-5xl font-serif text-[#082634] mb-8 leading-tight font-light">
-                Une vision de l’exigence portée dans le temps.
+                Une passion pour la perfection, transmise de génération en génération.
               </h2>
               <motion.div
                 initial={{ width: 0 }}
@@ -109,8 +108,8 @@ export default function APropos() {
                 transition={{ duration: 1, delay: 0.2 }}
                 className="h-px bg-[#082634]/25 mb-8"
               />
-              <div className="space-y-5 text-[#3B5661] font-light leading-relaxed text-sm">
-                <p>Depuis plus de quatre décennies, le groupe contribue à façonner le paysage urbain marocain en développant, à travers ses différentes marques, une offre résidentielle diversifiée portée par une exigence constante de qualité, de cohérence et de maîtrise d’exécution.</p>
+              <div className="space-y-5 text-[#082634] font-light leading-relaxed text-sm">
+                <p>Depuis plus de deux décennies, Groupe Acharaf sculpte le paysage urbain marocain. Notre mission dépasse la simple construction de murs ; nous créons des espaces de vie où l'art, le confort et le prestige se rencontrent pour définir une nouvelle norme d'excellence.</p>
                 <p>Né de la vision d'un bâtisseur passionné, le groupe s'est développé autour d'une conviction profonde : chaque projet doit être unique, pensé pour ses futurs occupants et respectueux de son environnement.</p>
               </div>
             </motion.div>
@@ -133,7 +132,7 @@ export default function APropos() {
                 <div className="absolute inset-0 bg-[#082634]/10 group-hover:bg-transparent transition-colors duration-700" />
               </div>
               <div className="absolute -bottom-8 -left-6 bg-[#082634] text-white p-8 w-52">
-                <div className="text-5xl font-serif mb-2 font-light">46</div>
+                <div className="text-5xl font-serif mb-2 font-light">20+</div>
                 <div className="text-xs uppercase tracking-[0.15em] text-[#8EA4AF]">Années d'excellence</div>
               </div>
             </motion.div>
@@ -146,16 +145,16 @@ export default function APropos() {
         <div className="container mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-20">
             <motion.div {...fade(0)}>
-              <p className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-5">Notre ADN</p>
+              <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-5">Notre ADN</p>
               <h2 className="text-4xl md:text-6xl font-serif text-[#082634] mb-6 font-light">Les Piliers du Groupe</h2>
             </motion.div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#8EA4AF]/12">
             {[
-              { icon: <Trophy size={22} />, title: "Exigence", desc: "Des standards élevés à chaque étape du projet." },
-              { icon: <Target size={22} />, title: "Pérennité", desc: "Des projets pensés pour durer et évoluer avec leur environnement." },
-              { icon: <Users size={22} />, title: "Humain", desc: "Placer le bien-être de nos clients au centre de toute réflexion conceptuelle et opérationnelle." },
+              { icon: <Trophy size={22} />, title: "L'Excellence", desc: "La recherche constante de la perfection dans les finitions, le choix des matériaux et le design architectural." },
+              { icon: <Target size={22} />, title: "L'Innovation", desc: "Intégrer les dernières avancées technologiques et architecturales pour un habitat durable et intelligent." },
+              { icon: <Users size={22} />, title: "L'Humain", desc: "Placer le bien-être de nos clients au centre de toute réflexion conceptuelle et opérationnelle." },
             ].map((value, i) => (
               <motion.div
                 key={i}
@@ -167,7 +166,7 @@ export default function APropos() {
               >
                 <div className="text-[#8EA4AF] mb-8 group-hover:text-[#082634]/50 transition-colors">{value.icon}</div>
                 <h3 className="text-2xl font-serif text-[#082634] mb-4 font-light">{value.title}</h3>
-                <p className="text-[#3B5661] font-light leading-relaxed text-sm">{value.desc}</p>
+                <p className="text-[#082634] font-light leading-relaxed text-sm">{value.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -179,7 +178,7 @@ export default function APropos() {
         <div className="container mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-24">
             <motion.div {...fade(0)}>
-              <p className="text-xs tracking-[0.2em] uppercase text-[#5C7480] mb-5">Chronologie</p>
+              <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-5">Chronologie</p>
               <h2 className="text-4xl md:text-6xl font-serif text-[#082634] font-light">Jalons Historiques</h2>
             </motion.div>
           </div>
@@ -187,10 +186,10 @@ export default function APropos() {
           <div className="max-w-4xl mx-auto relative">
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#8EA4AF]/30 -translate-x-1/2 hidden md:block" />
             {[
-              { year: "1980", title: "Fondation du Groupe", desc: "Création de Groupe Acharaf avec une première réalisation résidentielle à Casablanca." },
-              { year: "1999", title: "Lancement Acharaf Immobilier", desc: "Structuration de la marque premium pour répondre à la demande croissante." },
-              { year: "2007", title: "Expansion Nationale", desc: "Lancement de projets d'envergure à Rabat, Agadir et Marrakech." },
-              { year: "2019", title: "Création de la marque Estya", desc: "Naissance de notre signature de standing." },
+              { year: "2000", title: "Fondation du Groupe", desc: "Création de Groupe Acharaf avec une première réalisation résidentielle à Casablanca." },
+              { year: "2010", title: "Lancement Acharaf Immobilier", desc: "Structuration de la marque premium pour répondre à la demande croissante." },
+              { year: "2018", title: "Création de la marque Estya", desc: "Naissance de notre signature ultra-luxe pour une clientèle internationale exigeante." },
+              { year: "2023", title: "Expansion Nationale", desc: "Lancement de projets d'envergure à Rabat, Marrakech et Tanger." },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -202,7 +201,7 @@ export default function APropos() {
               >
                 <div className={`w-full md:w-1/2 ${i % 2 === 0 ? "md:text-right" : "md:text-left"}`}>
                   <h3 className="text-xl font-serif mb-2 text-[#082634] font-light">{item.title}</h3>
-                  <p className="text-[#3B5661] font-light text-sm leading-relaxed">{item.desc}</p>
+                  <p className="text-[#082634] font-light text-sm leading-relaxed">{item.desc}</p>
                 </div>
                 <div className="w-14 h-14 bg-white border border-[#8EA4AF]/35 text-[#082634] flex items-center justify-center text-xs font-light tracking-wide z-10 shrink-0">
                   {item.year}
@@ -219,7 +218,7 @@ export default function APropos() {
 
         {/* ── Background depth layers ── */}
         {/* Primary radial — stays within #082634 family */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_60%_at_50%_52%,#0d3a4f_0%,#082634_68%)] opacity-65 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_60%_at_50%_52%,#082634_0%,#082634_68%)] opacity-65 pointer-events-none" />
         {/* Subtle top vignette */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#082634]/40 via-transparent to-[#082634]/25 pointer-events-none" />
 
@@ -227,13 +226,13 @@ export default function APropos() {
         <motion.div
           animate={{ opacity: [0.4, 0.75, 0.4], scale: [1, 1.10, 1] }}
           transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[rgba(13,60,80,0.6)] blur-[130px] pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[rgba(8,38,52,0.6)] blur-[130px] pointer-events-none"
         />
         {/* Breathing glow — secondary, offset timing */}
         <motion.div
           animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.12, 1] }}
           transition={{ repeat: Infinity, duration: 12, ease: "easeInOut", delay: 4 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] rounded-full bg-[rgba(10,48,66,0.55)] blur-[100px] pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] rounded-full bg-[rgba(8,38,52,0.55)] blur-[100px] pointer-events-none"
         />
 
         {/* Ghost watermark word */}
@@ -249,8 +248,8 @@ export default function APropos() {
           {stats && (
             <div className="flex flex-wrap justify-center gap-16 md:gap-40 mb-14">
               {[
-                { value: stats.totalProjects, label: "Projets livrés" },
-                { value: stats.cities, label: "villes représentées" },
+                { value: stats.totalProjects,    label: "Projets initiés" },
+                { value: stats.satisfiedClients, label: "Clients satisfaits" },
               ].map((s, i) => (
                 <motion.div key={i} {...fade(i * 0.15)}>
                   <div className="text-7xl md:text-9xl font-serif text-white mb-3 font-light">

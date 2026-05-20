@@ -5,35 +5,64 @@
  * API specification for Groupe Acharaf luxury real estate website
  * OpenAPI spec version: 0.1.0
  */
+import type { CreateProjectBodyOpportunityType } from "./createProjectBodyOpportunityType";
 import type { CreateProjectBodyStatus } from "./createProjectBodyStatus";
 
 export interface CreateProjectBody {
   brandId: number;
   title: string;
   slug: string;
+  projectType?: string;
+  tagline?: string;
+  shortDescription?: string;
   description?: string;
+  longDescription?: string;
   location?: string;
   city?: string;
+  addressText?: string;
   status: CreateProjectBodyStatus;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroLocationText?: string;
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
   priceMin?: number;
   priceMax?: number;
+  showPrice?: boolean;
+  priceLabel?: string;
+  priceNote?: string;
+  availabilityNote?: string;
   surfaceMin?: number;
   surfaceMax?: number;
   deliveryDate?: string;
   featured?: boolean;
+  isOpportunity?: boolean;
+  opportunityType?: CreateProjectBodyOpportunityType;
+  opportunityTitle?: string;
+  opportunityDescription?: string;
+  opportunityHighlight?: string;
+  opportunityValidUntil?: string;
+  opportunityCtaLabel?: string;
   coverImageUrl?: string;
+  secondaryImageUrl?: string;
+  lifestyleImageUrl?: string;
   images?: string[];
   amenities?: string[];
-  tagline?: string;
-  shortDescription?: string;
-  storyTitle?: string;
-  storyText?: string;
+  galleryTitle?: string;
+  featuresTitle?: string;
+  projectSectionTitle?: string;
+  projectSectionDescription?: string;
   lifestyleTitle?: string;
-  lifestyleText?: string;
+  lifestyleDescription?: string;
+  locationSectionTitle?: string;
+  locationDescription?: string;
   locationAdvantages?: string[];
-  mapLocation?: string;
-  financingDetails?: string;
-  ctaText?: string;
-  seoTitle?: string;
-  seoDescription?: string;
+  mapEmbedUrl?: string;
+  mapIframeCode?: string;
+  mapShareUrl?: string;
+  contactTitle?: string;
+  contactSubtitle?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImageUrl?: string;
 }

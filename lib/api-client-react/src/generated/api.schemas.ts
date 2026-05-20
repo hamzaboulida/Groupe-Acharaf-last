@@ -58,38 +58,78 @@ export const ProjectStatus = {
   completed: "completed",
 } as const;
 
+export type ProjectOpportunityType =
+  (typeof ProjectOpportunityType)[keyof typeof ProjectOpportunityType];
+
+export const ProjectOpportunityType = {
+  promotion: "promotion",
+  reduction: "reduction",
+  limited_offer: "limited_offer",
+  investment: "investment",
+  last_units: "last_units",
+} as const;
+
 export interface Project {
   id: number;
   brandId: number;
   brand?: Brand;
   title: string;
   slug: string;
+  projectType?: string;
+  tagline?: string;
+  shortDescription?: string;
   description?: string;
+  longDescription?: string;
   location?: string;
   city?: string;
+  addressText?: string;
   status: ProjectStatus;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroLocationText?: string;
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
   priceMin?: number;
   priceMax?: number;
+  showPrice?: boolean;
+  priceLabel?: string;
+  priceNote?: string;
+  availabilityNote?: string;
   surfaceMin?: number;
   surfaceMax?: number;
   deliveryDate?: string;
   featured: boolean;
+  isOpportunity?: boolean;
+  opportunityType?: ProjectOpportunityType;
+  opportunityTitle?: string;
+  opportunityDescription?: string;
+  opportunityHighlight?: string;
+  opportunityValidUntil?: string;
+  opportunityCtaLabel?: string;
   coverImageUrl?: string;
+  secondaryImageUrl?: string;
+  lifestyleImageUrl?: string;
   images?: string[];
   amenities?: string[];
-  tagline?: string | null;
-  shortDescription?: string | null;
-  storyTitle?: string | null;
-  storyText?: string | null;
-  lifestyleTitle?: string | null;
-  lifestyleText?: string | null;
-  locationAdvantages?: string[] | null;
-  mapLocation?: string | null;
-  financingDetails?: string | null;
-  ctaText?: string | null;
-  seoTitle?: string | null;
-  seoDescription?: string | null;
+  galleryTitle?: string;
+  featuresTitle?: string;
+  projectSectionTitle?: string;
+  projectSectionDescription?: string;
+  lifestyleTitle?: string;
+  lifestyleDescription?: string;
+  locationSectionTitle?: string;
+  locationDescription?: string;
+  locationAdvantages?: string[];
+  mapEmbedUrl?: string;
+  mapIframeCode?: string;
+  mapShareUrl?: string;
+  contactTitle?: string;
+  contactSubtitle?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImageUrl?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export type CreateProjectBodyStatus =
@@ -101,35 +141,74 @@ export const CreateProjectBodyStatus = {
   completed: "completed",
 } as const;
 
+export type CreateProjectBodyOpportunityType =
+  (typeof CreateProjectBodyOpportunityType)[keyof typeof CreateProjectBodyOpportunityType];
+
+export const CreateProjectBodyOpportunityType = {
+  promotion: "promotion",
+  reduction: "reduction",
+  limited_offer: "limited_offer",
+  investment: "investment",
+  last_units: "last_units",
+} as const;
+
 export interface CreateProjectBody {
   brandId: number;
   title: string;
   slug: string;
+  projectType?: string;
+  tagline?: string;
+  shortDescription?: string;
   description?: string;
+  longDescription?: string;
   location?: string;
   city?: string;
+  addressText?: string;
   status: CreateProjectBodyStatus;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroLocationText?: string;
+  primaryCtaLabel?: string;
+  secondaryCtaLabel?: string;
   priceMin?: number;
   priceMax?: number;
+  showPrice?: boolean;
+  priceLabel?: string;
+  priceNote?: string;
+  availabilityNote?: string;
   surfaceMin?: number;
   surfaceMax?: number;
   deliveryDate?: string;
   featured?: boolean;
+  isOpportunity?: boolean;
+  opportunityType?: CreateProjectBodyOpportunityType;
+  opportunityTitle?: string;
+  opportunityDescription?: string;
+  opportunityHighlight?: string;
+  opportunityValidUntil?: string;
+  opportunityCtaLabel?: string;
   coverImageUrl?: string;
+  secondaryImageUrl?: string;
+  lifestyleImageUrl?: string;
   images?: string[];
   amenities?: string[];
-  tagline?: string;
-  shortDescription?: string;
-  storyTitle?: string;
-  storyText?: string;
+  galleryTitle?: string;
+  featuresTitle?: string;
+  projectSectionTitle?: string;
+  projectSectionDescription?: string;
   lifestyleTitle?: string;
-  lifestyleText?: string;
+  lifestyleDescription?: string;
+  locationSectionTitle?: string;
+  locationDescription?: string;
   locationAdvantages?: string[];
-  mapLocation?: string;
-  financingDetails?: string;
-  ctaText?: string;
-  seoTitle?: string;
-  seoDescription?: string;
+  mapEmbedUrl?: string;
+  mapIframeCode?: string;
+  mapShareUrl?: string;
+  contactTitle?: string;
+  contactSubtitle?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImageUrl?: string;
 }
 
 export interface Article {
@@ -173,16 +252,12 @@ export const CareerType = {
 export interface Career {
   id: number;
   title: string;
-  slug: string;
   department: string;
   location?: string;
   type: CareerType;
   description?: string;
   requirements?: string[];
-  coverImageUrl?: string;
   active: boolean;
-  metaTitle?: string;
-  metaDescription?: string;
   createdAt: string;
 }
 
@@ -198,16 +273,12 @@ export const CreateCareerBodyType = {
 
 export interface CreateCareerBody {
   title: string;
-  slug: string;
   department: string;
   location?: string;
   type: CreateCareerBodyType;
   description?: string;
   requirements?: string[];
-  coverImageUrl?: string;
   active?: boolean;
-  metaTitle?: string;
-  metaDescription?: string;
 }
 
 export interface Application {
@@ -219,7 +290,6 @@ export interface Application {
   email: string;
   phone?: string;
   message?: string;
-  cvUrl?: string;
   createdAt: string;
 }
 
@@ -229,7 +299,6 @@ export interface CreateApplicationBody {
   email: string;
   phone?: string;
   message?: string;
-  cvUrl?: string;
 }
 
 export interface Lead {
@@ -241,6 +310,7 @@ export interface Lead {
   subject?: string;
   message?: string;
   projectInterest?: string;
+  source?: string;
   createdAt: string;
 }
 
@@ -252,6 +322,7 @@ export interface CreateLeadBody {
   subject?: string;
   message?: string;
   projectInterest?: string;
+  source?: string;
 }
 
 export interface Stats {
@@ -277,14 +348,6 @@ export const ListProjectsStatus = {
   ongoing: "ongoing",
   completed: "completed",
 } as const;
-
-export type UploadFileBody = {
-  file?: Blob;
-};
-
-export type UploadFile200 = {
-  url?: string;
-};
 
 export type ListArticlesParams = {
   published?: boolean;
