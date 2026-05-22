@@ -5,7 +5,12 @@ import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes";
 import { logger } from "./lib/logger";
-import { uploadDir, uploadUrlPath } from "./lib/upload-storage";
+import {
+  uploadDir,
+  uploadUrlPath,
+  isGcsEnabled,
+  readGcsObjectStream,
+} from "./lib/upload-storage";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -33,53 +38,54 @@ app.use(
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(uploadUrlPath, express.static(uploadDir, {
-  immutable: true,
-  maxAge: "30d",
-}));
+app.use(
+  uploadUrlPath,
+  express.static(uploadDir, {
+    immutable: true,
+    maxAge: "30d",
+  }),
+);
 
-app.use("/api", router);
+if (isGcsEnabled) {
+  const escapedUploadPath = uploadUrlPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\/+$/, "");
+  const uploadPathRegex = new RegExp(`^${escapedUploadPath}/(.+)$`);
 
-// Serve uploads: GCS Proxy in production, local fallback in dev
-const gcsBucketName = process.env.GROUPE_ACHARAF_UPLOADS_BUCKET;
-if (process.env.NODE_ENV === "production" && gcsBucketName) {
-  app.get("/uploads/:filename", async (req, res) => {
-    try {
-      const { Storage } = await import("@google-cloud/storage");
-      const storage = new Storage();
-      const bucket = storage.bucket(gcsBucketName);
-      const file = bucket.file(req.params.filename);
-      
-      const [exists] = await file.exists();
-      if (!exists) {
-        return res.status(404).send("File not found in GCS");
-      }
-
-      // Stream the file from GCS to the response
-      const stream = file.createReadStream();
-      stream.on("error", (err) => {
-        logger.error({ err, filename: req.params.filename }, "Error streaming from GCS");
-        res.status(500).send("Error reading file");
-      });
-
-      // Set content type if possible
-      const [metadata] = await file.getMetadata();
-      if (metadata.contentType) {
-        res.setHeader("Content-Type", metadata.contentType);
-      }
-      
-      stream.pipe(res);
-      return;
-    } catch (err) {
-      logger.error({ err }, "GCS Proxy error");
-      res.status(500).send("Storage service error");
+  app.get(uploadPathRegex, async (req, res) => {
+    const objectPath = req.params[0];
+    if (!objectPath) {
+      res.status(404).send("File not found");
       return;
     }
+
+    try {
+      const streamPayload = await readGcsObjectStream(objectPath);
+      if (!streamPayload) {
+        res.status(404).send("File not found");
+        return;
+      }
+
+      if (streamPayload.metadata.contentType) {
+        res.setHeader("Content-Type", streamPayload.metadata.contentType);
+      }
+      if (streamPayload.metadata.cacheControl) {
+        res.setHeader("Cache-Control", streamPayload.metadata.cacheControl);
+      }
+
+      streamPayload.stream.on("error", (err) => {
+        logger.error({ err, objectPath }, "Error streaming media from GCS");
+        if (!res.headersSent) {
+          res.status(500).send("Storage read error");
+        }
+      });
+      streamPayload.stream.pipe(res);
+    } catch (err) {
+      logger.error({ err, objectPath }, "GCS media proxy failure");
+      res.status(500).send("Storage service error");
+    }
   });
-} else {
-  const localUploads = path.resolve(__dirname, "..", "..", "public", "uploads");
-  app.use("/uploads", express.static(localUploads));
 }
+
+app.use("/api", router);
 
 // Serve the Vite-built frontend in production
 if (process.env.NODE_ENV === "production") {
