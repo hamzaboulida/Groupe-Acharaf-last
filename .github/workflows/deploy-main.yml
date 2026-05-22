@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: g-acharaf-prod-2399
-  REGION: europe-west9
+  REGION: europe-west1
   SERVICE_NAME: groupe-acharaf-prod-api
   IMAGE_NAME: europe-west9-docker.pkg.dev/g-acharaf-prod-2399/groupe-acharaf-repo/api
 
