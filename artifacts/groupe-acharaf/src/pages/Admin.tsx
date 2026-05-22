@@ -348,7 +348,8 @@ async function uploadProjectImages(files: File[]): Promise<UploadedImage[]> {
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(payload.error ?? "Impossible d'uploader l'image.");
+    const backendError = payload.error || payload.detail;
+    throw new Error(backendError ? `${backendError}` : `Erreur serveur lors de l'upload image (HTTP ${response.status}).`);
   }
 
   return payload.files ?? [];
@@ -372,7 +373,8 @@ async function uploadHeroVideo(file: File): Promise<UploadedVideo> {
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(payload.error ?? "Impossible d'uploader la vidéo.");
+    const backendError = payload.error || payload.detail;
+    throw new Error(backendError ? `${backendError}` : `Erreur serveur lors de l'upload vidéo (HTTP ${response.status}).`);
   }
 
   return payload.files?.[0];

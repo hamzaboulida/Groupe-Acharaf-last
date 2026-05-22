@@ -7,7 +7,7 @@ import {
 import { Link } from "wouter";
 import {
   ArrowRight, ChevronRight,
-  PenTool, Building2, Wrench, Users, Quote,
+  PenTool, Building2, Wrench, Users,
 } from "lucide-react";
 import { useGetStats, useListProjects } from "@workspace/api-client-react";
 import { CountUp } from "@/components/ui/count-up";
@@ -15,6 +15,7 @@ import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-
 
 import brandEstya   from "@/assets/brand-estya.png";
 import brandAcharaf from "@/assets/brand-acharaf.png";
+import presenceNationaleMap from "@/assets/presence-nationale-map.png";
 
 /* ─────────────── Hero slides — night luxury visuals ─────────────── */
 const SLIDES = [
@@ -95,24 +96,6 @@ const PILLARS = [
     icon: <Users size={22} strokeWidth={1.2} />,
     title: "Livraison & accompagnement",
     desc: "Une remise des clés encadrée avec soin, accompagnée d’un suivi attentif jusqu’à votre installation.",
-  },
-];
-
-const TESTIMONIALS = [
-  {
-    quote: "Groupe Acharaf a su comprendre notre vision et livrer un appartement qui dépasse tout ce que nous imaginions. Un soin du détail rare au Maroc.",
-    author: "Mme. Laila Benjelloun",
-    role: "Cliente — Résidence Estya, Casablanca",
-  },
-  {
-    quote: "Une transparence totale tout au long du projet et une équipe d'une grande disponibilité. Nous recommandons sans réserve.",
-    author: "M. Karim El Fassi",
-    role: "Investisseur — Acharaf Prestige, Rabat",
-  },
-  {
-    quote: "Le standing, la localisation et la qualité de construction sont au rendez-vous. C'est exactement ce que nous cherchions.",
-    author: "M. & Mme. Tahiri",
-    role: "Clients — Villa Collection, Marrakech",
   },
 ];
 
@@ -745,45 +728,81 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          TESTIMONIALS — Trust & credibility
+          PRESENCE NATIONALE
       ══════════════════════════════════════════════ */}
-      <section className="pt-40 pb-60 bg-white relative overflow-hidden">
+      <section className="pt-36 pb-48 bg-white relative overflow-hidden">
         <SectionReveal className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-20">
-            <motion.div {...fade(0)}>
-              <p className="text-xs tracking-[0.22em] uppercase text-[#8EA4AF] mb-5">Ils nous font confiance</p>
-            </motion.div>
-            <motion.h2
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-start">
+            <div className="lg:col-span-5 xl:col-span-5 lg:pr-2">
+              <motion.div {...fade(0)}>
+                <p className="text-xs tracking-[0.22em] uppercase text-[#8EA4AF] mb-5">PRÉSENCE NATIONALE</p>
+              </motion.div>
+              <motion.h2
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 1.4, delay: 0.1, ease: EC }}
+                className="text-4xl md:text-5xl font-serif text-[#082634] font-light leading-[1.08] max-w-[15ch]"
+              >
+                Un ancrage fort à travers le Royaume
+              </motion.h2>
+              <motion.p
+                {...fade(0.16)}
+                className="text-[#082634]/80 font-light text-[15px] leading-relaxed mt-7 max-w-[46ch]"
+              >
+                Groupe Acharaf déploie ses réalisations dans les grandes dynamiques territoriales du Maroc, avec une vision durable de développement, de qualité et de valeur patrimoniale.
+              </motion.p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-12">
+                <motion.div
+                  initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 1.05, delay: 0.2, ease: EC }}
+                  className="group"
+                >
+                  <p className="font-serif font-light text-[#082634] leading-none tracking-tight" style={{ fontSize: "clamp(2.4rem, 4.2vw, 3.8rem)" }}>
+                    <CountUp end={15} duration={1.8} suffix="+" />
+                  </p>
+                  <p className="text-[10px] tracking-[0.24em] uppercase text-[#8EA4AF] mt-3 group-hover:text-[#082634] transition-colors duration-500">
+                    villes
+                  </p>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 1.05, delay: 0.28, ease: EC }}
+                  className="group"
+                >
+                  <p className="font-serif font-light text-[#082634] leading-none tracking-tight" style={{ fontSize: "clamp(2.4rem, 4.2vw, 3.8rem)" }}>
+                    <CountUp end={30} duration={1.9} suffix="+" />
+                  </p>
+                  <p className="text-[10px] tracking-[0.24em] uppercase text-[#8EA4AF] mt-3 group-hover:text-[#082634] transition-colors duration-500">
+                    projets
+                  </p>
+                </motion.div>
+              </div>
+              <motion.p
+                {...fade(0.36)}
+                className="text-[#082634] text-xs tracking-[0.16em] uppercase mt-10 leading-relaxed"
+              >
+                Présence dans les principales régions du Maroc
+              </motion.p>
+            </div>
+
+            <motion.div
               initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 1.4, delay: 0.1, ease: EC }}
-              className="text-4xl md:text-5xl font-serif text-[#082634] font-light"
+              transition={{ duration: 1.4, delay: 0.12, ease: EC }}
+              className="lg:col-span-7 xl:col-span-7"
             >
-              La parole de nos clients
-            </motion.h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
-            {TESTIMONIALS.map((t, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 44 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 1.3, delay: i * 0.18, ease: EC }}
-                className="group"
-              >
-                <div className="text-[#8EA4AF]/60 mb-7 group-hover:text-[#8EA4AF] transition-colors duration-700">
-                  <Quote size={36} strokeWidth={1} />
-                </div>
-                <p className="text-[#082634] font-light leading-relaxed mb-8 text-[15px] italic group-hover:text-[#082634] transition-colors duration-700">
-                  "{t.quote}"
-                </p>
-                <div className="w-8 h-px bg-[#8EA4AF]/35 mb-6" />
-                <p className="text-[#082634] text-sm font-light">{t.author}</p>
-                <p className="text-[#8EA4AF] text-xs tracking-[0.12em] mt-1">{t.role}</p>
-              </motion.div>
-            ))}
+              <div className="relative w-full lg:pl-3 xl:pl-5">
+                <img
+                  src={presenceNationaleMap}
+                  alt="Carte de présence nationale Groupe Acharaf"
+                  className="w-full h-auto object-contain mx-auto max-w-[640px] lg:max-w-none"
+                  loading="lazy"
+                />
+              </div>
+            </motion.div>
           </div>
         </SectionReveal>
       </section>

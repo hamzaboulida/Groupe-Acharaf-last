@@ -14,9 +14,6 @@ process.on("unhandledRejection", (reason) => {
 
 import app from "./app";
 import { seedIfEmpty } from "./seed";
-import { Storage } from "@google-cloud/storage";
-
-logger.info({ hasStorage: !!Storage }, "Verifying storage availability...");
 
 const rawPort = process.env["PORT"];
 
