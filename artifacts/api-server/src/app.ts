@@ -78,7 +78,7 @@ if (isGcsEnabled) {
         }
       });
       streamPayload.stream.pipe(res);
-    } catch (err) {
+    } catch (err: any) {
       logger.error({ err, objectPath }, "GCS media proxy failure");
       res.status(500).send("Storage service error");
     }

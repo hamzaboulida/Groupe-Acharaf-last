@@ -188,7 +188,7 @@ router.post("/uploads/images", async (req, res): Promise<void> => {
     const uploaded = await handleUpload(req, "image", "projects");
     req.log.info({ count: uploaded.length, firstUrl: uploaded[0]?.url }, "Image upload success");
     res.status(201).json({ files: uploaded });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof UploadError) {
       res.status(error.statusCode).json({ error: error.message });
       return;
@@ -208,7 +208,7 @@ router.post("/uploads/videos", async (req, res): Promise<void> => {
     const uploaded = await handleUpload(req, "video", "videos");
     req.log.info({ count: uploaded.length, firstUrl: uploaded[0]?.url }, "Video upload success");
     res.status(201).json({ files: uploaded });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof UploadError) {
       res.status(error.statusCode).json({ error: error.message });
       return;
@@ -243,7 +243,7 @@ router.post("/uploads", async (req, res): Promise<void> => {
     });
     req.log.info({ url: saved.publicUrl, mimeType: first.mimeType }, "Legacy upload success");
     res.status(201).json({ url: saved.publicUrl, storagePath: saved.storagePath });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof UploadError) {
       res.status(error.statusCode).json({ error: error.message });
       return;
