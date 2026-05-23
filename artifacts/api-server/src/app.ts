@@ -71,7 +71,7 @@ if (isGcsEnabled) {
         res.setHeader("Cache-Control", streamPayload.metadata.cacheControl);
       }
 
-      streamPayload.stream.on("error", (err) => {
+      streamPayload.stream.on("error", (err: any) => {
         logger.error({ err, objectPath }, "Error streaming media from GCS");
         if (!res.headersSent) {
           res.status(500).send("Storage read error");
