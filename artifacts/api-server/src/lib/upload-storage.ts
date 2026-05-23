@@ -1,6 +1,7 @@
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
+import { Storage } from "@google-cloud/storage";
 
 export const uploadUrlPath = process.env["UPLOAD_URL_PATH"] ?? "/uploads";
 const explicitUploadDir = process.env["UPLOAD_DIR"]?.trim() ?? "";
@@ -44,22 +45,6 @@ function safeBaseName(filename: string): string {
     .slice(0, 120) || "upload";
 }
 
-let storageModulePromise: Promise<{ Storage: new () => any }> | null = null;
-
-async function dynamicImport<T>(moduleName: string): Promise<T> {
-  const importer = new Function("name", "return import(name);") as (
-    name: string,
-  ) => Promise<T>;
-  return importer(moduleName);
-}
-
-async function getStorageModule() {
-  if (!storageModulePromise) {
-    storageModulePromise = dynamicImport("@google-cloud/storage");
-  }
-  return storageModulePromise;
-}
-
 export async function saveUploadedAsset({
   folder,
   originalName,
@@ -71,7 +56,6 @@ export async function saveUploadedAsset({
   const objectName = `${folder}/${Date.now()}-${randomUUID()}-${base}${extension}`;
 
   if (isGcsEnabled) {
-    const { Storage } = await getStorageModule();
     const storage = new Storage();
     const bucket = storage.bucket(gcsBucketName);
     const file = bucket.file(objectName);
@@ -109,7 +93,6 @@ export async function saveUploadedAsset({
 
 export async function readGcsObjectStream(objectPath: string) {
   if (!isGcsEnabled) return null;
-  const { Storage } = await getStorageModule();
   const storage = new Storage();
   const bucket = storage.bucket(gcsBucketName);
   const file = bucket.file(objectPath);
