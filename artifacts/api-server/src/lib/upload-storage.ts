@@ -91,7 +91,10 @@ export async function saveUploadedAsset({
   };
 }
 
-export async function readGcsObjectStream(objectPath: string) {
+export async function readGcsObjectStream(
+  objectPath: string,
+  range?: { start: number; end: number },
+) {
   if (!isGcsEnabled) return null;
   const storage = new Storage();
   const bucket = storage.bucket(gcsBucketName);
@@ -99,8 +102,9 @@ export async function readGcsObjectStream(objectPath: string) {
   const [exists] = await file.exists();
   if (!exists) return null;
   const [metadata] = await file.getMetadata();
+  const streamOptions = range ? { start: range.start, end: range.end } : {};
   return {
     metadata,
-    stream: file.createReadStream(),
+    stream: file.createReadStream(streamOptions),
   };
 }

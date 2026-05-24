@@ -58,6 +58,55 @@ if (isGcsEnabled) {
     }
 
     try {
+      const rangeHeader = req.headers.range;
+
+      if (rangeHeader) {
+        // Query metadata first to get total size
+        const streamPayload = await readGcsObjectStream(objectPath);
+        if (!streamPayload) {
+          res.status(404).send("File not found");
+          return;
+        }
+
+        const totalSize = Number(streamPayload.metadata.size || 0);
+        const parts = rangeHeader.replace(/bytes=/, "").split("-");
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : totalSize - 1;
+
+        if (start >= totalSize || end >= totalSize) {
+          res.status(416).setHeader("Content-Range", `bytes */${totalSize}`);
+          res.end();
+          return;
+        }
+
+        const chunksize = (end - start) + 1;
+
+        res.writeHead(206, {
+          "Content-Range": `bytes ${start}-${end}/${totalSize}`,
+          "Accept-Ranges": "bytes",
+          "Content-Length": chunksize,
+          "Content-Type": streamPayload.metadata.contentType || "video/mp4",
+          "Cache-Control": streamPayload.metadata.cacheControl || "public, max-age=31536000",
+        });
+
+        // Request partial stream
+        const partialPayload = await readGcsObjectStream(objectPath, { start, end });
+        if (!partialPayload) {
+          res.status(404).send("File not found");
+          return;
+        }
+
+        partialPayload.stream.on("error", (err: any) => {
+          logger.error({ err, objectPath }, "Error streaming partial media from GCS");
+          if (!res.headersSent) {
+            res.status(500).send("Storage read error");
+          }
+        });
+        partialPayload.stream.pipe(res);
+        return;
+      }
+
+      // Standard non-range request fallback
       const streamPayload = await readGcsObjectStream(objectPath);
       if (!streamPayload) {
         res.status(404).send("File not found");
@@ -70,6 +119,7 @@ if (isGcsEnabled) {
       if (streamPayload.metadata.cacheControl) {
         res.setHeader("Cache-Control", streamPayload.metadata.cacheControl);
       }
+      res.setHeader("Accept-Ranges", "bytes");
 
       streamPayload.stream.on("error", (err: any) => {
         logger.error({ err, objectPath }, "Error streaming media from GCS");
