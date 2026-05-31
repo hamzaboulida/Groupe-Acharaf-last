@@ -38,6 +38,23 @@ app.use(
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const isReadOnlyMode = process.env["READ_ONLY_MODE"] === "true";
+if (isReadOnlyMode) {
+  app.use("/api", (req, res, next) => {
+    const method = req.method.toUpperCase();
+    if (method === "GET" || method === "HEAD" || method === "OPTIONS") {
+      next();
+      return;
+    }
+
+    res.status(503).json({
+      message:
+        "API locale en mode lecture seule. Les modifications sont désactivées pour protéger les données de production.",
+    });
+  });
+}
+
 app.use(
   uploadUrlPath,
   express.static(uploadDir, {
@@ -45,6 +62,8 @@ app.use(
     maxAge: "30d",
   }),
 );
+
+const uploadsUpstreamBaseUrl = process.env["UPLOADS_UPSTREAM_BASE_URL"]?.replace(/\/+$/, "");
 
 if (isGcsEnabled) {
   const escapedUploadPath = uploadUrlPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\/+$/, "");
@@ -132,6 +151,22 @@ if (isGcsEnabled) {
       logger.error({ err, objectPath }, "GCS media proxy failure");
       res.status(500).send("Storage service error");
     }
+  });
+}
+
+if (uploadsUpstreamBaseUrl) {
+  const escapedUploadPath = uploadUrlPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\/+$/, "");
+  const uploadPathRegex = new RegExp(`^${escapedUploadPath}/(.+)$`);
+
+  app.get(uploadPathRegex, (req, res) => {
+    const objectPath = req.params[0];
+    if (!objectPath) {
+      res.status(404).send("File not found");
+      return;
+    }
+
+    const upstreamUrl = `${uploadsUpstreamBaseUrl}/${objectPath}`;
+    res.redirect(302, upstreamUrl);
   });
 }
 

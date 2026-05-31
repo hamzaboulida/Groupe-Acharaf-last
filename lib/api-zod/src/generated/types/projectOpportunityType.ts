@@ -10,9 +10,8 @@ export type ProjectOpportunityType =
   (typeof ProjectOpportunityType)[keyof typeof ProjectOpportunityType];
 
 export const ProjectOpportunityType = {
-  promotion: "promotion",
-  reduction: "reduction",
-  limited_offer: "limited_offer",
-  investment: "investment",
-  last_units: "last_units",
+  lots_r1: "lots_r1",
+  lots_r2: "lots_r2",
+  lots_r3: "lots_r3",
+  creche: "creche",
 } as const;

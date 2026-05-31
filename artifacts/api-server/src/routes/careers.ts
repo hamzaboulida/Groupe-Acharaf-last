@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, careersTable, applicationsTable } from "@workspace/db";
+import { z } from "zod/v4";
 import {
   CreateCareerBody,
   UpdateCareerBody,
@@ -17,6 +18,15 @@ import {
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
+const SpontaneousApplicationBody = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  email: z.string().email(),
+  phone: z.string().min(1),
+  desiredPosition: z.string().min(1),
+  message: z.string().min(1),
+  cvUrl: z.string().min(1),
+});
 
 router.get("/careers", async (req, res): Promise<void> => {
   const queryParams = ListCareersQueryParams.safeParse(req.query);
@@ -104,7 +114,30 @@ router.post("/careers/:id/apply", async (req, res): Promise<void> => {
   }
   const [application] = await db
     .insert(applicationsTable)
-    .values({ ...parsed.data, careerId: params.data.id })
+    .values({ ...parsed.data, careerId: params.data.id, applicationType: "job" })
+    .returning();
+  res.status(201).json(application);
+});
+
+router.post("/applications/spontaneous", async (req, res): Promise<void> => {
+  const parsed = SpontaneousApplicationBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const [application] = await db
+    .insert(applicationsTable)
+    .values({
+      careerId: null,
+      applicationType: "spontaneous",
+      desiredPosition: parsed.data.desiredPosition,
+      firstName: parsed.data.firstName,
+      lastName: parsed.data.lastName,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      message: parsed.data.message,
+      cvUrl: parsed.data.cvUrl,
+    })
     .returning();
   res.status(201).json(application);
 });
@@ -114,6 +147,8 @@ router.get("/applications", async (_req, res): Promise<void> => {
     .select({
       id: applicationsTable.id,
       careerId: applicationsTable.careerId,
+      applicationType: applicationsTable.applicationType,
+      desiredPosition: applicationsTable.desiredPosition,
       firstName: applicationsTable.firstName,
       lastName: applicationsTable.lastName,
       email: applicationsTable.email,

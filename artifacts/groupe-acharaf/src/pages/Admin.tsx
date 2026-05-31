@@ -26,8 +26,10 @@ import {
 import { motion } from "framer-motion";
 import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
 import { ArrowDown, ArrowUp, Image as ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
+import { usePageSeo } from "@/lib/seo";
 
 type Tab = "projects" | "leads" | "articles" | "careers" | "applications";
+type OpportunityCategory = "lots_r1" | "lots_r2" | "lots_r3" | "creche";
 
 const NAV_ITEMS: { id: Tab; label: string }[] = [
   { id: "projects", label: "Projets" },
@@ -113,7 +115,7 @@ type ProjectForm = {
   deliveryDate: string;
   featured: boolean;
   isOpportunity: boolean;
-  opportunityType: "promotion" | "reduction" | "limited_offer" | "investment" | "last_units";
+  opportunityType: OpportunityCategory;
   opportunityTitle: string;
   opportunityDescription: string;
   opportunityHighlight: string;
@@ -173,7 +175,7 @@ function emptyProjectForm(brandId = 1): ProjectForm {
     deliveryDate: "",
     featured: false,
     isOpportunity: false,
-    opportunityType: "promotion",
+    opportunityType: "lots_r1",
     opportunityTitle: "",
     opportunityDescription: "",
     opportunityHighlight: "",
@@ -202,6 +204,26 @@ function emptyProjectForm(brandId = 1): ProjectForm {
     metaDescription: "",
     ogImageUrl: "",
   };
+}
+
+function normalizeOpportunityType(value?: string | null): OpportunityCategory {
+  switch (value) {
+    case "lots_r1":
+    case "promotion":
+      return "lots_r1";
+    case "lots_r2":
+    case "reduction":
+      return "lots_r2";
+    case "lots_r3":
+    case "limited_offer":
+      return "lots_r3";
+    case "creche":
+    case "investment":
+    case "last_units":
+      return "creche";
+    default:
+      return "lots_r1";
+  }
 }
 
 const inputClass = "ga-input ga-input-dark";
@@ -1035,7 +1057,7 @@ function ProjectsTab() {
       deliveryDate: p.deliveryDate ?? "",
       featured: p.featured,
       isOpportunity: p.isOpportunity ?? false,
-      opportunityType: (p.opportunityType as ProjectForm["opportunityType"]) ?? "promotion",
+      opportunityType: normalizeOpportunityType(p.opportunityType),
       opportunityTitle: p.opportunityTitle ?? "",
       opportunityDescription: p.opportunityDescription ?? "",
       opportunityHighlight: p.opportunityHighlight ?? "",
@@ -1081,6 +1103,10 @@ function ProjectsTab() {
     e.preventDefault();
     if (!form.title.trim() || !form.slug.trim() || !form.brandId || !form.status) {
       setFormError("Titre, slug, marque et statut sont obligatoires.");
+      return;
+    }
+    if (form.isOpportunity && !form.opportunityType) {
+      setFormError("La catégorie d’opportunité est obligatoire.");
       return;
     }
     if (form.showPrice && !form.priceMin.trim()) {
@@ -1210,11 +1236,10 @@ function ProjectsTab() {
                   onChange={(e) => setForm({ ...form, opportunityType: e.target.value as ProjectForm["opportunityType"] })}
                   className={inputClass}
                 >
-                  <option value="promotion">Promotion</option>
-                  <option value="reduction">Réduction</option>
-                  <option value="limited_offer">Offre limitée</option>
-                  <option value="investment">Opportunité d’investissement</option>
-                  <option value="last_units">Dernières unités</option>
+                  <option value="lots_r1">LOTS R+1</option>
+                  <option value="lots_r2">LOTS R+2</option>
+                  <option value="lots_r3">LOTS R+3</option>
+                  <option value="creche">CRÈCHE</option>
                 </select>
               </div>
               <div>
@@ -1754,27 +1779,64 @@ function CareersTab() {
 // ──────────────────────────────────────────────────────────
 function ApplicationsTab() {
   const { data: applications = [] } = useListApplications();
+  const jobApplications = applications.filter((a: any) => (a.applicationType ?? "job") !== "spontaneous");
+  const spontaneousApplications = applications.filter((a: any) => (a.applicationType ?? "job") === "spontaneous");
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-serif text-white">Candidatures <span className="text-white/30 text-lg ml-2">({applications.length})</span></h2>
       </div>
-      <div className="space-y-2">
-        {applications.map((a) => (
-          <div key={a.id} className="ga-card-dark p-4 hover:border-white/20 transition-colors">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-white font-medium">{a.firstName} {a.lastName}</div>
-                <div className="text-[#8EA4AF] text-sm">{a.email} {a.phone && `· ${a.phone}`}</div>
-                {a.career && <div className="text-white/50 text-sm mt-1">Poste: {a.career.title}</div>}
-                {a.message && <div className="text-white/40 text-sm mt-2 max-w-2xl">{a.message}</div>}
+      <div className="space-y-8">
+        <section>
+          <h3 className="text-white/75 text-xs tracking-[0.18em] uppercase mb-3">Candidatures sur offres ({jobApplications.length})</h3>
+          <div className="space-y-2">
+            {jobApplications.map((a: any) => (
+              <div key={a.id} className="ga-card-dark p-4 hover:border-white/20 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="text-white font-medium">{a.firstName} {a.lastName}</div>
+                    <div className="text-[#8EA4AF] text-sm">{a.email} {a.phone && `· ${a.phone}`}</div>
+                    {a.career && <div className="text-white/50 text-sm mt-1">Poste: {a.career.title}</div>}
+                    {a.cvUrl && (
+                      <a href={a.cvUrl} target="_blank" rel="noreferrer" className="text-[#8EA4AF] text-xs uppercase tracking-[0.12em] mt-2 inline-block hover:text-white transition-colors">
+                        Télécharger le CV
+                      </a>
+                    )}
+                    {a.message && <div className="text-white/40 text-sm mt-2 max-w-2xl">{a.message}</div>}
+                  </div>
+                  <div className="text-white/30 text-xs">{formatDate(a.createdAt)}</div>
+                </div>
               </div>
-              <div className="text-white/30 text-xs">{formatDate(a.createdAt)}</div>
-            </div>
+            ))}
+            {jobApplications.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucune candidature sur offre.</p>}
           </div>
-        ))}
-        {applications.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucune candidature.</p>}
+        </section>
+
+        <section>
+          <h3 className="text-white/75 text-xs tracking-[0.18em] uppercase mb-3">Candidatures spontanées ({spontaneousApplications.length})</h3>
+          <div className="space-y-2">
+            {spontaneousApplications.map((a: any) => (
+              <div key={a.id} className="ga-card-dark p-4 hover:border-white/20 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="text-white font-medium">{a.firstName} {a.lastName}</div>
+                    <div className="text-[#8EA4AF] text-sm">{a.email} {a.phone && `· ${a.phone}`}</div>
+                    {a.desiredPosition && <div className="text-white/55 text-sm mt-1">Domaine d’intérêt: {a.desiredPosition}</div>}
+                    {a.cvUrl && (
+                      <a href={a.cvUrl} target="_blank" rel="noreferrer" className="text-[#8EA4AF] text-xs uppercase tracking-[0.12em] mt-2 inline-block hover:text-white transition-colors">
+                        Télécharger le CV
+                      </a>
+                    )}
+                    {a.message && <div className="text-white/40 text-sm mt-2 max-w-2xl">{a.message}</div>}
+                  </div>
+                  <div className="text-white/30 text-xs">{formatDate(a.createdAt)}</div>
+                </div>
+              </div>
+            ))}
+            {spontaneousApplications.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucune candidature spontanée.</p>}
+          </div>
+        </section>
       </div>
     </div>
   );
@@ -1784,6 +1846,13 @@ function ApplicationsTab() {
 // MAIN ADMIN PAGE
 // ──────────────────────────────────────────────────────────
 export default function Admin() {
+  usePageSeo({
+    title: "Admin | Groupe Acharaf",
+    description: "Espace d’administration Groupe Acharaf.",
+    path: "/admin",
+    noIndex: true,
+  });
+
   const [activeTab, setActiveTab] = useState<Tab>("projects");
 
   return (

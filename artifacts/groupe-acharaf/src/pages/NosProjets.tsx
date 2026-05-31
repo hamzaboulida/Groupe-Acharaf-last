@@ -5,8 +5,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useSearch } from "wouter";
 import { ArrowRight, MapPin } from "lucide-react";
 import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
+import { usePageSeo } from "@/lib/seo";
 
 export default function NosProjets() {
+  usePageSeo({
+    title: "Projets immobiliers au Maroc | Groupe Acharaf",
+    description:
+      "Découvrez les projets immobiliers Groupe Acharaf au Maroc : résidences premium, adresses d’exception et opportunités en cours.",
+    path: "/nos-projets",
+  });
+
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
   const initialBrandParam = searchParams.get("brand");
@@ -111,7 +119,7 @@ export default function NosProjets() {
                     className="mb-32 group cursor-pointer"
                   >
                     <Link href={`/nos-projets/${featuredProject.id}`}>
-                      <div className="relative w-full aspect-[21/9] md:aspect-[21/7] overflow-hidden mb-8 bg-[#8EA4AF]/10">
+                      <div className="relative w-full aspect-[4/5] sm:aspect-[16/10] md:aspect-[21/7] overflow-hidden mb-8 bg-[#8EA4AF]/10">
                         {featuredProject.coverImageUrl && (
                           <motion.img
                             src={featuredProject.coverImageUrl}
@@ -124,24 +132,24 @@ export default function NosProjets() {
                         <div className="absolute inset-0 bg-gradient-to-t from-[#082634]/55 via-transparent to-transparent" />
                         <div className="absolute inset-0 bg-[#082634]/10 group-hover:bg-transparent transition-colors duration-1000" />
 
-                        <div className="absolute top-6 left-6 flex gap-3">
-                          <span className="px-4 py-1.5 bg-white/85 backdrop-blur-sm border border-white/50 text-[#082634] text-xs tracking-[0.15em] uppercase">
+                        <div className="absolute top-4 left-4 right-4 md:top-6 md:left-6 md:right-auto flex flex-wrap gap-2 md:gap-3">
+                          <span className="px-3 py-1 md:px-4 md:py-1.5 bg-white/85 backdrop-blur-sm border border-white/50 text-[#082634] text-[10px] md:text-xs tracking-[0.14em] md:tracking-[0.15em] uppercase">
                             {featuredProject.brand?.name || "Projet"}
                           </span>
-                          <span className={`px-4 py-1.5 border text-xs tracking-[0.15em] uppercase font-medium ${statusBadgeClass(featuredProject.status)}`}>
+                          <span className={`px-3 py-1 md:px-4 md:py-1.5 border text-[10px] md:text-xs tracking-[0.14em] md:tracking-[0.15em] uppercase font-medium ${statusBadgeClass(featuredProject.status)}`}>
                             {statusLabel(featuredProject.status)}
                           </span>
                         </div>
 
-                        <div className="absolute bottom-8 left-8 right-8 flex items-end justify-between">
-                          <div>
-                            <h2 className="text-5xl md:text-7xl font-serif text-white mb-3 font-light">{featuredProject.title}</h2>
-                            <p className="text-white/75 tracking-[0.15em] uppercase text-xs flex items-center gap-2 mb-3">
+                        <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 md:bottom-8 md:left-8 md:right-8 flex items-end justify-between gap-4">
+                          <div className="min-w-0">
+                            <h2 className="text-2xl sm:text-4xl md:text-7xl font-serif text-white mb-2 sm:mb-3 font-light leading-[1.05] break-words">{featuredProject.title}</h2>
+                            <p className="text-white/85 tracking-[0.13em] md:tracking-[0.15em] uppercase text-[10px] md:text-xs flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3 break-words">
                               <MapPin size={12} className="text-[#8EA4AF]" /> {featuredProject.location}
                             </p>
-                            <p className="text-white text-sm font-serif tracking-wide">{projectPriceLabel(featuredProject)}</p>
+                            <p className="text-white text-xs sm:text-sm font-serif tracking-wide">{projectPriceLabel(featuredProject)}</p>
                           </div>
-                          <div className="w-14 h-14 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:bg-[#8EA4AF] group-hover:border-[#8EA4AF] group-hover:text-[#082634] transition-all duration-500">
+                          <div className="w-11 h-11 sm:w-14 sm:h-14 shrink-0 border border-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:bg-[#8EA4AF] group-hover:border-[#8EA4AF] group-hover:text-[#082634] transition-all duration-500">
                             <ArrowRight size={20} className="-rotate-45 group-hover:rotate-0 transition-transform duration-500" />
                           </div>
                         </div>
@@ -159,7 +167,7 @@ export default function NosProjets() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-80px" }}
                       transition={{ duration: 1, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                      className={`group cursor-pointer ${index % 2 !== 0 ? "md:mt-32" : ""}`}
+                    className={`group cursor-pointer ${index % 2 !== 0 ? "md:mt-32" : ""} pb-2`}
                     >
                       <Link href={`/nos-projets/${project.id}`}>
                         <div className="relative overflow-hidden aspect-[4/5] mb-7 bg-[#8EA4AF]/10">
@@ -185,7 +193,7 @@ export default function NosProjets() {
 
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="text-2xl font-serif text-[#082634] mb-2 font-light group-hover:text-[#8EA4AF] transition-colors duration-500">
+                            <h3 className="text-xl md:text-2xl font-serif text-[#082634] mb-2 font-light group-hover:text-[#8EA4AF] transition-colors duration-500 leading-tight">
                               {project.title}
                             </h3>
                             <p className="text-[#8EA4AF] tracking-[0.12em] uppercase text-xs flex items-center gap-1.5">

@@ -1,14 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "wouter";
-import { Send, Instagram, Linkedin, ArrowRight } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Instagram, Linkedin, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 const col1 = [
-  { href: "/a-propos", label: "Notre Maison" },
-  { href: "/nos-marques", label: "Nos Marques" },
-  //{ href: "/nos-marques?brand=acharaf", label: "Acharaf Immobilier" },
-  { href: "/nos-projets", label: "Galerie de Projets" },
+  { href: "/a-propos", label: "Groupe" },
+  { href: "/nos-marques", label: "Marques" },
+  { href: "/projets", label: "Projets" },
 ];
 const col2 = [
   { href: "/opportunites", label: "Opportunités" },
@@ -17,66 +15,11 @@ const col2 = [
 ];
 
 export function Footer() {
-  const [email, setEmail] = useState("");
-  const { toast } = useToast();
-
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    if (typeof window !== "undefined" && (window as any).dataLayer) {
-      (window as any).dataLayer.push({ event: "newsletter_signup" });
-    }
-    toast({ title: "Inscription réussie", description: "Vous êtes maintenant abonné à notre newsletter." });
-    setEmail("");
-  };
-
   return (
-    <footer className="relative bg-white border-t border-[#8EA4AF]/15 overflow-hidden">
+    <footer className="relative bg-[#F7F9FA] border-t border-[#8EA4AF]/14 overflow-hidden">
       <div className="relative z-10">
-        {/* Top CTA band */}
-        <div className="border-b border-[#8EA4AF]/10">
-          <div className="container mx-auto px-6 md:px-12 py-20 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.9 }}
-              className="max-w-md"
-            >
-              <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-4">Newsletter</p>
-              <h3 className="font-serif text-3xl text-[#082634] font-light leading-snug">
-                L'Art de Vivre,<br />en avant-première.
-              </h3>
-            </motion.div>
-
-            <motion.form
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.9, delay: 0.15 }}
-              onSubmit={handleNewsletterSubmit}
-              className="flex w-full lg:w-auto"
-            >
-              <input
-                type="email"
-                placeholder="Votre adresse email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-[#DCE0E7]/40 border border-[#8EA4AF]/20 text-[#082634] px-5 py-3.5 w-full lg:w-72 focus:outline-none focus:border-[#8EA4AF]/60 transition-colors placeholder:text-[#082634]/45 text-sm font-light"
-                required
-              />
-              <button
-                type="submit"
-                className="bg-[#082634] text-white px-5 py-3.5 hover:bg-[#082634] transition-colors flex-shrink-0 flex items-center gap-2"
-              >
-                <Send size={13} />
-              </button>
-            </motion.form>
-          </div>
-        </div>
-
         {/* Main footer body */}
-        <div className="container mx-auto px-6 md:px-12 py-20">
+        <div className="container mx-auto px-6 md:px-12 py-14 md:py-16">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-16">
             {/* Brand column */}
             <div className="md:col-span-5">

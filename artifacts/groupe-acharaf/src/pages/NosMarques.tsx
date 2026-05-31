@@ -5,6 +5,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Link } from "wouter";
 import { useListProjects } from "@workspace/api-client-react";
 import { projectPriceLabel } from "@/lib/project-display";
+import { usePageSeo } from "@/lib/seo";
 
 import estyaBg   from "@/assets/brand-estya.png";
 import acharafBg from "@/assets/brand-acharaf.png";
@@ -16,6 +17,12 @@ type Brand = "estya" | "acharaf";
 
 const EC = [0.22, 1, 0.36, 1] as const;
 const FALLBACK = [proj1, proj2, proj3];
+const ACHARAF_PRIMARY = "#043235";
+const ACHARAF_SECONDARY = "#88978D";
+const ACHARAF_TERTIARY = "#C0C7C2";
+const ESTYA_PRIMARY = "#181F39";
+const ESTYA_SECONDARY = "#CCDCE1";
+const ESTYA_TERTIARY = "#000000";
 
 function getBrandFromUrl(): Brand | null {
   if (typeof window === "undefined") return null;
@@ -30,12 +37,13 @@ function getBrandFromUrl(): Brand | null {
 /* ─────────────────────────────────────── */
 
 function ProjectCard({
-  proj, index, dark,
+  proj, index, brand,
 }: {
   proj: { id: number; title: string; location?: string | null; coverImageUrl?: string | null; priceMin?: number | null; priceMax?: number | null; showPrice?: boolean | null };
   index: number;
-  dark: boolean;
+  brand: Brand;
 }) {
+  const isEstya = brand === "estya";
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -44,7 +52,10 @@ function ProjectCard({
       className="group"
     >
       <Link href={`/nos-projets/${proj.id}`}>
-        <div className={`relative aspect-[4/3] overflow-hidden mb-4 ${dark ? "bg-[#8EA4AF]/8" : "bg-[#082634]/8"}`}>
+        <div
+          className="relative aspect-[4/3] overflow-hidden mb-4"
+          style={{ backgroundColor: isEstya ? "rgba(204,220,225,0.12)" : "rgba(4,50,53,0.08)" }}
+        >
           <motion.img
             src={proj.coverImageUrl ?? FALLBACK[index % 3]}
             alt={proj.title}
@@ -52,15 +63,27 @@ function ProjectCard({
             whileHover={{ scale: 1.06 }}
             transition={{ duration: 1.1, ease: EC }}
           />
-          <div className={`absolute inset-0 transition-colors duration-700 group-hover:opacity-0 ${dark ? "bg-[#082634]/25" : "bg-[#DCE0E7]/15"}`} />
+          <div
+            className="absolute inset-0 transition-colors duration-700 group-hover:opacity-0"
+            style={{ backgroundColor: isEstya ? "rgba(24,31,57,0.22)" : "rgba(192,199,194,0.22)" }}
+          />
         </div>
-        <h3 className={`font-serif text-lg font-light mb-1 transition-colors duration-500 ${dark ? "text-white group-hover:text-[#8EA4AF]" : "text-[#082634] group-hover:text-[#082634]"}`}>
+        <h3
+          className="font-serif text-lg font-light mb-1 transition-colors duration-500"
+          style={{ color: isEstya ? "#FFFFFF" : ACHARAF_PRIMARY }}
+        >
           {proj.title}
         </h3>
-        <p className={`text-[11px] tracking-[0.14em] uppercase ${dark ? "text-white/55" : "text-[#8EA4AF]"}`}>
+        <p
+          className="text-[11px] tracking-[0.14em] uppercase"
+          style={{ color: isEstya ? "rgba(204,220,225,0.72)" : ACHARAF_SECONDARY }}
+        >
           {proj.location}
         </p>
-        <p className={`text-sm font-serif font-light mt-2 ${dark ? "text-white/75" : "text-[#082634]"}`}>
+        <p
+          className="text-sm font-serif font-light mt-2"
+          style={{ color: isEstya ? "rgba(204,220,225,0.92)" : ACHARAF_PRIMARY }}
+        >
           {projectPriceLabel(proj)}
         </p>
       </Link>
@@ -83,7 +106,7 @@ function EstyaContent({ projects }: { projects?: BrandPreviewProject[] }) {
       transition={{ duration: 0.85, ease: EC }}
     >
       {/* Brand Story */}
-      <section className="bg-[#082634] py-28">
+      <section style={{ backgroundColor: ESTYA_PRIMARY }} className="py-28">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -91,11 +114,11 @@ function EstyaContent({ projects }: { projects?: BrandPreviewProject[] }) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.1, ease: EC }}
             >
-              <p className="text-[#8EA4AF]/75 text-[9px] tracking-[0.35em] uppercase mb-8">L'univers Estya</p>
-              <h2 className="text-4xl md:text-5xl font-serif font-light text-white leading-[1.1] mb-8">
+              <p className="text-[9px] tracking-[0.35em] uppercase mb-8" style={{ color: "rgba(204,220,225,0.72)" }}>L'univers Estya</p>
+              <h2 className="text-4xl md:text-5xl font-light text-white leading-[1.1] mb-8">
                 L'art de vivre<br />à son apogée
               </h2>
-              <div className="h-px w-12 bg-[#8EA4AF]/20 mb-8" />
+              <div className="h-px w-12 mb-8" style={{ backgroundColor: "rgba(204,220,225,0.3)" }} />
               <p className="text-white/70 font-light leading-relaxed text-[15px] mb-5">
                 ESTYA incarne la vision résidentielle moyen et haut standing du Groupe Acharaf. La marque développe des projets conçus avec une attention particulière portée à l’architecture, à la qualité des finitions et à l’expérience de vie des résidents. Pensés dans une logique d’élégance, de confort et de durabilité.
               </p>
@@ -104,7 +127,8 @@ function EstyaContent({ projects }: { projects?: BrandPreviewProject[] }) {
               </p>
               <Link
                 href="/nos-projets?brand=1"
-                className="group inline-flex items-center gap-3 px-7 py-4 border border-white/25 text-white/80 hover:border-[#8EA4AF]/60 hover:text-white transition-all duration-500 text-[11px] tracking-[0.18em] uppercase"
+                className="group inline-flex items-center gap-3 px-7 py-4 border text-white transition-all duration-500 text-[11px] tracking-[0.18em] uppercase"
+                style={{ borderColor: "rgba(204,220,225,0.35)", color: "rgba(204,220,225,0.95)" }}
               >
                 Découvrir les projets Estya
                 <ArrowRight size={12} className="group-hover:translate-x-1.5 transition-transform duration-300" />
@@ -126,19 +150,20 @@ function EstyaContent({ projects }: { projects?: BrandPreviewProject[] }) {
 
       {/* Projects */}
       {projects && projects.length > 0 && (
-        <section className="bg-[#082634] border-t border-white/5 py-20">
+        <section style={{ backgroundColor: ESTYA_PRIMARY, borderTopColor: "rgba(204,220,225,0.18)" }} className="border-t py-20">
           <div className="container mx-auto px-6 max-w-6xl">
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
-              className="text-[#8EA4AF]/70 text-[9px] tracking-[0.28em] uppercase mb-10"
+              className="text-[9px] tracking-[0.28em] uppercase mb-10"
+              style={{ color: "rgba(204,220,225,0.72)" }}
             >
               Projets phares · Estya
             </motion.p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {projects.slice(0, 3).map((proj, i) => (
-                <ProjectCard key={proj.id} proj={proj} index={i} dark />
+                <ProjectCard key={proj.id} proj={proj} index={i} brand="estya" />
               ))}
             </div>
           </div>
@@ -146,19 +171,19 @@ function EstyaContent({ projects }: { projects?: BrandPreviewProject[] }) {
       )}
 
       {/* CTA — white closing section for clean footer transition */}
-      <section className="bg-white border-t border-[#8EA4AF]/18 py-20">
+      <section style={{ backgroundColor: ESTYA_SECONDARY, borderTopColor: "rgba(24,31,57,0.2)" }} className="border-t py-20">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
-              <p className="text-[#082634] font-light text-lg font-serif mb-1">Prêt à entrer dans l'univers Estya&nbsp;?</p>
-              <p className="text-[#082634] text-sm font-light">Nos conseillers vous accompagnent dans votre acquisition confidentielle.</p>
+              <p style={{ color: ESTYA_PRIMARY }} className="font-light text-lg font-serif mb-1">Prêt à entrer dans l'univers Estya&nbsp;?</p>
+              <p style={{ color: ESTYA_TERTIARY }} className="text-sm font-light">Nos conseillers vous accompagnent dans votre acquisition confidentielle.</p>
             </div>
             <div className="flex items-center gap-4 flex-shrink-0">
-              <Link href="/nos-projets?brand=1" className="group inline-flex items-center gap-2 px-6 py-3.5 bg-[#082634] text-white text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-[#082634] transition-colors duration-300">
+              <Link href="/nos-projets?brand=1" style={{ backgroundColor: ESTYA_PRIMARY }} className="group inline-flex items-center gap-2 px-6 py-3.5 text-white text-[11px] tracking-[0.18em] uppercase font-medium transition-colors duration-300">
                 Voir les projets
                 <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform duration-300" />
               </Link>
-              <Link href="/contact" className="group inline-flex items-center gap-2 px-6 py-3.5 border border-[#082634]/25 text-[#082634] text-[11px] tracking-[0.18em] uppercase hover:border-[#082634]/50 hover:text-[#082634] transition-all duration-300">
+              <Link href="/contact" style={{ borderColor: "rgba(24,31,57,0.32)", color: ESTYA_PRIMARY }} className="group inline-flex items-center gap-2 px-6 py-3.5 border text-[11px] tracking-[0.18em] uppercase transition-all duration-300">
                 Contact
               </Link>
             </div>
@@ -182,7 +207,7 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
       transition={{ duration: 0.85, ease: EC }}
     >
       {/* Brand Story */}
-      <section className="bg-white py-28">
+      <section style={{ backgroundColor: ACHARAF_TERTIARY }} className="py-28">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -192,7 +217,7 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
               className="relative aspect-[4/5] overflow-hidden order-2 lg:order-1"
             >
               <img src={acharafBg} alt="Acharaf Immobilier" className="w-full h-full object-cover brightness-95" />
-              <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#043235]/25 via-transparent to-transparent" />
             </motion.div>
 
             <motion.div
@@ -201,20 +226,21 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
               transition={{ duration: 1, delay: 0.1, ease: EC }}
               className="order-1 lg:order-2"
             >
-              <p className="text-[#8EA4AF] text-[9px] tracking-[0.35em] uppercase mb-8">L'univers Acharaf</p>
-              <h2 className="text-4xl md:text-5xl font-serif font-light text-[#082634] leading-[1.1] mb-8">
+              <p className="text-[9px] tracking-[0.35em] uppercase mb-8" style={{ color: ACHARAF_SECONDARY }}>L'univers Acharaf</p>
+              <h2 className="text-4xl md:text-5xl font-serif font-light leading-[1.1] mb-8" style={{ color: ACHARAF_PRIMARY }}>
                 L'excellence<br />accessible
               </h2>
-              <div className="h-px w-12 bg-[#082634]/15 mb-8" />
-              <p className="text-[#082634] font-light leading-relaxed text-[15px] mb-5">
+              <div className="h-px w-12 mb-8" style={{ backgroundColor: "rgba(4,50,53,0.22)" }} />
+              <p className="font-light leading-relaxed text-[15px] mb-5" style={{ color: ACHARAF_PRIMARY }}>
                 Acharaf Immobilier porte le développement de projets résidentiels accessibles et fonctionnels, pensés pour répondre aux attentes réelles des acquéreurs et aux dynamiques des marchés locaux. À travers une approche fondée sur la maîtrise des coûts, la qualité de réalisation et la pertinence des emplacements.
               </p>
-              <p className="text-[#082634] font-light leading-relaxed text-sm mb-10">
+              <p className="font-light leading-relaxed text-sm mb-10" style={{ color: ACHARAF_PRIMARY }}>
                 La marque développe des projets offrant un équilibre durable entre accessibilité, confort et valeur d’usage.
               </p>
               <Link
                 href="/nos-projets?brand=2"
-                className="group inline-flex items-center gap-3 px-7 py-4 border border-[#082634]/25 text-[#082634] hover:border-[#082634]/50 hover:text-[#082634] transition-all duration-500 text-[11px] tracking-[0.18em] uppercase"
+                style={{ borderColor: "rgba(4,50,53,0.3)", color: ACHARAF_PRIMARY }}
+                className="group inline-flex items-center gap-3 px-7 py-4 border transition-all duration-500 text-[11px] tracking-[0.18em] uppercase"
               >
                 Découvrir les projets Acharaf
                 <ArrowRight size={12} className="group-hover:translate-x-1.5 transition-transform duration-300" />
@@ -226,19 +252,20 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
 
       {/* Projects */}
       {projects && projects.length > 0 && (
-        <section className="bg-white border-t border-[#082634]/6 py-20">
+        <section style={{ backgroundColor: ACHARAF_TERTIARY, borderTopColor: "rgba(4,50,53,0.12)" }} className="border-t py-20">
           <div className="container mx-auto px-6 max-w-6xl">
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
-              className="text-[#8EA4AF] text-[9px] tracking-[0.28em] uppercase mb-10"
+              className="text-[9px] tracking-[0.28em] uppercase mb-10"
+              style={{ color: ACHARAF_SECONDARY }}
             >
               Projets phares · Acharaf Immobilier
             </motion.p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {projects.slice(0, 3).map((proj, i) => (
-                <ProjectCard key={proj.id} proj={proj} index={i} dark={false} />
+                <ProjectCard key={proj.id} proj={proj} index={i} brand="acharaf" />
               ))}
             </div>
           </div>
@@ -246,19 +273,19 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
       )}
 
       {/* CTA */}
-      <section className="bg-white border-t border-[#082634]/6 py-16">
+      <section style={{ backgroundColor: ACHARAF_TERTIARY, borderTopColor: "rgba(4,50,53,0.12)" }} className="border-t py-16">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
-              <p className="text-[#082634]/60 font-light text-lg font-serif mb-1">Prêt à découvrir Acharaf Immobilier&nbsp;?</p>
-              <p className="text-[#082634] text-sm font-light">Nos équipes sont à votre disposition pour vous guider.</p>
+              <p className="font-light text-lg font-serif mb-1" style={{ color: ACHARAF_PRIMARY }}>Prêt à découvrir Acharaf Immobilier&nbsp;?</p>
+              <p className="text-sm font-light" style={{ color: ACHARAF_PRIMARY }}>Nos équipes sont à votre disposition pour vous guider.</p>
             </div>
             <div className="flex items-center gap-4 flex-shrink-0">
-              <Link href="/nos-projets?brand=2" className="group inline-flex items-center gap-2 px-6 py-3.5 bg-[#082634] text-white text-[11px] tracking-[0.18em] uppercase hover:bg-[#082634]/85 transition-colors duration-300">
+              <Link href="/nos-projets?brand=2" style={{ backgroundColor: ACHARAF_PRIMARY }} className="group inline-flex items-center gap-2 px-6 py-3.5 text-white text-[11px] tracking-[0.18em] uppercase transition-colors duration-300">
                 Voir les projets
                 <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform duration-300" />
               </Link>
-              <Link href="/contact" className="group inline-flex items-center gap-2 px-6 py-3.5 border border-[#082634]/25 text-[#082634] text-[11px] tracking-[0.18em] uppercase hover:border-[#082634]/50 hover:text-[#082634] transition-all duration-300">
+              <Link href="/contact" style={{ borderColor: "rgba(4,50,53,0.3)", color: ACHARAF_PRIMARY }} className="group inline-flex items-center gap-2 px-6 py-3.5 border text-[11px] tracking-[0.18em] uppercase transition-all duration-300">
                 Contact
               </Link>
             </div>
@@ -274,6 +301,13 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
 /* ─────────────────────────────────────── */
 
 export default function NosMarques() {
+  usePageSeo({
+    title: "Nos Marques | Groupe Acharaf",
+    description:
+      "Explorez les univers Estya et Acharaf Immobilier, deux signatures complémentaires du Groupe Acharaf.",
+    path: "/nos-marques",
+  });
+
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(getBrandFromUrl);
   const [hoveredBrand, setHoveredBrand]   = useState<Brand | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -351,14 +385,6 @@ export default function NosMarques() {
 
           {/* Content */}
           <div className="relative z-10 h-full flex flex-col justify-center px-9 md:px-12 xl:px-20 py-16" style={{ textShadow: "0 2px 18px rgba(8,38,52,0.55)" }}>
-            <motion.p
-              className="text-white/75 text-[9px] tracking-[0.35em] uppercase mb-7"
-              animate={{ opacity: (acharafActive || hoveredBrand === "acharaf") ? 0.25 : hoveredBrand === "estya" ? 1 : 0.8 }}
-              transition={{ duration: 0.7 }}
-            >
-              Ultra-Luxe · Confidentiel
-            </motion.p>
-
             <div className="overflow-hidden mb-2">
               <motion.h2
                 className="text-[4.5rem] sm:text-[6rem] md:text-[5rem] lg:text-[7rem] xl:text-[9rem] font-serif font-light text-white leading-none"
@@ -414,15 +440,6 @@ export default function NosMarques() {
               )}
             </motion.div>
 
-            {/* Positioning note */}
-            <motion.div
-              className="absolute bottom-8 right-8 text-right"
-              animate={{ opacity: (acharafActive || hoveredBrand === "acharaf") ? 0.15 : hoveredBrand === "estya" ? 0.75 : 0.6 }}
-              transition={{ duration: 0.7 }}
-            >
-              <p className="text-white/60 text-[9px] tracking-[0.22em] uppercase mb-1">Collection</p>
-              <p className="text-white font-serif text-2xl font-light opacity-85">Ultra-luxe</p>
-            </motion.div>
           </div>
         </motion.div>
 
@@ -480,14 +497,6 @@ export default function NosMarques() {
 
           {/* Content */}
           <div className="relative z-10 h-full flex flex-col justify-center px-9 md:px-12 xl:px-20 py-16">
-            <motion.p
-              className="text-[#082634]/80 text-[9px] tracking-[0.35em] uppercase mb-7"
-              animate={{ opacity: (estyaActive || hoveredBrand === "estya") ? 0.2 : hoveredBrand === "acharaf" ? 1 : 0.85 }}
-              transition={{ duration: 0.7 }}
-            >
-              Premium · Accessible
-            </motion.p>
-
             <div className="overflow-hidden mb-2">
               <motion.div
                 initial={{ y: "105%" }}
@@ -549,15 +558,6 @@ export default function NosMarques() {
               )}
             </motion.div>
 
-            {/* Positioning note */}
-            <motion.div
-              className="absolute bottom-8 right-8 text-right"
-              animate={{ opacity: (estyaActive || hoveredBrand === "estya") ? 0.15 : hoveredBrand === "acharaf" ? 0.8 : 0.65 }}
-              transition={{ duration: 0.7 }}
-            >
-              <p className="text-[#082634]/65 text-[9px] tracking-[0.22em] uppercase mb-1">Collection</p>
-              <p className="text-[#082634] font-serif text-2xl font-light opacity-90">Résidentielle</p>
-            </motion.div>
           </div>
         </motion.div>
 

@@ -4,7 +4,8 @@ import { useListCareers, useApplyForCareer } from "@workspace/api-client-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { MapPin, Briefcase } from "lucide-react";
-import heroBg from "@/assets/hero-bg.png";
+import { sharedHeroImage } from "@/assets/hero-shared";
+import { usePageSeo } from "@/lib/seo";
 
 const EC = [0.22, 1, 0.36, 1] as const;
 
@@ -14,6 +15,7 @@ type ApplicationForm = {
   email: string;
   phone: string;
   message: string;
+  desiredPosition?: string;
 };
 
 const TYPE_LABEL: Record<string, string> = {
@@ -263,24 +265,216 @@ function ApplicationModal({
   );
 }
 
+type SpontaneousForm = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  desiredPosition: string;
+  message: string;
+};
+
+function SpontaneousApplicationModal({ onClose }: { onClose: () => void }) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SpontaneousForm>();
+  const [sent, setSent] = useState(false);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvError, setCvError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const inputClass =
+    "w-full bg-white/4 border border-white/10 text-white px-4 py-3 text-sm focus:outline-none focus:border-[#8EA4AF]/40 transition-colors placeholder:text-white/40 font-light";
+
+  function validateCv(file: File | null): string {
+    if (!file) return "Le CV est obligatoire.";
+    const allowed = new Set([
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ]);
+    if (!allowed.has(file.type)) {
+      return "Formats CV acceptés : PDF, DOC, DOCX.";
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return "Le CV ne doit pas dépasser 5 MB.";
+    }
+    return "";
+  }
+
+  async function onSubmit(data: SpontaneousForm) {
+    const validationError = validateCv(cvFile);
+    if (validationError) {
+      setCvError(validationError);
+      return;
+    }
+    setCvError("");
+    setIsSubmitting(true);
+    try {
+      const uploadData = new FormData();
+      uploadData.append("file", cvFile as File);
+      const uploadResp = await fetch("/api/uploads/documents", { method: "POST", body: uploadData });
+      const uploadJson = await uploadResp.json();
+      if (!uploadResp.ok || !uploadJson?.files?.[0]?.url) {
+        throw new Error(uploadJson?.error || "Impossible d'uploader le CV.");
+      }
+      const cvUrl = uploadJson.files[0].url as string;
+
+      const applyResp = await fetch("/api/applications/spontaneous", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          desiredPosition: data.desiredPosition,
+          message: data.message,
+          cvUrl,
+        }),
+      });
+      const applyJson = await applyResp.json().catch(() => ({}));
+      if (!applyResp.ok) {
+        throw new Error(applyJson?.error || "Impossible d'envoyer la candidature.");
+      }
+      setSent(true);
+    } catch (error: any) {
+      setCvError(error?.message || "Erreur lors de l'envoi.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-[#082634]/90 backdrop-blur-md z-50 flex items-center justify-center p-6"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: 30, opacity: 0, scale: 0.97 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: 20, opacity: 0 }}
+        transition={{ duration: 0.45, ease: EC }}
+        className="bg-[#082634] border border-[#8EA4AF]/10 p-8 w-full max-w-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {!sent ? (
+          <>
+            <p className="text-[#8EA4AF]/80 text-xs tracking-[0.2em] uppercase mb-2">
+              Candidature spontanée
+            </p>
+            <h2 className="text-white font-serif text-2xl mb-7 font-light">
+              Envoyer ma candidature
+            </h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <input placeholder="Prénom *" {...register("firstName", { required: true })} className={inputClass} />
+                  {errors.firstName && <span className="ga-error mt-1 block">Requis</span>}
+                </div>
+                <div>
+                  <input placeholder="Nom *" {...register("lastName", { required: true })} className={inputClass} />
+                  {errors.lastName && <span className="ga-error mt-1 block">Requis</span>}
+                </div>
+              </div>
+              <div>
+                <input type="email" placeholder="Email *" {...register("email", { required: true })} className={inputClass} />
+                {errors.email && <span className="ga-error mt-1 block">Requis</span>}
+              </div>
+              <div>
+                <input placeholder="Téléphone *" {...register("phone", { required: true })} className={inputClass} />
+                {errors.phone && <span className="ga-error mt-1 block">Requis</span>}
+              </div>
+              <div>
+                <input placeholder="Poste souhaité / Domaine d’intérêt *" {...register("desiredPosition", { required: true })} className={inputClass} />
+                {errors.desiredPosition && <span className="ga-error mt-1 block">Requis</span>}
+              </div>
+              <div>
+                <textarea rows={4} placeholder="Message *" {...register("message", { required: true })} className={`${inputClass} resize-none`} />
+                {errors.message && <span className="ga-error mt-1 block">Requis</span>}
+              </div>
+              <div>
+                <label className="text-white/60 text-xs tracking-[0.16em] uppercase mb-2 block">CV (PDF, DOC, DOCX — 5 MB max)</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={(e) => {
+                    const next = e.target.files?.[0] ?? null;
+                    setCvFile(next);
+                    setCvError(validateCv(next));
+                  }}
+                  className="w-full bg-white/4 border border-white/10 text-white/80 px-4 py-3 text-sm"
+                />
+                {cvError && <span className="ga-error mt-1 block">{cvError}</span>}
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="submit" disabled={isSubmitting} className="flex-1 bg-[#8EA4AF] text-[#082634] py-3 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#DCE0E7] transition-colors disabled:opacity-50">
+                  {isSubmitting ? "Envoi…" : "Envoyer ma candidature"}
+                </button>
+                <button type="button" onClick={onClose} className="px-5 border border-white/20 text-white/55 text-xs uppercase tracking-wider hover:border-white/35 hover:text-white/75 transition-colors">
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </>
+        ) : (
+          <div className="text-center py-10">
+            <div className="w-12 h-12 border border-[#8EA4AF]/30 flex items-center justify-center mx-auto mb-6">
+              <span className="text-[#8EA4AF] text-lg">✓</span>
+            </div>
+            <h3 className="text-white font-serif text-2xl mb-3 font-light">Candidature envoyée</h3>
+            <p className="text-white/60 mb-7 font-light text-sm leading-relaxed">
+              Merci pour votre candidature spontanée. Nous conserverons votre profil pour nos futures opportunités.
+            </p>
+            <button onClick={onClose} className="border border-white/20 text-white/55 px-6 py-2 text-xs uppercase tracking-wider hover:border-white/35 hover:text-white/75 transition-colors">
+              Fermer
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+}
+
 /* ── Page ────────────────────────────────────────────────── */
 export default function Carrieres() {
+  usePageSeo({
+    title: "Carrières | Groupe Acharaf",
+    description:
+      "Consultez nos opportunités de carrière et déposez votre candidature spontanée pour rejoindre Groupe Acharaf.",
+    path: "/carrieres",
+  });
+
   const { data: careers = [], isLoading } = useListCareers({ active: true });
   const [selectedCareer, setSelectedCareer] = useState<{
     id: number;
     title: string;
   } | null>(null);
+  const [openSpontaneous, setOpenSpontaneous] = useState(false);
 
   return (
     <Layout>
       {/* ── Hero ── */}
       <section className="relative h-[65vh] w-full flex items-end pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
-            src={heroBg}
-            alt=""
-            className="w-full h-full object-cover scale-105 brightness-[0.72]"
-          />
+          <picture>
+            <source srcSet={sharedHeroImage.srcSetWebp} sizes={sharedHeroImage.heroSizes} type="image/webp" />
+            <img
+              src={sharedHeroImage.src}
+              srcSet={sharedHeroImage.srcSetJpg}
+              sizes={sharedHeroImage.heroSizes}
+              alt=""
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover scale-105 brightness-[0.72]"
+            />
+          </picture>
         </div>
         <div className="absolute inset-0 bg-[#082634]/22" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#082634]/55 via-transparent to-[#082634]/50" />
@@ -372,6 +566,26 @@ export default function Carrieres() {
             </motion.div>
           )}
 
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EC, delay: 0.12 }}
+            className="mt-12 border border-[#DCE0E7] p-8 md:p-10"
+          >
+            <h3 className="text-[#082634] font-serif text-2xl md:text-3xl font-light mb-3">
+              Candidature spontanée
+            </h3>
+            <p className="text-[#8EA4AF] font-light text-sm leading-relaxed max-w-2xl mb-7">
+              Vous souhaitez rejoindre Groupe Acharaf ? Envoyez-nous votre candidature spontanée. Nous conserverons votre profil pour nos futures opportunités.
+            </p>
+            <button
+              onClick={() => setOpenSpontaneous(true)}
+              className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#082634] text-white text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#082634] transition-colors duration-300"
+            >
+              Envoyer ma candidature
+            </button>
+          </motion.div>
+
           {/* List */}
           {!isLoading && careers.length > 0 && (
             <motion.div
@@ -411,6 +625,9 @@ export default function Carrieres() {
             title={selectedCareer.title}
             onClose={() => setSelectedCareer(null)}
           />
+        )}
+        {openSpontaneous && (
+          <SpontaneousApplicationModal onClose={() => setOpenSpontaneous(false)} />
         )}
       </AnimatePresence>
     </Layout>

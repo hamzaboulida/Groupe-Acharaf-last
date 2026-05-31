@@ -9,12 +9,15 @@ import type { Career } from "./career";
 
 export interface Application {
   id: number;
-  careerId: number;
+  careerId?: number | null;
+  applicationType?: "job" | "spontaneous";
+  desiredPosition?: string;
   career?: Career;
   firstName: string;
   lastName: string;
   email: string;
   phone?: string;
   message?: string;
+  cvUrl?: string;
   createdAt: Date;
 }

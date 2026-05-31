@@ -62,11 +62,10 @@ export type ProjectOpportunityType =
   (typeof ProjectOpportunityType)[keyof typeof ProjectOpportunityType];
 
 export const ProjectOpportunityType = {
-  promotion: "promotion",
-  reduction: "reduction",
-  limited_offer: "limited_offer",
-  investment: "investment",
-  last_units: "last_units",
+  lots_r1: "lots_r1",
+  lots_r2: "lots_r2",
+  lots_r3: "lots_r3",
+  creche: "creche",
 } as const;
 
 export interface Project {
@@ -145,11 +144,10 @@ export type CreateProjectBodyOpportunityType =
   (typeof CreateProjectBodyOpportunityType)[keyof typeof CreateProjectBodyOpportunityType];
 
 export const CreateProjectBodyOpportunityType = {
-  promotion: "promotion",
-  reduction: "reduction",
-  limited_offer: "limited_offer",
-  investment: "investment",
-  last_units: "last_units",
+  lots_r1: "lots_r1",
+  lots_r2: "lots_r2",
+  lots_r3: "lots_r3",
+  creche: "creche",
 } as const;
 
 export interface CreateProjectBody {
@@ -283,13 +281,16 @@ export interface CreateCareerBody {
 
 export interface Application {
   id: number;
-  careerId: number;
+  careerId?: number | null;
+  applicationType?: "job" | "spontaneous";
+  desiredPosition?: string;
   career?: Career;
   firstName: string;
   lastName: string;
   email: string;
   phone?: string;
   message?: string;
+  cvUrl?: string;
   createdAt: string;
 }
 
@@ -298,7 +299,9 @@ export interface CreateApplicationBody {
   lastName: string;
   email: string;
   phone?: string;
+  desiredPosition?: string;
   message?: string;
+  cvUrl?: string;
 }
 
 export interface Lead {

@@ -457,6 +457,25 @@ paths:
                 items:
                   $ref: "#/components/schemas/Application"
 
+  /applications/spontaneous:
+    post:
+      operationId: applySpontaneous
+      tags: [careers]
+      summary: Submit a spontaneous application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateApplicationBody"
+      responses:
+        "201":
+          description: Spontaneous application submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+
   # ── Leads ─────────────────────────────────────────────────────────────────
   /leads:
     get:
@@ -657,7 +676,7 @@ components:
           type: boolean
         opportunityType:
           type: string
-          enum: [promotion, reduction, limited_offer, investment, last_units]
+          enum: [lots_r1, lots_r2, lots_r3, creche]
         opportunityTitle:
           type: string
         opportunityDescription:
@@ -795,7 +814,7 @@ components:
           type: boolean
         opportunityType:
           type: string
-          enum: [promotion, reduction, limited_offer, investment, last_units]
+          enum: [lots_r1, lots_r2, lots_r3, creche]
         opportunityTitle:
           type: string
         opportunityDescription:
@@ -996,6 +1015,12 @@ components:
           type: integer
         careerId:
           type: integer
+          nullable: true
+        applicationType:
+          type: string
+          enum: [job, spontaneous]
+        desiredPosition:
+          type: string
         career:
           $ref: "#/components/schemas/Career"
         firstName:
@@ -1008,12 +1033,13 @@ components:
           type: string
         message:
           type: string
+        cvUrl:
+          type: string
         createdAt:
           type: string
           format: date-time
       required:
         - id
-        - careerId
         - firstName
         - lastName
         - email
@@ -1030,7 +1056,11 @@ components:
           type: string
         phone:
           type: string
+        desiredPosition:
+          type: string
         message:
+          type: string
+        cvUrl:
           type: string
       required:
         - firstName
