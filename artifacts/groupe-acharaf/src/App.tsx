@@ -43,6 +43,14 @@ function RedirectToOpportunites() {
   return null;
 }
 
+function RedirectToNosProjets() {
+  const [, navigate] = useLocation();
+  useEffect(() => {
+    navigate("/nos-projets", { replace: true });
+  }, [navigate]);
+  return null;
+}
+
 function Router() {
   return (
     <>
@@ -53,6 +61,7 @@ function Router() {
           <Route path="/a-propos" component={APropos} />
           <Route path="/nos-marques" component={NosMarques} />
           <Route path="/nos-projets" component={NosProjets} />
+          <Route path="/projets" component={RedirectToNosProjets} />
           <Route path="/nos-projets/:id" component={ProjectDetail} />
           <Route path="/opportunites" component={Opportunites} />
           <Route path="/actualites" component={RedirectToOpportunites} />

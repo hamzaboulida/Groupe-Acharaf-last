@@ -54,7 +54,7 @@ export function Layout({
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Nous contacter sur WhatsApp"
-        className="fixed bottom-8 right-8 z-50 group"
+        className="fixed bottom-5 right-4 md:bottom-8 md:right-8 z-50 group"
         initial={{ opacity: 0, scale: 0.8, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ delay: 1.5, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -64,8 +64,8 @@ export function Layout({
         {/* Outer ring — pulses on hover */}
         <span className="absolute inset-0 rounded-full border border-[#8EA4AF]/20 scale-100 group-hover:scale-125 group-hover:opacity-0 transition-all duration-700" />
         {/* Button body */}
-        <span className="relative flex items-center justify-center w-13 h-13 rounded-full bg-[#082634] border border-[#8EA4AF]/25 shadow-[0_8px_32px_rgba(8,38,52,0.35),0_0_0_1px_rgba(142,164,175,0.12)] group-hover:border-[#8EA4AF]/50 transition-all duration-500"
-          style={{ width: "3.25rem", height: "3.25rem" }}>
+        <span className="relative flex items-center justify-center rounded-full bg-[#082634] border border-[#8EA4AF]/25 shadow-[0_8px_32px_rgba(8,38,52,0.35),0_0_0_1px_rgba(142,164,175,0.12)] group-hover:border-[#8EA4AF]/50 transition-all duration-500"
+          style={{ width: "3rem", height: "3rem" }}>
           {/* WhatsApp SVG — cleaner than icon library version */}
           <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
             <path

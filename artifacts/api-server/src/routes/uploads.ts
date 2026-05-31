@@ -6,9 +6,15 @@ const router: IRouter = Router();
 const MAX_REQUEST_SIZE = Number(process.env["MAX_UPLOAD_REQUEST_BYTES"] ?? 60 * 1024 * 1024);
 const maxImageSize = Number(process.env["MAX_UPLOAD_IMAGE_BYTES"] ?? 5 * 1024 * 1024);
 const maxVideoSize = Number(process.env["MAX_UPLOAD_VIDEO_BYTES"] ?? 50 * 1024 * 1024);
+const maxDocumentSize = Number(process.env["MAX_UPLOAD_DOCUMENT_BYTES"] ?? 5 * 1024 * 1024);
 
 const imageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 const videoTypes = new Set(["video/mp4", "video/webm"]);
+const documentTypes = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
 
 type MultipartFile = {
   fieldName: string;
@@ -122,7 +128,7 @@ function parseMultipartFiles(body: Buffer, boundary: string): MultipartFile[] {
   return files;
 }
 
-function validateFiles(files: MultipartFile[], kind: "image" | "video"): void {
+function validateFiles(files: MultipartFile[], kind: "image" | "video" | "document"): void {
   if (!files.length) {
     throw new UploadError(400, "Aucun fichier reçu.");
   }
@@ -138,12 +144,19 @@ function validateFiles(files: MultipartFile[], kind: "image" | "video"): void {
       if (file.content.length > maxImageSize) {
         throw new UploadError(413, `Chaque image doit faire moins de ${Math.round(maxImageSize / (1024 * 1024))} Mo.`);
       }
-    } else {
+    } else if (kind === "video") {
       if (!videoTypes.has(file.mimeType)) {
         throw new UploadError(415, "Formats vidéo acceptés : MP4, WEBM.");
       }
       if (file.content.length > maxVideoSize) {
         throw new UploadError(413, `Chaque vidéo doit faire moins de ${Math.round(maxVideoSize / (1024 * 1024))} Mo.`);
+      }
+    } else {
+      if (!documentTypes.has(file.mimeType)) {
+        throw new UploadError(415, "Formats CV acceptés : PDF, DOC, DOCX.");
+      }
+      if (file.content.length > maxDocumentSize) {
+        throw new UploadError(413, `Chaque document doit faire moins de ${Math.round(maxDocumentSize / (1024 * 1024))} Mo.`);
       }
     }
   }
@@ -151,8 +164,8 @@ function validateFiles(files: MultipartFile[], kind: "image" | "video"): void {
 
 async function handleUpload(
   req: Request,
-  kind: "image" | "video",
-  folder: "projects" | "videos",
+  kind: "image" | "video" | "document",
+  folder: "projects" | "videos" | "documents",
 ) {
   const boundary = parseBoundary(req.headers["content-type"]);
   const body = await readRequestBuffer(req);
@@ -215,6 +228,26 @@ router.post("/uploads/videos", async (req, res): Promise<void> => {
     }
     const mapped = mapUnknownUploadError(error);
     req.log.error({ err: error, mappedError: mapped.message }, "Video upload failed");
+    res.status(mapped.statusCode).json({ error: mapped.message, detail: toErrorDetail(error) });
+  }
+});
+
+router.post("/uploads/documents", async (req, res): Promise<void> => {
+  try {
+    req.log.info(
+      { contentType: req.headers["content-type"], contentLength: req.headers["content-length"] },
+      "Document upload started",
+    );
+    const uploaded = await handleUpload(req, "document", "documents");
+    req.log.info({ count: uploaded.length, firstUrl: uploaded[0]?.url }, "Document upload success");
+    res.status(201).json({ files: uploaded });
+  } catch (error: any) {
+    if (error instanceof UploadError) {
+      res.status(error.statusCode).json({ error: error.message });
+      return;
+    }
+    const mapped = mapUnknownUploadError(error);
+    req.log.error({ err: error, mappedError: mapped.message }, "Document upload failed");
     res.status(mapped.statusCode).json({ error: mapped.message, detail: toErrorDetail(error) });
   }
 });

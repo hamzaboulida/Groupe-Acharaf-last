@@ -14,6 +14,22 @@ import {
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
+const OPPORTUNITY_TYPES = new Set(["lots_r1", "lots_r2", "lots_r3", "creche"]);
+
+function validateOpportunityCategory(payload: {
+  isOpportunity?: boolean;
+  opportunityType?: string;
+}) {
+  if (!payload.isOpportunity) return null;
+  const category = payload.opportunityType?.trim();
+  if (!category) {
+    return "Opportunity category is required when isOpportunity is true.";
+  }
+  if (!OPPORTUNITY_TYPES.has(category)) {
+    return "Invalid opportunity category.";
+  }
+  return null;
+}
 
 const projectSelection = {
   id: projectsTable.id,
@@ -119,6 +135,11 @@ router.post("/projects", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
+  const opportunityValidationError = validateOpportunityCategory(parsed.data);
+  if (opportunityValidationError) {
+    res.status(400).json({ error: opportunityValidationError });
+    return;
+  }
   const [project] = await db.insert(projectsTable).values(parsed.data).returning();
 
   const [full] = await db
@@ -158,6 +179,11 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
   const parsed = UpdateProjectBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const opportunityValidationError = validateOpportunityCategory(parsed.data);
+  if (opportunityValidationError) {
+    res.status(400).json({ error: opportunityValidationError });
     return;
   }
   await db

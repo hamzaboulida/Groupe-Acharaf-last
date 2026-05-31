@@ -12,39 +12,10 @@ import {
 import { useGetStats, useListProjects } from "@workspace/api-client-react";
 import { CountUp } from "@/components/ui/count-up";
 import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
+import { usePageSeo } from "@/lib/seo";
 
-import brandEstya   from "@/assets/brand-estya.png";
-import brandAcharaf from "@/assets/brand-acharaf.png";
 import presenceNationaleMap from "@/assets/presence-nationale-map.png";
 
-/* ─────────────── Hero slides — night luxury visuals ─────────────── */
-const SLIDES = [
-  {
-    /* Luxury wood & glass house at night — blue sky, warm amber glow */
-    src: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&q=90",
-    zoomDir: "in",
-  },
-  {
-    /* Elegant courtyard villa at twilight — warm accent lighting */
-    src: "https://images.unsplash.com/photo-1531971589569-0d9370cbe1e5?w=1920&q=90",
-    zoomDir: "out",
-  },
-  {
-    /* Luxury pool at dusk — fire feature, golden reflections in water */
-    src: "https://images.unsplash.com/photo-1599809275671-b5942cabc7a2?w=1920&q=90",
-    zoomDir: "in",
-  },
-  {
-    /* Mediterranean white villa — blue-hour pool, cinematic atmosphere */
-    src: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1920&q=90",
-    zoomDir: "out",
-  },
-  {
-    /* Contemporary dark-wood house at dusk — deep blue sky, warm interior */
-    src: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=90",
-    zoomDir: "in",
-  },
-];
 const SLIDE_DURATION = 6000;
 const TRANSITION_S   = 1.4;
 const ZOOM_S         = 7;
@@ -130,6 +101,13 @@ function SectionReveal({
 
 /* ════════════════════════════════════════════════════════ */
 export default function Home() {
+  usePageSeo({
+    title: "Groupe Acharaf — Immobilier d'Exception au Maroc",
+    description:
+      "Promoteur immobilier marocain d’excellence. Découvrez nos projets, nos opportunités et notre vision résidentielle premium.",
+    path: "/",
+  });
+
   const { data: stats }    = useGetStats();
   const { data: projects } = useListProjects({ featured: true });
 
@@ -159,49 +137,57 @@ export default function Home() {
   const [videoFailed, setVideoFailed] = useState(false);
   const [isMobileLike, setIsMobileLike] = useState(false);
 
-  /* Brand gateway — click to highlight */
-  const [selectedBrand, setSelectedBrand] = useState<"estya" | "acharaf" | null>(null);
   const uploadedHeroImages = useMemo(
     () => (heroSettings?.images ?? []).map((src) => src.trim()).filter(Boolean),
     [heroSettings?.images]
   );
-  const mobileFallbackSource = useMemo(
-    () => heroSettings?.fallbackImageUrl?.trim() || uploadedHeroImages[0] || SLIDES[0]?.src,
-    [heroSettings?.fallbackImageUrl, uploadedHeroImages]
-  );
+  const heroVideoUrl = heroSettings?.videoUrl?.trim() ?? "";
+  const heroFallbackImage = heroSettings?.fallbackImageUrl?.trim() ?? "";
+  const heroMediaType = heroSettings?.mediaType ?? "slideshow";
+  const hasAdminVideo = heroVideoUrl.length > 0;
+  const hasAdminImages = uploadedHeroImages.length > 0;
 
-  const configuredSlides = useMemo(() => {
+  const heroFrameImages = useMemo(() => {
     const mediaType = heroSettings?.mediaType ?? "slideshow";
     const wantsVideo = mediaType === "video" || mediaType === "mixed";
     const mobileVideoDisabled = isMobileLike && heroSettings?.enableVideoOnMobile !== true;
 
-    if (wantsVideo && mobileVideoDisabled) {
-      return [{ src: mobileFallbackSource, zoomDir: "in" as const }];
+    if (wantsVideo && mobileVideoDisabled && heroFallbackImage) {
+      return [heroFallbackImage];
     }
 
-    if (!uploadedHeroImages.length) return SLIDES;
-    return uploadedHeroImages.map((src, index) => ({
-      src,
-      zoomDir: index % 2 === 0 ? "in" : "out",
-    }));
-  }, [heroSettings?.enableVideoOnMobile, heroSettings?.mediaType, isMobileLike, mobileFallbackSource, uploadedHeroImages]);
+    if (hasAdminImages) return uploadedHeroImages;
+    if (heroFallbackImage) return [heroFallbackImage];
+    return [];
+  }, [
+    hasAdminImages,
+    heroFallbackImage,
+    heroSettings?.enableVideoOnMobile,
+    heroSettings?.mediaType,
+    isMobileLike,
+    uploadedHeroImages,
+  ]);
 
   const showVideo =
-    !!heroSettings?.videoUrl &&
+    hasAdminVideo &&
     (!isMobileLike || heroSettings?.enableVideoOnMobile === true) &&
     !videoFailed &&
-    (heroSettings.mediaType === "video" || heroSettings.mediaType === "mixed");
+    (heroMediaType === "video" || heroMediaType === "mixed");
 
   useEffect(() => {
+    if (heroFrameImages.length <= 1) {
+      setCurrent(0);
+      return;
+    }
     const t = setInterval(() => {
-      setCurrent((p) => (p + 1) % configuredSlides.length);
+      setCurrent((p) => (p + 1) % heroFrameImages.length);
     }, SLIDE_DURATION);
     return () => clearInterval(t);
-  }, [configuredSlides.length]);
+  }, [heroFrameImages.length]);
 
   useEffect(() => {
     setCurrent(0);
-  }, [configuredSlides.length]);
+  }, [heroFrameImages.length]);
 
   useEffect(() => {
     setVideoReady(false);
@@ -222,7 +208,7 @@ export default function Home() {
           enableVideoOnMobile: payload.enableVideoOnMobile === true,
         });
       } catch {
-        // Keep default static slides if API is unavailable.
+        // Keep empty premium fallback when API is unavailable.
       }
     }
 
@@ -242,7 +228,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const firstImage = (heroSettings?.images?.[0] || heroSettings?.fallbackImageUrl || configuredSlides[0]?.src || "").trim();
+    const firstImage = (
+      heroFallbackImage ||
+      heroFrameImages[0] ||
+      ""
+    ).trim();
     if (!firstImage || typeof document === "undefined") return;
     const existing = document.querySelector(`link[rel="preload"][href="${firstImage}"]`);
     if (existing) return;
@@ -254,7 +244,7 @@ export default function Home() {
     return () => {
       link.remove();
     };
-  }, [configuredSlides, heroSettings?.fallbackImageUrl, heroSettings?.images]);
+  }, [heroFallbackImage, heroFrameImages]);
 
   /* Global scroll — hero parallax */
   const heroRef = useRef<HTMLDivElement>(null);
@@ -276,9 +266,9 @@ export default function Home() {
       <section ref={heroRef} className="relative h-[100dvh] w-full flex items-center justify-center overflow-hidden">
         {showVideo ? (
           <>
-            {(heroSettings?.fallbackImageUrl && !videoReady) && (
+            {((heroFallbackImage || uploadedHeroImages[0]) && !videoReady) && (
               <img
-                src={heroSettings.fallbackImageUrl}
+                src={heroFallbackImage || uploadedHeroImages[0]}
                 alt=""
                 className="absolute inset-0 z-0 w-full h-full object-cover object-center"
                 fetchPriority="high"
@@ -291,16 +281,16 @@ export default function Home() {
               loop
               playsInline
               preload="metadata"
-              poster={heroSettings?.fallbackImageUrl || undefined}
+              poster={heroFallbackImage || uploadedHeroImages[0] || undefined}
               onCanPlay={() => setVideoReady(true)}
               onError={() => setVideoFailed(true)}
             >
-              <source src={heroSettings?.videoUrl} type={heroSettings?.videoUrl?.endsWith(".webm") ? "video/webm" : "video/mp4"} />
+              <source src={heroVideoUrl} type={heroVideoUrl.endsWith(".webm") ? "video/webm" : "video/mp4"} />
             </video>
           </>
-        ) : (
+        ) : heroFrameImages.length > 0 ? (
         <AnimatePresence mode="sync">
-          {configuredSlides.map((slide, i) =>
+          {heroFrameImages.map((slideSrc, i) =>
             i === current ? (
               <motion.div
                 key={i}
@@ -311,19 +301,21 @@ export default function Home() {
                 transition={{ duration: TRANSITION_S, ease: "easeInOut" }}
               >
                 <motion.img
-                  src={slide.src}
+                  src={slideSrc}
                   alt=""
                   className="w-full h-full object-cover object-center"
                   loading={i === 0 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : "auto"}
-                  initial={{ scale: slide.zoomDir === "in" ? 1.0 : 1.12 }}
-                  animate={{ scale: slide.zoomDir === "in" ? 1.12 : 1.0 }}
+                  initial={{ scale: i % 2 === 0 ? 1.0 : 1.12 }}
+                  animate={{ scale: i % 2 === 0 ? 1.12 : 1.0 }}
                   transition={{ duration: ZOOM_S, ease: "linear" }}
                 />
               </motion.div>
             ) : null
           )}
         </AnimatePresence>
+        ) : (
+          <div className="absolute inset-0 z-0 bg-[#082634]" />
         )}
 
         {/* Layered overlays */}
@@ -332,8 +324,9 @@ export default function Home() {
         <div className="absolute inset-0 z-1 bg-[radial-gradient(ellipse_60%_70%_at_50%_50%,_rgba(8,38,52,0.18)_0%,_transparent_100%)]" />
 
         {/* Slide dots */}
+        {heroFrameImages.length > 1 && (
         <div className="absolute bottom-10 right-10 z-20 flex gap-2 items-center">
-          {configuredSlides.map((_, i) => (
+          {heroFrameImages.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
@@ -341,6 +334,7 @@ export default function Home() {
             />
           ))}
         </div>
+        )}
 
         {/* Copy */}
         <motion.div className="relative z-10 container mx-auto px-6 text-center" style={{ opacity: heroOpacity }}>
@@ -657,7 +651,7 @@ export default function Home() {
                   </div>
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="text-2xl font-serif text-[#082634] mb-2 font-light group-hover:text-[#8EA4AF] transition-colors duration-700">
+                      <h3 className="text-xl md:text-2xl font-serif text-[#082634] mb-2 font-light group-hover:text-[#8EA4AF] transition-colors duration-700 leading-tight">
                         {project.title}
                       </h3>
                       <p className="text-[#8EA4AF] tracking-[0.15em] uppercase text-xs">{project.location}</p>
@@ -673,67 +667,12 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          BRAND GATEWAY — Mobile-first premium selector
-          Two always-visible cards: Estya + Acharaf
-      ══════════════════════════════════════════════ */}
-      <section className="py-28 bg-white">
-        <SectionReveal className="container mx-auto px-6 max-w-6xl">
-
-          {/* Header */}
-          <div className="text-center mb-14">
-            <motion.p {...fade(0)} className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-4">
-              Nos Marques
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }} transition={{ duration: 1.2, delay: 0.1, ease: EC }}
-              className="text-4xl md:text-5xl font-serif text-[#082634] font-light"
-            >
-              Deux références, une exigence
-            </motion.h2>
-            <motion.p
-              {...fade(0.2)}
-              className="text-[#082634] font-light text-sm mt-5 max-w-sm mx-auto leading-relaxed"
-            >
-              Deux marques pensées pour répondre à chaque besoin résidentiel.
-            </motion.p>
-          </div>
-
-          {/* Cards — stacked on mobile, side-by-side on md+ */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            <BrandCard
-              bg={brandEstya} brandId="estya"
-              selected={selectedBrand === "estya"}
-              onSelect={() => setSelectedBrand((s) => (s === "estya" ? null : "estya"))}
-            />
-            <BrandCard
-              bg={brandAcharaf} brandId="acharaf"
-              selected={selectedBrand === "acharaf"}
-              onSelect={() => setSelectedBrand((s) => (s === "acharaf" ? null : "acharaf"))}
-            />
-          </div>
-
-          {/* See-all gateway */}
-          <motion.div {...fade(0.3)} className="text-center mt-12">
-            <Link
-              href="/nos-marques"
-              className="group inline-flex items-center gap-2.5 text-xs uppercase tracking-[0.2em] text-[#8EA4AF] hover:text-[#082634] transition-colors duration-500"
-            >
-              Explorer toutes nos marques
-              <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform duration-300" />
-            </Link>
-          </motion.div>
-
-        </SectionReveal>
-      </section>
-
-      {/* ══════════════════════════════════════════════
           PRESENCE NATIONALE
       ══════════════════════════════════════════════ */}
-      <section className="pt-36 pb-48 bg-white relative overflow-hidden">
+      <section className="pt-20 pb-24 md:pt-28 md:pb-28 bg-white relative overflow-hidden">
         <SectionReveal className="container mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-start">
-            <div className="lg:col-span-5 xl:col-span-5 lg:pr-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 lg:gap-6 items-center">
+            <div className="lg:col-span-4 xl:col-span-4 lg:pr-4">
               <motion.div {...fade(0)}>
                 <p className="text-xs tracking-[0.22em] uppercase text-[#8EA4AF] mb-5">PRÉSENCE NATIONALE</p>
               </motion.div>
@@ -741,64 +680,23 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 1.4, delay: 0.1, ease: EC }}
-                className="text-4xl md:text-5xl font-serif text-[#082634] font-light leading-[1.08] max-w-[15ch]"
+                className="text-4xl md:text-5xl lg:text-6xl font-serif text-[#082634] font-light leading-[1.04] max-w-[13ch]"
               >
                 Un ancrage fort à travers le Royaume
               </motion.h2>
-              <motion.p
-                {...fade(0.16)}
-                className="text-[#082634]/80 font-light text-[15px] leading-relaxed mt-7 max-w-[46ch]"
-              >
-                Groupe Acharaf déploie ses réalisations dans les grandes dynamiques territoriales du Maroc, avec une vision durable de développement, de qualité et de valeur patrimoniale.
-              </motion.p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-12">
-                <motion.div
-                  initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 1.05, delay: 0.2, ease: EC }}
-                  className="group"
-                >
-                  <p className="font-serif font-light text-[#082634] leading-none tracking-tight" style={{ fontSize: "clamp(2.4rem, 4.2vw, 3.8rem)" }}>
-                    <CountUp end={15} duration={1.8} suffix="+" />
-                  </p>
-                  <p className="text-[10px] tracking-[0.24em] uppercase text-[#8EA4AF] mt-3 group-hover:text-[#082634] transition-colors duration-500">
-                    villes
-                  </p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 1.05, delay: 0.28, ease: EC }}
-                  className="group"
-                >
-                  <p className="font-serif font-light text-[#082634] leading-none tracking-tight" style={{ fontSize: "clamp(2.4rem, 4.2vw, 3.8rem)" }}>
-                    <CountUp end={30} duration={1.9} suffix="+" />
-                  </p>
-                  <p className="text-[10px] tracking-[0.24em] uppercase text-[#8EA4AF] mt-3 group-hover:text-[#082634] transition-colors duration-500">
-                    projets
-                  </p>
-                </motion.div>
-              </div>
-              <motion.p
-                {...fade(0.36)}
-                className="text-[#082634] text-xs tracking-[0.16em] uppercase mt-10 leading-relaxed"
-              >
-                Présence dans les principales régions du Maroc
-              </motion.p>
             </div>
 
             <motion.div
               initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 1.4, delay: 0.12, ease: EC }}
-              className="lg:col-span-7 xl:col-span-7"
+              className="lg:col-span-8 xl:col-span-8"
             >
-              <div className="relative w-full lg:pl-3 xl:pl-5">
+              <div className="relative w-full lg:pl-1 overflow-x-clip">
                 <img
                   src={presenceNationaleMap}
                   alt="Carte de présence nationale Groupe Acharaf"
-                  className="w-full h-auto object-contain mx-auto max-w-[640px] lg:max-w-none"
+                  className="block h-auto object-contain mx-auto w-[116%] max-w-none -mx-[8%] sm:w-[112%] sm:-mx-[6%] md:w-full md:mx-0 md:max-w-[860px] lg:max-w-none"
                   loading="lazy"
                 />
               </div>
@@ -808,155 +706,5 @@ export default function Home() {
       </section>
 
     </Layout>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   BRAND CARD — Mobile-first premium gateway card
-   Always-visible content, click-to-highlight, no hover dependency
-═══════════════════════════════════════════════════════════════════════ */
-
-function BrandCard({
-  bg, brandId, selected, onSelect,
-}: {
-  bg: string;
-  brandId: "estya" | "acharaf";
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-
-  const EC       = [0.22, 1, 0.36, 1] as const;
-  const isEstya  = brandId === "estya";
-
-  /* Combine hover + focus into a single "active" signal.
-     selected state takes visual priority but is independent. */
-  const isActive = isHovered || isFocused;
-
-  /* Derived animation values — layered priority: selected > active > rest */
-  const imgScale  = selected ? 1.04 : isActive ? 1.03 : 1.0;
-  const overlayOp = selected ? 0.38 : isActive ? 0.44 : 0.55;
-  const liftY     = selected ? -4   : isActive ? -2   : 0;
-  const shadow    = selected
-    ? "0 28px 70px rgba(8,38,52,0.20), 0 4px 14px rgba(8,38,52,0.12)"
-    : isActive
-      ? "0 14px 44px rgba(8,38,52,0.14), 0 2px 8px rgba(8,38,52,0.08)"
-      : "0 0px 0px rgba(8,38,52,0)";
-
-  /* Accent bar: full width+opacity on selected; 1/3 width at half-opacity on hover */
-  const barScaleX = selected ? 1 : isActive ? 0.34 : 0;
-  const barOpacity = selected ? 1 : isActive ? 0.55 : 0;
-
-  return (
-    <motion.div
-      className="relative overflow-hidden cursor-pointer outline-none"
-      tabIndex={0}
-      role="button"
-      aria-pressed={selected}
-      onClick={onSelect}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(); }
-      }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
-      animate={{ y: liftY, boxShadow: shadow }}
-      transition={{ duration: 0.75, ease: EC }}
-    >
-      {/* ── Keyboard focus ring — only visible on :focus-visible ── */}
-      <motion.div
-        className={`absolute inset-0 z-40 pointer-events-none ring-2 ${isEstya ? "ring-[#8EA4AF]" : "ring-[#DCE0E7]"}`}
-        animate={{ opacity: isFocused ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-      />
-
-      {/* ── Accent bar: preview (hover) → confirmed (selected) ── */}
-      <motion.div
-        className={`absolute top-0 inset-x-0 h-[2px] z-30 ${isEstya ? "bg-[#8EA4AF]" : "bg-[#DCE0E7]"}`}
-        animate={{ scaleX: barScaleX, opacity: barOpacity }}
-        style={{ originX: 0 }}
-        transition={{ duration: selected ? 0.55 : 0.8, ease: EC }}
-      />
-
-      {/* ── Image + overlays ── */}
-      <div className="relative h-[420px] sm:h-[480px] md:h-[520px] lg:h-[560px]">
-
-        {/* Background image — slow cinematic zoom on hover/select */}
-        <motion.img
-          src={bg}
-          alt={isEstya ? "Estya — Ultra-Luxe" : "Acharaf Immobilier — Premium"}
-          className="absolute inset-0 w-full h-full object-cover"
-          animate={{ scale: imgScale }}
-          transition={{ duration: 1.9, ease: EC }}
-        />
-
-        {/* Brand-specific dark overlay — brightens on hover/select */}
-        <motion.div
-          className={`absolute inset-0 ${isEstya ? "bg-[#082634]" : "bg-[#082634]"}`}
-          animate={{ opacity: overlayOp }}
-          transition={{ duration: 1.1, ease: EC }}
-        />
-
-        {/* Bottom-up gradient scrim — permanent text anchor */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#082634]/75 via-[#082634]/25 to-transparent pointer-events-none" />
-
-        {/* Top-down subtle vignette */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#082634]/20 via-transparent to-transparent pointer-events-none" />
-
-        {/* ── Content — pinned to bottom, always fully readable ── */}
-        <div className="absolute inset-0 z-10 flex flex-col justify-end p-7 sm:p-9 md:p-10">
-
-          {/* Kicker */}
-          <p className={`text-[10px] tracking-[0.32em] uppercase font-light mb-3 ${isEstya ? "text-[#8EA4AF]" : "text-[#DCE0E7]"}`}>
-            {isEstya ? "Ultra-Luxe" : "Premium & Accessible"}
-          </p>
-
-          {/* Brand name */}
-          <div className="mb-4">
-            <h2
-              className="font-serif text-white font-light leading-none"
-              style={{ fontSize: isEstya ? "clamp(3.5rem,7vw,5.5rem)" : "clamp(3rem,6vw,4.8rem)" }}
-            >
-              {isEstya ? "Estya" : "Acharaf"}
-            </h2>
-            {!isEstya && (
-              <p className="text-white/65 text-base font-light tracking-wide mt-0.5">Immobilier</p>
-            )}
-          </div>
-
-          {/* Rule — expands on active or selected */}
-          <motion.div
-            className="h-px bg-white/30 mb-5"
-            animate={{ width: (selected || isActive) ? "3rem" : "1.75rem" }}
-            transition={{ duration: 0.6, ease: EC }}
-          />
-
-          {/* Description — always fully visible */}
-          <p className="text-white/80 text-sm font-light leading-relaxed mb-7 max-w-[28ch]">
-            {isEstya
-              ? "La quintessence du luxe immobilier. Des adresses confidentielles, des volumes majestueux, une rareté absolue."
-              : "L'excellence du cadre de vie. Architecture contemporaine, espaces chaleureux, emplacements stratégiques pour une vie pleine."}
-          </p>
-
-          {/* CTA — stops propagation so card click and link click are independent */}
-          <div>
-            <Link
-              href="/nos-marques"
-              onClick={(e) => e.stopPropagation()}
-              className={`group inline-flex items-center gap-2.5 text-[11px] uppercase tracking-[0.22em] border-b pb-0.5 transition-colors duration-500 ${
-                isEstya
-                  ? "text-[#DCE0E7] border-[#8EA4AF]/40 hover:border-[#8EA4AF]/80"
-                  : "text-[#DCE0E7] border-[#DCE0E7]/40 hover:border-[#DCE0E7]/80"
-              }`}
-            >
-              {isEstya ? "Explorer" : "Découvrir"}
-              <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform duration-500" />
-            </Link>
-          </div>
-        </div>
-      </div>
-    </motion.div>
   );
 }

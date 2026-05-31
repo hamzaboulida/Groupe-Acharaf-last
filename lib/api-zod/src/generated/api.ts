@@ -158,11 +158,10 @@ export const ListProjectsResponseItem = zod.object({
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
-      "promotion",
-      "reduction",
-      "limited_offer",
-      "investment",
-      "last_units",
+      "lots_r1",
+      "lots_r2",
+      "lots_r3",
+      "creche",
     ])
     .optional(),
   opportunityTitle: zod.string().optional(),
@@ -231,11 +230,10 @@ export const CreateProjectBody = zod.object({
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
-      "promotion",
-      "reduction",
-      "limited_offer",
-      "investment",
-      "last_units",
+      "lots_r1",
+      "lots_r2",
+      "lots_r3",
+      "creche",
     ])
     .optional(),
   opportunityTitle: zod.string().optional(),
@@ -320,11 +318,10 @@ export const GetProjectResponse = zod.object({
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
-      "promotion",
-      "reduction",
-      "limited_offer",
-      "investment",
-      "last_units",
+      "lots_r1",
+      "lots_r2",
+      "lots_r3",
+      "creche",
     ])
     .optional(),
   opportunityTitle: zod.string().optional(),
@@ -396,11 +393,10 @@ export const UpdateProjectBody = zod.object({
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
-      "promotion",
-      "reduction",
-      "limited_offer",
-      "investment",
-      "last_units",
+      "lots_r1",
+      "lots_r2",
+      "lots_r3",
+      "creche",
     ])
     .optional(),
   opportunityTitle: zod.string().optional(),
@@ -478,11 +474,10 @@ export const UpdateProjectResponse = zod.object({
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
-      "promotion",
-      "reduction",
-      "limited_offer",
-      "investment",
-      "last_units",
+      "lots_r1",
+      "lots_r2",
+      "lots_r3",
+      "creche",
     ])
     .optional(),
   opportunityTitle: zod.string().optional(),
@@ -729,7 +724,9 @@ export const ApplyForCareerBody = zod.object({
   lastName: zod.string(),
   email: zod.string(),
   phone: zod.string().optional(),
+  desiredPosition: zod.string().optional(),
   message: zod.string().optional(),
+  cvUrl: zod.string().optional(),
 });
 
 /**
@@ -737,7 +734,9 @@ export const ApplyForCareerBody = zod.object({
  */
 export const ListApplicationsResponseItem = zod.object({
   id: zod.number(),
-  careerId: zod.number(),
+  careerId: zod.number().nullable().optional(),
+  applicationType: zod.enum(["job", "spontaneous"]).optional(),
+  desiredPosition: zod.string().optional(),
   career: zod
     .object({
       id: zod.number(),
@@ -756,6 +755,7 @@ export const ListApplicationsResponseItem = zod.object({
   email: zod.string(),
   phone: zod.string().optional(),
   message: zod.string().optional(),
+  cvUrl: zod.string().optional(),
   createdAt: zod.coerce.date(),
 });
 export const ListApplicationsResponse = zod.array(ListApplicationsResponseItem);

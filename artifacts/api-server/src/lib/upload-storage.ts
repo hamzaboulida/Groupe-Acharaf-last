@@ -30,7 +30,7 @@ export type UploadedAsset = {
 };
 
 type SaveUploadParams = {
-  folder: "projects" | "videos" | "hero";
+  folder: "projects" | "videos" | "hero" | "documents";
   originalName: string;
   mimeType: string;
   buffer: Buffer;

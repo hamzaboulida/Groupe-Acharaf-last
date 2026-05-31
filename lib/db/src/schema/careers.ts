@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -24,7 +24,9 @@ export type Career = typeof careersTable.$inferSelect;
 
 export const applicationsTable = pgTable("applications", {
   id: serial("id").primaryKey(),
-  careerId: serial("career_id").notNull(),
+  careerId: integer("career_id"),
+  applicationType: text("application_type").notNull().default("job"),
+  desiredPosition: text("desired_position").notNull().default(""),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email").notNull(),

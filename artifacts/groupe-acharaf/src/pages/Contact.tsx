@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/select";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin } from "lucide-react";
-import heroBg from "@/assets/hero-bg.png";
+import { sharedHeroImage } from "@/assets/hero-shared";
+import { usePageSeo } from "@/lib/seo";
 
 const formSchema = z.object({
   firstName: z.string().min(2),
@@ -31,6 +32,13 @@ const formSchema = z.object({
 
 
 export default function Contact() {
+  usePageSeo({
+    title: "Contact | Groupe Acharaf",
+    description:
+      "Contactez Groupe Acharaf pour vos projets immobiliers au Maroc et échangez avec notre équipe.",
+    path: "/contact",
+  });
+
   const { toast } = useToast();
   const createLead = useCreateLead();
   const { data: projects = [] } = useListProjects();
@@ -70,7 +78,19 @@ export default function Contact() {
       {/* ── Hero ── */}
       <section className="relative h-[65vh] w-full flex items-end pb-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img src={heroBg} alt="" className="w-full h-full object-cover scale-105 brightness-[0.72]" />
+          <picture>
+            <source srcSet={sharedHeroImage.srcSetWebp} sizes={sharedHeroImage.heroSizes} type="image/webp" />
+            <img
+              src={sharedHeroImage.src}
+              srcSet={sharedHeroImage.srcSetJpg}
+              sizes={sharedHeroImage.heroSizes}
+              alt=""
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover scale-105 brightness-[0.72]"
+            />
+          </picture>
         </div>
         <div className="absolute inset-0 bg-[#082634]/22" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#082634]/55 via-transparent to-[#082634]/50" />

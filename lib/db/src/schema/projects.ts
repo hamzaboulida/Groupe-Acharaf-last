@@ -33,7 +33,7 @@ export const projectsTable = pgTable("projects", {
   deliveryDate: text("delivery_date"),
   featured: boolean("featured").notNull().default(false),
   isOpportunity: boolean("is_opportunity").notNull().default(false),
-  opportunityType: text("opportunity_type").notNull().default("promotion"),
+  opportunityType: text("opportunity_type").notNull().default("lots_r1"),
   opportunityTitle: text("opportunity_title").notNull().default(""),
   opportunityDescription: text("opportunity_description").notNull().default(""),
   opportunityHighlight: text("opportunity_highlight").notNull().default(""),

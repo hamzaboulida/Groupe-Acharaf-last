@@ -5,7 +5,8 @@ import { useGetStats } from "@workspace/api-client-react";
 import { CountUp } from "@/components/ui/count-up";
 import { Link } from "wouter";
 import { ArrowRight, Trophy, Target, Users } from "lucide-react";
-import heroBg from "@/assets/hero-bg.png";
+import { sharedHeroImage } from "@/assets/hero-shared";
+import { usePageSeo } from "@/lib/seo";
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 28 },
@@ -15,6 +16,13 @@ const fade = (delay = 0) => ({
 });
 
 export default function APropos() {
+  usePageSeo({
+    title: "À propos | Groupe Acharaf",
+    description:
+      "Découvrez l’histoire, la vision et l’exigence de Groupe Acharaf, promoteur immobilier premium au Maroc.",
+    path: "/a-propos",
+  });
+
   const { data: stats } = useGetStats();
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 900], [0, 180]);
@@ -31,11 +39,19 @@ export default function APropos() {
           animate={{ scale: [1.06, 1.14] }}
           transition={{ duration: 16, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
         >
-          <img
-            src={heroBg}
-            alt=""
-            className="w-full h-full object-cover brightness-[0.70]"
-          />
+          <picture>
+            <source srcSet={sharedHeroImage.srcSetWebp} sizes={sharedHeroImage.heroSizes} type="image/webp" />
+            <img
+              src={sharedHeroImage.src}
+              srcSet={sharedHeroImage.srcSetJpg}
+              sizes={sharedHeroImage.heroSizes}
+              alt=""
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover brightness-[0.70]"
+            />
+          </picture>
         </motion.div>
 
         {/* ── Overlay system — refined cinematic layers ── */}
@@ -123,7 +139,7 @@ export default function APropos() {
             >
               <div className="aspect-[4/5] overflow-hidden bg-[#082634]/10 relative group">
                 <motion.img
-                  src={heroBg}
+                  src={sharedHeroImage.src}
                   alt="Vision"
                   className="w-full h-full object-cover brightness-75"
                   whileHover={{ scale: 1.05 }}

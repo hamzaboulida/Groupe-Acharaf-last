@@ -11,5 +11,7 @@ export interface CreateApplicationBody {
   lastName: string;
   email: string;
   phone?: string;
+  desiredPosition?: string;
   message?: string;
+  cvUrl?: string;
 }
