@@ -2,6 +2,7 @@ import React from "react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { motion, AnimatePresence } from "framer-motion";
+import { SITE_NAME, SITE_URL, useStructuredData } from "@/lib/structured-data";
 
 const pageVariants = {
   initial: { opacity: 0, filter: "blur(4px)", scale: 0.995 },
@@ -22,6 +23,38 @@ export function Layout({
   children: React.ReactNode;
   hideFooter?: boolean;
 }) {
+  useStructuredData("ga-site-organization", [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/logo.png`,
+      sameAs: [],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: SITE_URL,
+      inLanguage: "fr-MA",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${SITE_URL}/nos-projets?search={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": ["RealEstateAgent", "LocalBusiness"],
+      name: SITE_NAME,
+      url: SITE_URL,
+      areaServed: "MA",
+      telephone: "+212600000000",
+      image: `${SITE_URL}/og-default.jpg`,
+    },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#082634] text-white">
       <Navbar />

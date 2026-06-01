@@ -10,11 +10,49 @@ import statsRouter from "./stats";
 import seoRouter from "./seo";
 import uploadsRouter from "./uploads";
 import homepageHeroRouter from "./homepage-hero";
+import adminAuthRouter from "./admin-auth";
+import { requireAdminAuth } from "../lib/admin-auth";
 
 const router: IRouter = Router();
 
 router.use(seoRouter);
 router.use(healthRouter);
+router.use(adminAuthRouter);
+
+router.use(
+  [
+    "/projects",
+    "/projects/:id",
+    "/brands",
+    "/brands/:id",
+    "/articles",
+    "/articles/:id",
+    "/careers",
+    "/careers/:id",
+    "/applications",
+    "/homepage-hero",
+    "/leads",
+    "/leads/:id",
+    "/subscribers",
+    "/subscribers/:id",
+    "/uploads/images",
+    "/uploads/videos",
+    "/uploads",
+  ],
+  (req, res, next) => {
+    const isReadOnlyMethod = req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS";
+    const needsAdminForRead =
+      req.path.startsWith("/applications") ||
+      req.path.startsWith("/leads") ||
+      req.path.startsWith("/subscribers");
+
+    if (!isReadOnlyMethod || needsAdminForRead) {
+      return requireAdminAuth(req, res, next);
+    }
+    return next();
+  },
+);
+
 router.use(uploadsRouter);
 router.use(homepageHeroRouter);
 router.use(brandsRouter);

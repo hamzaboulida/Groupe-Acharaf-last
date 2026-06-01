@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { MapPin, Briefcase } from "lucide-react";
 import { sharedHeroImage } from "@/assets/hero-shared";
 import { usePageSeo } from "@/lib/seo";
+import { breadcrumbSchema, SITE_NAME, SITE_URL, useStructuredData } from "@/lib/structured-data";
 
 const EC = [0.22, 1, 0.36, 1] as const;
 
@@ -456,6 +457,42 @@ export default function Carrieres() {
     title: string;
   } | null>(null);
   const [openSpontaneous, setOpenSpontaneous] = useState(false);
+  useStructuredData(
+    "ga-breadcrumb-carrieres",
+    breadcrumbSchema([
+      { name: "Accueil", path: "/" },
+      { name: "Carrières", path: "/carrieres" },
+    ]),
+  );
+  useStructuredData(
+    "ga-jobposting-list",
+    careers.length
+      ? careers.map((career) => ({
+          "@context": "https://schema.org",
+          "@type": "JobPosting",
+          title: career.title,
+          description: career.description || `Offre d'emploi ${career.title} chez ${SITE_NAME}`,
+          hiringOrganization: {
+            "@type": "Organization",
+            name: SITE_NAME,
+            sameAs: SITE_URL,
+          },
+          jobLocation: career.location
+            ? {
+                "@type": "Place",
+                address: {
+                  "@type": "PostalAddress",
+                  addressCountry: "MA",
+                  addressLocality: career.location,
+                },
+              }
+            : undefined,
+          employmentType: career.type || "FULL_TIME",
+          datePosted: career.createdAt,
+          validThrough: career.updatedAt,
+        }))
+      : null,
+  );
 
   return (
     <Layout>

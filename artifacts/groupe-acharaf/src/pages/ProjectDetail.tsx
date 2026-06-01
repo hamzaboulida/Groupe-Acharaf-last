@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useGetProject, useCreateLead } from "@workspace/api-client-react";
+import { useGetProject, useCreateLead, useListProjects } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
 import {
   projectPriceLabel,
@@ -13,13 +13,14 @@ import {
 } from "@/lib/project-display";
 import {
   MapPin, Ruler, Calendar, ChevronDown, ArrowRight,
-  Shield, Trees, Car, Wifi, Star, Building2,
-  Check, X, ZoomIn, ChevronLeft, ChevronRight, ExternalLink,
+  Check, X, ZoomIn, ChevronLeft, ChevronRight, ExternalLink, Loader2, Building2,
 } from "lucide-react";
 
 import project1 from "@/assets/project-1.png";
 import project2 from "@/assets/project-2.png";
 import project3 from "@/assets/project-3.png";
+import { projectMatchesSlug, projectPath, slugifyProjectTitle } from "@/lib/project-routing";
+import { SITE_NAME, SITE_URL, breadcrumbSchema, useStructuredData } from "@/lib/structured-data";
 
 const FB = [project1, project2, project3];
 const EC = [0.22, 1, 0.36, 1] as const;
@@ -67,20 +68,20 @@ function normalizeMapEmbedUrl(value: string | null | undefined): string {
   }
 }
 
+function normalizeVirtualTourUrl(value: string | null | undefined): string {
+  const raw = clean(value);
+  if (!raw) return "";
+
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+
 function AmenityIcon({ label }: { label: string }) {
-  const l = label.toLowerCase();
-  if (l.includes("sécurité") || l.includes("securite") || l.includes("gardien") || l.includes("biométrique") || l.includes("surveillance"))
-    return <Shield size={16} strokeWidth={1.4} />;
-  if (l.includes("jardin") || l.includes("vert") || l.includes("arbre") || l.includes("parc") || l.includes("paysag"))
-    return <Trees size={16} strokeWidth={1.4} />;
-  if (l.includes("parking") || l.includes("garage") || l.includes("véhicule") || l.includes("recharge"))
-    return <Car size={16} strokeWidth={1.4} />;
-  if (l.includes("domotique") || l.includes("wifi") || l.includes("smart") || l.includes("lutron"))
-    return <Wifi size={16} strokeWidth={1.4} />;
-  if (l.includes("terrasse") || l.includes("rooftop") || l.includes("vue") || l.includes("panoram"))
-    return <Star size={16} strokeWidth={1.4} />;
-  if (l.includes("piscine") || l.includes("spa") || l.includes("hammam") || l.includes("fitness") || l.includes("lounge"))
-    return <Building2 size={16} strokeWidth={1.4} />;
+  void label;
   return <Check size={16} strokeWidth={1.4} />;
 }
 
@@ -242,14 +243,136 @@ function LeadSection({
   );
 }
 
+function VirtualTourSection({ url }: { url: string }) {
+  const [shouldMountIframe, setShouldMountIframe] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const mountRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const node = mountRef.current;
+    if (!node || shouldMountIframe) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldMountIframe(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "220px 0px" },
+    );
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [shouldMountIframe]);
+
+  useEffect(() => {
+    if (!shouldMountIframe || loaded || failed) return;
+    const timeout = window.setTimeout(() => {
+      setFailed(true);
+    }, 15000);
+    return () => window.clearTimeout(timeout);
+  }, [failed, loaded, shouldMountIframe]);
+
+  return (
+    <section className="py-28 bg-white">
+      <div className="container mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: EC }}
+          className="mb-10"
+        >
+          <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-4">Expérience immersive</p>
+          <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634] mb-4">Visite virtuelle</h2>
+          <p className="text-[#082634] font-light text-sm leading-relaxed max-w-3xl">
+            Découvrez le projet à travers une expérience immersive à 360° et explorez chaque espace comme si vous y étiez.
+          </p>
+        </motion.div>
+
+        <div
+          ref={mountRef}
+          className="relative w-full overflow-hidden rounded-2xl shadow-[0_14px_50px_rgba(8,38,52,0.14)] bg-[#DCE0E7]/40 h-[500px] md:h-[650px] lg:h-[800px]"
+        >
+          {!shouldMountIframe && (
+            <div className="absolute inset-0 flex items-center justify-center text-center px-8">
+              <div className="flex flex-col items-center gap-3 text-[#082634]/75">
+                <Loader2 size={24} className="animate-spin" />
+                <p className="text-sm tracking-[0.08em] uppercase">Chargement de la visite virtuelle...</p>
+              </div>
+            </div>
+          )}
+
+          {shouldMountIframe && !failed && (
+            <>
+              {!loaded && (
+                <div className="absolute inset-0 z-[1] flex items-center justify-center text-center px-8 bg-white/70 backdrop-blur-[1px]">
+                  <div className="flex flex-col items-center gap-3 text-[#082634]/75">
+                    <Loader2 size={24} className="animate-spin" />
+                    <p className="text-sm tracking-[0.08em] uppercase">Chargement de la visite virtuelle...</p>
+                  </div>
+                </div>
+              )}
+              <iframe
+                src={url}
+                title="Visite virtuelle du projet"
+                loading="lazy"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0"
+                onLoad={() => setLoaded(true)}
+                onError={() => setFailed(true)}
+              />
+            </>
+          )}
+
+          {failed && (
+            <div className="absolute inset-0 flex items-center justify-center text-center px-8">
+              <div>
+                <p className="text-[#082634] text-base font-light mb-5">Impossible de charger la visite virtuelle.</p>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-[#082634] text-white px-6 py-3 text-xs tracking-[0.15em] uppercase hover:bg-[#8EA4AF] hover:text-[#082634] transition-colors"
+                >
+                  Voir la visite virtuelle <ExternalLink size={12} />
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════
    Main page
 ═══════════════════════════════════════════════════════════ */
 export default function ProjectDetail() {
   const { id } = useParams<{ id: string }>();
-  const projectId = id ? Number(id) : 0;
+  const [, navigate] = useLocation();
+  const projectKey = slugifyProjectTitle(id);
+  const isNumericKey = /^\d+$/.test(projectKey);
+  const numericId = isNumericKey ? Number(projectKey) : null;
 
-  const { data: project, isLoading, isError } = useGetProject(projectId);
+  const { data: projects = [], isLoading: isProjectsLoading } = useListProjects();
+  const projectFromSlug = !isNumericKey
+    ? projects.find((p) => projectMatchesSlug(p, projectKey))
+    : undefined;
+  const resolvedProjectId = numericId ?? projectFromSlug?.id ?? 0;
+
+  const {
+    data: project,
+    isLoading: isProjectLoading,
+    isError,
+  } = useGetProject(resolvedProjectId, {
+    query: {
+      enabled: resolvedProjectId > 0,
+    },
+  });
 
   const [activeImage, setActiveImage] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -263,8 +386,16 @@ export default function ProjectDetail() {
   const heroOpacity = useTransform(heroScroll, [0, 0.7], [1, 0]);
 
   const projectImages = project?.images?.filter(Boolean) ?? [];
-  const cover = clean(project?.coverImageUrl) || FB[projectId % 3];
+  const cover = clean(project?.coverImageUrl) || FB[resolvedProjectId % 3];
   const gallery = projectImages.length ? projectImages : [FB[0], FB[1], FB[2]];
+
+  useEffect(() => {
+    if (!project) return;
+    const canonicalPath = projectPath(project);
+    if (window.location.pathname !== canonicalPath) {
+      navigate(canonicalPath, { replace: true });
+    }
+  }, [navigate, project]);
 
   /* SEO */
   useEffect(() => {
@@ -283,11 +414,20 @@ export default function ProjectDetail() {
       upsertMeta("property", "og:title", document.title);
       upsertMeta("property", "og:description", seoDescription);
       upsertMeta("property", "og:image", ogImage);
+      upsertMeta("property", "og:url", `${window.location.origin}${projectPath(project)}`);
+
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (!canonical) {
+        canonical = document.createElement("link");
+        canonical.setAttribute("rel", "canonical");
+        document.head.appendChild(canonical);
+      }
+      canonical.setAttribute("href", `${window.location.origin}${projectPath(project)}`);
     }
   }, [cover, project]);
 
   /* Loading state */
-  if (isLoading) {
+  if (isProjectLoading || (!isNumericKey && isProjectsLoading)) {
     return (
       <Layout>
         <div className="h-screen bg-white flex items-center justify-center">
@@ -354,10 +494,43 @@ export default function ProjectDetail() {
   const locationAdvantages = project.locationAdvantages?.filter(Boolean) ?? [];
   const addressText = clean(project.addressText) || [project.location, project.city].filter(Boolean).join(", ");
   const mapEmbedUrl = normalizeMapEmbedUrl(project.mapIframeCode) || normalizeMapEmbedUrl(project.mapEmbedUrl);
+  const virtualTourUrl = normalizeVirtualTourUrl(project.virtualTourUrl);
   const contactTitle = clean(project.contactTitle) || "Intéressé par ce projet ?";
   const contactSubtitle =
     clean(project.contactSubtitle) ||
     "Notre équipe vous recontacte dans les 24 heures pour organiser une visite ou répondre à toutes vos questions.";
+  useStructuredData(
+    "ga-breadcrumb-project",
+    breadcrumbSchema([
+      { name: "Accueil", path: "/" },
+      { name: "Nos Projets", path: "/nos-projets" },
+      { name: project.title, path: projectPath(project) },
+    ]),
+  );
+  useStructuredData("ga-project-schema", {
+    "@context": "https://schema.org",
+    "@type": "Residence",
+    name: project.title,
+    url: `${SITE_URL}${projectPath(project)}`,
+    description: clean(project.metaDescription) || clean(project.shortDescription) || clean(project.description),
+    image: clean(project.ogImageUrl) || clean(project.coverImageUrl),
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: project.city || project.location || "",
+      addressCountry: "MA",
+      streetAddress: clean(project.addressText),
+    },
+    brand: {
+      "@type": "Brand",
+      name: project.brand?.name || SITE_NAME,
+    },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "MAD",
+      availability: project.status === "completed" ? "https://schema.org/LimitedAvailability" : "https://schema.org/InStock",
+      price: shouldShowProjectPrice(project) ? project.priceMin ?? undefined : undefined,
+    },
+  });
 
   return (
     <Layout>
@@ -662,6 +835,8 @@ export default function ProjectDetail() {
           )}
         </div>
       </section>
+
+      {virtualTourUrl && <VirtualTourSection url={virtualTourUrl} />}
 
       {/* ════════════════════════════════════════════════════
           5 · KEY FEATURES / AMENITIES

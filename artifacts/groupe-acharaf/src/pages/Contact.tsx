@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { sharedHeroImage } from "@/assets/hero-shared";
 import { usePageSeo } from "@/lib/seo";
+import { breadcrumbSchema, SITE_NAME, SITE_URL, useStructuredData } from "@/lib/structured-data";
 
 const formSchema = z.object({
   firstName: z.string().min(2),
@@ -37,6 +38,31 @@ export default function Contact() {
     description:
       "Contactez Groupe Acharaf pour vos projets immobiliers au Maroc et échangez avec notre équipe.",
     path: "/contact",
+  });
+  useStructuredData(
+    "ga-breadcrumb-contact",
+    breadcrumbSchema([
+      { name: "Accueil", path: "/" },
+      { name: "Contact", path: "/contact" },
+    ]),
+  );
+  useStructuredData("ga-contact-page", {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: `Contact | ${SITE_NAME}`,
+    url: `${SITE_URL}/contact`,
+    mainEntity: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        telephone: "+212600000000",
+        areaServed: "MA",
+        availableLanguage: ["fr", "ar"],
+      },
+    },
   });
 
   const { toast } = useToast();

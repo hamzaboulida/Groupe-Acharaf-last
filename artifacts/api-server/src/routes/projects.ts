@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { db, projectsTable, brandsTable } from "@workspace/db";
 import {
   CreateProjectBody,
@@ -15,6 +15,32 @@ import {
 
 const router: IRouter = Router();
 const OPPORTUNITY_TYPES = new Set(["lots_r1", "lots_r2", "lots_r3", "creche"]);
+
+function slugifyTitle(title: string): string {
+  return title
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+async function ensureUniqueSlug(baseTitle: string, options?: { excludeId?: number }) {
+  const baseSlug = slugifyTitle(baseTitle) || "projet";
+  const all = await db.select({ id: projectsTable.id, slug: projectsTable.slug }).from(projectsTable);
+  const used = new Set(
+    all
+      .filter((p) => (options?.excludeId ? p.id !== options.excludeId : true))
+      .map((p) => p.slug.toLowerCase()),
+  );
+  if (!used.has(baseSlug)) return baseSlug;
+  let suffix = 2;
+  while (used.has(`${baseSlug}-${suffix}`)) suffix += 1;
+  return `${baseSlug}-${suffix}`;
+}
 
 function validateOpportunityCategory(payload: {
   isOpportunity?: boolean;
@@ -60,6 +86,7 @@ const projectSelection = {
   surfaceMax: projectsTable.surfaceMax,
   deliveryDate: projectsTable.deliveryDate,
   featured: projectsTable.featured,
+  displayOrder: projectsTable.displayOrder,
   isOpportunity: projectsTable.isOpportunity,
   opportunityType: projectsTable.opportunityType,
   opportunityTitle: projectsTable.opportunityTitle,
@@ -84,6 +111,7 @@ const projectSelection = {
   mapEmbedUrl: projectsTable.mapEmbedUrl,
   mapIframeCode: projectsTable.mapIframeCode,
   mapShareUrl: projectsTable.mapShareUrl,
+  virtualTourUrl: projectsTable.virtualTourUrl,
   contactTitle: projectsTable.contactTitle,
   contactSubtitle: projectsTable.contactSubtitle,
   metaTitle: projectsTable.metaTitle,
@@ -111,7 +139,7 @@ router.get("/projects", async (req, res): Promise<void> => {
     .select(projectSelection)
     .from(projectsTable)
     .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id))
-    .orderBy(projectsTable.createdAt);
+    .orderBy(asc(projectsTable.displayOrder), desc(projectsTable.createdAt));
 
   let filtered = projects;
   if (queryParams.success) {
@@ -140,7 +168,11 @@ router.post("/projects", async (req, res): Promise<void> => {
     res.status(400).json({ error: opportunityValidationError });
     return;
   }
-  const [project] = await db.insert(projectsTable).values(parsed.data).returning();
+  const resolvedSlug = await ensureUniqueSlug(parsed.data.title);
+  const [project] = await db
+    .insert(projectsTable)
+    .values({ ...parsed.data, slug: resolvedSlug })
+    .returning();
 
   const [full] = await db
     .select(projectSelection)
@@ -186,9 +218,23 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
     res.status(400).json({ error: opportunityValidationError });
     return;
   }
+  const [existing] = await db
+    .select({ id: projectsTable.id, slug: projectsTable.slug, title: projectsTable.title })
+    .from(projectsTable)
+    .where(eq(projectsTable.id, params.data.id));
+
+  if (!existing) {
+    res.status(404).json({ error: "Project not found" });
+    return;
+  }
+
+  const resolvedSlug = cleanSlug(existing.slug)
+    ? existing.slug
+    : await ensureUniqueSlug(parsed.data.title || existing.title, { excludeId: existing.id });
+
   await db
     .update(projectsTable)
-    .set({ ...parsed.data, updatedAt: new Date() })
+    .set({ ...parsed.data, slug: resolvedSlug, updatedAt: new Date() })
     .where(eq(projectsTable.id, params.data.id));
 
   const [full] = await db
@@ -215,3 +261,7 @@ router.delete("/projects/:id", async (req, res): Promise<void> => {
 });
 
 export default router;
+
+function cleanSlug(value: string | null | undefined) {
+  return value?.trim() ?? "";
+}

@@ -39,6 +39,7 @@ export interface Project {
   surfaceMax?: number;
   deliveryDate?: string;
   featured: boolean;
+  displayOrder?: number;
   isOpportunity?: boolean;
   opportunityType?: ProjectOpportunityType;
   opportunityTitle?: string;
@@ -63,6 +64,7 @@ export interface Project {
   mapEmbedUrl?: string;
   mapIframeCode?: string;
   mapShareUrl?: string;
+  virtualTourUrl?: string;
   contactTitle?: string;
   contactSubtitle?: string;
   metaTitle?: string;

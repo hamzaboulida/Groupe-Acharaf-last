@@ -6,6 +6,8 @@ import { Link, useSearch } from "wouter";
 import { ArrowRight, MapPin } from "lucide-react";
 import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
 import { usePageSeo } from "@/lib/seo";
+import { projectPath } from "@/lib/project-routing";
+import { breadcrumbSchema, useStructuredData } from "@/lib/structured-data";
 
 export default function NosProjets() {
   usePageSeo({
@@ -14,6 +16,13 @@ export default function NosProjets() {
       "Découvrez les projets immobiliers Groupe Acharaf au Maroc : résidences premium, adresses d’exception et opportunités en cours.",
     path: "/nos-projets",
   });
+  useStructuredData(
+    "ga-breadcrumb-projets",
+    breadcrumbSchema([
+      { name: "Accueil", path: "/" },
+      { name: "Nos Projets", path: "/nos-projets" },
+    ]),
+  );
 
   const searchString = useSearch();
   const searchParams = new URLSearchParams(searchString);
@@ -118,7 +127,7 @@ export default function NosProjets() {
                     transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                     className="mb-32 group cursor-pointer"
                   >
-                    <Link href={`/nos-projets/${featuredProject.id}`}>
+                    <Link href={projectPath(featuredProject)}>
                       <div className="relative w-full aspect-[4/5] sm:aspect-[16/10] md:aspect-[21/7] overflow-hidden mb-8 bg-[#8EA4AF]/10">
                         {featuredProject.coverImageUrl && (
                           <motion.img
@@ -169,7 +178,7 @@ export default function NosProjets() {
                       transition={{ duration: 1, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
                     className={`group cursor-pointer ${index % 2 !== 0 ? "md:mt-32" : ""} pb-2`}
                     >
-                      <Link href={`/nos-projets/${project.id}`}>
+                      <Link href={projectPath(project)}>
                         <div className="relative overflow-hidden aspect-[4/5] mb-7 bg-[#8EA4AF]/10">
                           {project.coverImageUrl && (
                             <motion.img

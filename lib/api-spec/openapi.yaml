@@ -672,6 +672,8 @@ components:
           type: string
         featured:
           type: boolean
+        displayOrder:
+          type: integer
         isOpportunity:
           type: boolean
         opportunityType:
@@ -726,6 +728,8 @@ components:
         mapIframeCode:
           type: string
         mapShareUrl:
+          type: string
+        virtualTourUrl:
           type: string
         contactTitle:
           type: string
@@ -810,6 +814,8 @@ components:
           type: string
         featured:
           type: boolean
+        displayOrder:
+          type: integer
         isOpportunity:
           type: boolean
         opportunityType:
@@ -864,6 +870,8 @@ components:
         mapIframeCode:
           type: string
         mapShareUrl:
+          type: string
+        virtualTourUrl:
           type: string
         contactTitle:
           type: string

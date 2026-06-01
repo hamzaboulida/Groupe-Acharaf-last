@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import {
   useListProjects,
   useListBrands,
@@ -23,9 +24,9 @@ import {
   getListLeadsQueryKey,
   getListApplicationsQueryKey,
 } from "@workspace/api-client-react";
-import { motion } from "framer-motion";
+import { motion, Reorder } from "framer-motion";
 import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
-import { ArrowDown, ArrowUp, Image as ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
+import { ArrowDown, ArrowUp, GripVertical, Image as ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
 import { usePageSeo } from "@/lib/seo";
 
 type Tab = "projects" | "leads" | "articles" | "careers" | "applications";
@@ -41,6 +42,18 @@ const NAV_ITEMS: { id: Tab; label: string }[] = [
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("fr-MA", { year: "numeric", month: "short", day: "numeric" });
+}
+
+function slugFromTitle(title: string): string {
+  return title
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function Badge({ children, color = "gold" }: { children: React.ReactNode; color?: "gold" | "blue" | "green" | "red" | "gray" }) {
@@ -114,6 +127,7 @@ type ProjectForm = {
   surfaceMax: string;
   deliveryDate: string;
   featured: boolean;
+  displayOrder: string;
   isOpportunity: boolean;
   opportunityType: OpportunityCategory;
   opportunityTitle: string;
@@ -138,6 +152,7 @@ type ProjectForm = {
   mapEmbedUrl: string;
   mapIframeCode: string;
   mapShareUrl: string;
+  virtualTourUrl: string;
   contactTitle: string;
   contactSubtitle: string;
   metaTitle: string;
@@ -174,6 +189,7 @@ function emptyProjectForm(brandId = 1): ProjectForm {
     surfaceMax: "",
     deliveryDate: "",
     featured: false,
+    displayOrder: "",
     isOpportunity: false,
     opportunityType: "lots_r1",
     opportunityTitle: "",
@@ -198,6 +214,7 @@ function emptyProjectForm(brandId = 1): ProjectForm {
     mapEmbedUrl: "",
     mapIframeCode: "",
     mapShareUrl: "",
+    virtualTourUrl: "",
     contactTitle: "Intéressé par ce projet ?",
     contactSubtitle: "Notre équipe vous recontacte dans les 24 heures pour organiser une visite ou répondre à toutes vos questions.",
     metaTitle: "",
@@ -1019,6 +1036,24 @@ function ProjectsTab() {
   const [showForm, setShowForm] = useState(false);
   const [formError, setFormError] = useState("");
   const [form, setForm] = useState<ProjectForm>(() => emptyProjectForm());
+  const [orderedIds, setOrderedIds] = useState<number[]>([]);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
+
+  useEffect(() => {
+    setOrderedIds(projects.map((p) => p.id));
+  }, [projects]);
+
+  const orderedProjects = useMemo(
+    () => orderedIds
+      .map((id) => projects.find((p) => p.id === id))
+      .filter((p): p is NonNullable<typeof p> => Boolean(p)),
+    [orderedIds, projects],
+  );
+
+  const orderDirty = useMemo(() => {
+    if (orderedIds.length !== projects.length) return false;
+    return orderedIds.some((id, index) => id !== projects[index]?.id);
+  }, [orderedIds, projects]);
 
   function resetForm() {
     setForm(emptyProjectForm(brands[0]?.id ?? 1));
@@ -1056,6 +1091,7 @@ function ProjectsTab() {
       surfaceMax: p.surfaceMax ? String(p.surfaceMax) : "",
       deliveryDate: p.deliveryDate ?? "",
       featured: p.featured,
+      displayOrder: p.displayOrder !== undefined && p.displayOrder !== null ? String(p.displayOrder) : "",
       isOpportunity: p.isOpportunity ?? false,
       opportunityType: normalizeOpportunityType(p.opportunityType),
       opportunityTitle: p.opportunityTitle ?? "",
@@ -1080,6 +1116,7 @@ function ProjectsTab() {
       mapEmbedUrl: p.mapEmbedUrl ?? "",
       mapIframeCode: p.mapIframeCode ?? "",
       mapShareUrl: p.mapShareUrl ?? "",
+      virtualTourUrl: p.virtualTourUrl ?? "",
       contactTitle: p.contactTitle ?? "Intéressé par ce projet ?",
       contactSubtitle: p.contactSubtitle ?? "Notre équipe vous recontacte dans les 24 heures pour organiser une visite ou répondre à toutes vos questions.",
       metaTitle: p.metaTitle ?? "",
@@ -1101,8 +1138,8 @@ function ProjectsTab() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.title.trim() || !form.slug.trim() || !form.brandId || !form.status) {
-      setFormError("Titre, slug, marque et statut sont obligatoires.");
+    if (!form.title.trim() || !form.brandId || !form.status) {
+      setFormError("Titre, marque et statut sont obligatoires.");
       return;
     }
     if (form.isOpportunity && !form.opportunityType) {
@@ -1117,7 +1154,7 @@ function ProjectsTab() {
     const payload = {
       ...form,
       title: form.title.trim(),
-      slug: form.slug.trim(),
+      slug: form.slug.trim() || slugFromTitle(form.title.trim()) || `projet-${Date.now()}`,
       priceLabel: form.priceLabel.trim() || "Prix de départ",
       galleryTitle: form.galleryTitle.trim() || "Visuels du projet",
       featuresTitle: form.featuresTitle.trim() || "Points forts du projet",
@@ -1125,6 +1162,7 @@ function ProjectsTab() {
       priceMax: toNumber(form.priceMax),
       surfaceMin: toNumber(form.surfaceMin),
       surfaceMax: toNumber(form.surfaceMax),
+      displayOrder: form.displayOrder.trim() ? Number(form.displayOrder) : 9999,
       images: cleanList(form.images),
       amenities: cleanList(form.amenities),
       locationAdvantages: cleanList(form.locationAdvantages),
@@ -1138,18 +1176,52 @@ function ProjectsTab() {
     resetForm();
   }
 
+  async function saveDisplayOrder() {
+    if (!orderDirty || isSavingOrder) return;
+    setIsSavingOrder(true);
+    try {
+      for (const [index, projectId] of orderedIds.entries()) {
+        const project = projects.find((p) => p.id === projectId);
+        if (!project) continue;
+        await updateProject.mutateAsync({
+          id: project.id,
+          data: {
+            brandId: project.brandId,
+            title: project.title,
+            slug: project.slug,
+            status: project.status,
+            displayOrder: index + 1,
+          },
+        });
+      }
+      qc.invalidateQueries({ queryKey: getListProjectsQueryKey() });
+    } finally {
+      setIsSavingOrder(false);
+    }
+  }
+
   return (
     <div>
       <HomepageHeroAdminSection />
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-serif text-white">Projets <span className="text-white/30 text-lg ml-2">({projects.length})</span></h2>
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="ga-btn btn-medium px-4 py-2"
-        >
-          + Ajouter
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            disabled={!orderDirty || isSavingOrder}
+            onClick={saveDisplayOrder}
+            className="ga-btn ga-btn-light px-4 py-2 disabled:opacity-45 disabled:cursor-not-allowed"
+          >
+            {isSavingOrder ? "Enregistrement..." : "Enregistrer l’ordre"}
+          </button>
+          <button
+            onClick={() => { resetForm(); setShowForm(true); }}
+            className="ga-btn btn-medium px-4 py-2"
+          >
+            + Ajouter
+          </button>
+        </div>
       </div>
 
       {showForm && (
@@ -1162,10 +1234,6 @@ function ProjectsTab() {
               <div>
                 <label className={labelClass}>Titre *</label>
                 <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
-              </div>
-              <div>
-                <label className={labelClass}>Slug *</label>
-                <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>Type</label>
@@ -1215,6 +1283,20 @@ function ProjectsTab() {
             <div>
               <label className={labelClass}>Livraison</label>
               <input value={form.deliveryDate} onChange={(e) => setForm({ ...form, deliveryDate: e.target.value })} className={inputClass} placeholder="ex: T4 2025" />
+            </div>
+            <div>
+              <label className={labelClass}>Ordre d’affichage</label>
+              <input
+                type="number"
+                min={1}
+                value={form.displayOrder}
+                onChange={(e) => setForm({ ...form, displayOrder: e.target.value })}
+                className={inputClass}
+                placeholder="1"
+              />
+              <p className="text-white/35 text-[11px] mt-1">
+                Les projets avec le plus petit numéro apparaissent en premier.
+              </p>
             </div>
             </div>
             <label className="flex items-center gap-3 text-white/70 text-sm">
@@ -1345,6 +1427,16 @@ function ProjectsTab() {
               </div>
             </div>
             <div>
+              <label className={labelClass}>Visite Virtuelle (URL HTTPS)</label>
+              <input
+                type="url"
+                placeholder="https://axeon.ma/CLIENT/GROUPE_ACHARAF/Marrakech/VISITE_360/F3/"
+                value={form.virtualTourUrl}
+                onChange={(e) => setForm({ ...form, virtualTourUrl: e.target.value })}
+                className={inputClass}
+              />
+            </div>
+            <div>
               <label className={labelClass}>Google Maps iframe code</label>
               <textarea
                 rows={3}
@@ -1470,10 +1562,18 @@ function ProjectsTab() {
         </form>
       )}
 
-      <div className="space-y-2">
-        {projects.map((p) => (
-          <div key={p.id} className="ga-card-dark p-4 flex items-center justify-between hover:border-white/20 transition-colors">
+      <Reorder.Group axis="y" values={orderedIds} onReorder={setOrderedIds} className="space-y-2">
+        {orderedProjects.map((p) => (
+          <Reorder.Item
+            key={p.id}
+            value={p.id}
+            className="ga-card-dark p-4 flex items-center justify-between hover:border-white/20 transition-colors"
+            whileDrag={{ scale: 1.01 }}
+          >
             <div className="flex items-center gap-4">
+              <div className="text-white/40 cursor-grab active:cursor-grabbing">
+                <GripVertical size={16} />
+              </div>
               {p.coverImageUrl && <img src={p.coverImageUrl} alt="" className="w-16 h-12 object-cover opacity-70" />}
               <div>
                 <div className="text-white font-medium">{p.title}</div>
@@ -1492,10 +1592,10 @@ function ProjectsTab() {
                 qc.invalidateQueries({ queryKey: getListProjectsQueryKey() });
               }} />
             </div>
-          </div>
+          </Reorder.Item>
         ))}
         {projects.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucun projet.</p>}
-      </div>
+      </Reorder.Group>
     </div>
   );
 }
@@ -1854,6 +1954,15 @@ export default function Admin() {
   });
 
   const [activeTab, setActiveTab] = useState<Tab>("projects");
+  const [, navigate] = useLocation();
+
+  async function logout() {
+    await fetch("/api/admin/logout", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    navigate("/admin/login", { replace: true });
+  }
 
   return (
     <div className="ga-admin-shell flex">
@@ -1889,7 +1998,15 @@ export default function Admin() {
       {/* Main */}
       <main className="flex-1 overflow-auto">
         <header className="bg-[#082634]/92 border-b border-white/10 px-8 py-4">
-          <h1 className="text-white/60 text-sm tracking-widest uppercase">{NAV_ITEMS.find((n) => n.id === activeTab)?.label}</h1>
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-white/60 text-sm tracking-widest uppercase">{NAV_ITEMS.find((n) => n.id === activeTab)?.label}</h1>
+            <button
+              onClick={logout}
+              className="text-white/55 hover:text-white text-xs tracking-[0.14em] uppercase border border-white/15 px-3 py-2 hover:border-white/30 transition-colors"
+            >
+              Déconnexion
+            </button>
+          </div>
         </header>
         <div className="p-8">
           <motion.div

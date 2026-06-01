@@ -7,6 +7,7 @@ import { Link } from "wouter";
 import { ArrowRight, Trophy, Target, Users } from "lucide-react";
 import { sharedHeroImage } from "@/assets/hero-shared";
 import { usePageSeo } from "@/lib/seo";
+import { breadcrumbSchema, useStructuredData } from "@/lib/structured-data";
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 28 },
@@ -22,6 +23,13 @@ export default function APropos() {
       "Découvrez l’histoire, la vision et l’exigence de Groupe Acharaf, promoteur immobilier premium au Maroc.",
     path: "/a-propos",
   });
+  useStructuredData(
+    "ga-breadcrumb-a-propos",
+    breadcrumbSchema([
+      { name: "Accueil", path: "/" },
+      { name: "À propos", path: "/a-propos" },
+    ]),
+  );
 
   const { data: stats } = useGetStats();
   const { scrollY } = useScroll();

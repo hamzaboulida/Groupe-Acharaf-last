@@ -6,9 +6,11 @@ import { Link } from "wouter";
 import { useListProjects } from "@workspace/api-client-react";
 import { projectPriceLabel } from "@/lib/project-display";
 import { usePageSeo } from "@/lib/seo";
+import { projectPath } from "@/lib/project-routing";
+import { breadcrumbSchema, useStructuredData } from "@/lib/structured-data";
 
 import estyaBg   from "@/assets/brand-estya.png";
-import acharafBg from "@/assets/brand-acharaf.png";
+import acharafBg from "@/assets/brand-acharaf-new.jpg";
 import proj1 from "@/assets/project-1.png";
 import proj2 from "@/assets/project-2.png";
 import proj3 from "@/assets/project-3.png";
@@ -51,7 +53,7 @@ function ProjectCard({
       transition={{ duration: 0.8, delay: index * 0.1, ease: EC }}
       className="group"
     >
-      <Link href={`/nos-projets/${proj.id}`}>
+      <Link href={projectPath(proj)}>
         <div
           className="relative aspect-[4/3] overflow-hidden mb-4"
           style={{ backgroundColor: isEstya ? "rgba(204,220,225,0.12)" : "rgba(4,50,53,0.08)" }}
@@ -307,6 +309,13 @@ export default function NosMarques() {
       "Explorez les univers Estya et Acharaf Immobilier, deux signatures complémentaires du Groupe Acharaf.",
     path: "/nos-marques",
   });
+  useStructuredData(
+    "ga-breadcrumb-marques",
+    breadcrumbSchema([
+      { name: "Accueil", path: "/" },
+      { name: "Nos Marques", path: "/nos-marques" },
+    ]),
+  );
 
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(getBrandFromUrl);
   const [hoveredBrand, setHoveredBrand]   = useState<Brand | null>(null);
