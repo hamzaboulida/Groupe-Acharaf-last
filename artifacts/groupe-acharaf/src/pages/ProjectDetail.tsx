@@ -389,6 +389,47 @@ export default function ProjectDetail() {
   const cover = clean(project?.coverImageUrl) || FB[resolvedProjectId % 3];
   const gallery = projectImages.length ? projectImages : [FB[0], FB[1], FB[2]];
 
+  useStructuredData(
+    "ga-breadcrumb-project",
+    project
+      ? breadcrumbSchema([
+          { name: "Accueil", path: "/" },
+          { name: "Nos Projets", path: "/nos-projets" },
+          { name: project.title, path: projectPath(project) },
+        ])
+      : null,
+  );
+
+  useStructuredData(
+    "ga-project-schema",
+    project
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Residence",
+          name: project.title,
+          url: `${SITE_URL}${projectPath(project)}`,
+          description: clean(project.metaDescription) || clean(project.shortDescription) || clean(project.description),
+          image: clean(project.ogImageUrl) || clean(project.coverImageUrl),
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: project.city || project.location || "",
+            addressCountry: "MA",
+            streetAddress: clean(project.addressText),
+          },
+          brand: {
+            "@type": "Brand",
+            name: project.brand?.name || SITE_NAME,
+          },
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "MAD",
+            availability: project.status === "completed" ? "https://schema.org/LimitedAvailability" : "https://schema.org/InStock",
+            price: shouldShowProjectPrice(project) ? project.priceMin ?? undefined : undefined,
+          },
+        }
+      : null,
+  );
+
   useEffect(() => {
     if (!project) return;
     const canonicalPath = projectPath(project);
@@ -499,38 +540,6 @@ export default function ProjectDetail() {
   const contactSubtitle =
     clean(project.contactSubtitle) ||
     "Notre équipe vous recontacte dans les 24 heures pour organiser une visite ou répondre à toutes vos questions.";
-  useStructuredData(
-    "ga-breadcrumb-project",
-    breadcrumbSchema([
-      { name: "Accueil", path: "/" },
-      { name: "Nos Projets", path: "/nos-projets" },
-      { name: project.title, path: projectPath(project) },
-    ]),
-  );
-  useStructuredData("ga-project-schema", {
-    "@context": "https://schema.org",
-    "@type": "Residence",
-    name: project.title,
-    url: `${SITE_URL}${projectPath(project)}`,
-    description: clean(project.metaDescription) || clean(project.shortDescription) || clean(project.description),
-    image: clean(project.ogImageUrl) || clean(project.coverImageUrl),
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: project.city || project.location || "",
-      addressCountry: "MA",
-      streetAddress: clean(project.addressText),
-    },
-    brand: {
-      "@type": "Brand",
-      name: project.brand?.name || SITE_NAME,
-    },
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "MAD",
-      availability: project.status === "completed" ? "https://schema.org/LimitedAvailability" : "https://schema.org/InStock",
-      price: shouldShowProjectPrice(project) ? project.priceMin ?? undefined : undefined,
-    },
-  });
 
   return (
     <Layout>
