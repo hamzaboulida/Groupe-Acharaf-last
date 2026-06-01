@@ -11,6 +11,8 @@ router.get("/robots.txt", (_req, res) => {
   res.type("text/plain");
   res.send(`User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 Sitemap: ${BASE_URL}/sitemap.xml
 `);
@@ -19,7 +21,7 @@ Sitemap: ${BASE_URL}/sitemap.xml
 router.get("/sitemap.xml", async (_req, res) => {
   try {
     const [allProjects, allArticles] = await Promise.all([
-      db.select({ id: projectsTable.id, updatedAt: projectsTable.updatedAt }).from(projectsTable),
+      db.select({ id: projectsTable.id, slug: projectsTable.slug, updatedAt: projectsTable.updatedAt }).from(projectsTable),
       db.select({ id: articlesTable.id, slug: articlesTable.slug, updatedAt: articlesTable.updatedAt })
         .from(articlesTable)
         .where(eq(articlesTable.published, true)),
@@ -30,20 +32,21 @@ router.get("/sitemap.xml", async (_req, res) => {
       { loc: `${BASE_URL}/a-propos`, priority: "0.8", changefreq: "monthly" },
       { loc: `${BASE_URL}/nos-marques`, priority: "0.9", changefreq: "monthly" },
       { loc: `${BASE_URL}/nos-projets`, priority: "0.9", changefreq: "weekly" },
-      { loc: `${BASE_URL}/actualites`, priority: "0.8", changefreq: "weekly" },
+      { loc: `${BASE_URL}/opportunites`, priority: "0.8", changefreq: "weekly" },
       { loc: `${BASE_URL}/carrieres`, priority: "0.6", changefreq: "weekly" },
       { loc: `${BASE_URL}/contact`, priority: "0.7", changefreq: "monthly" },
+      { loc: `${BASE_URL}/actualites`, priority: "0.4", changefreq: "monthly" },
     ];
 
     const projectUrls = allProjects.map((p) => ({
-      loc: `${BASE_URL}/nos-projets/${p.id}`,
+      loc: `${BASE_URL}/nos-projets/${p.slug || p.id}`,
       priority: "0.8",
       changefreq: "monthly",
       lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().split("T")[0] : undefined,
     }));
 
     const articleUrls = allArticles.map((a) => ({
-      loc: `${BASE_URL}/actualites/${a.id}`,
+      loc: `${BASE_URL}/actualites/${a.slug || a.id}`,
       priority: "0.7",
       changefreq: "monthly",
       lastmod: a.updatedAt ? new Date(a.updatedAt).toISOString().split("T")[0] : undefined,

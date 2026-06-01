@@ -1,10 +1,13 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import path from "path";
 import { fileURLToPath } from "url";
+import { eq } from "drizzle-orm";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { db, projectsTable } from "@workspace/db";
 import {
   uploadDir,
   uploadUrlPath,
@@ -36,6 +39,7 @@ app.use(
   }),
 );
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -182,6 +186,31 @@ if (process.env.NODE_ENV === "production") {
     "dist",
     "public",
   );
+
+  app.get(/^\/(?:nos-projets|projets)\/(\d+)\/?$/, async (req, res, next) => {
+    try {
+      const projectId = Number(req.params[0]);
+      if (!Number.isFinite(projectId)) {
+        next();
+        return;
+      }
+
+      const [project] = await db
+        .select({ slug: projectsTable.slug })
+        .from(projectsTable)
+        .where(eq(projectsTable.id, projectId));
+
+      if (!project?.slug) {
+        next();
+        return;
+      }
+
+      res.redirect(301, `/nos-projets/${project.slug}`);
+    } catch {
+      next();
+    }
+  });
+
   app.use(express.static(frontendDist));
   // SPA fallback — send index.html for any non-API route (Express v5 syntax)
   app.get(/.*/, (_req, res) => {

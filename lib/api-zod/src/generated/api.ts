@@ -155,6 +155,7 @@ export const ListProjectsResponseItem = zod.object({
   surfaceMax: zod.number().optional(),
   deliveryDate: zod.string().optional(),
   featured: zod.boolean(),
+  displayOrder: zod.number().optional(),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
@@ -186,6 +187,7 @@ export const ListProjectsResponseItem = zod.object({
   mapEmbedUrl: zod.string().optional(),
   mapIframeCode: zod.string().optional(),
   mapShareUrl: zod.string().optional(),
+  virtualTourUrl: zod.string().optional(),
   contactTitle: zod.string().optional(),
   contactSubtitle: zod.string().optional(),
   metaTitle: zod.string().optional(),
@@ -227,6 +229,7 @@ export const CreateProjectBody = zod.object({
   surfaceMax: zod.number().optional(),
   deliveryDate: zod.string().optional(),
   featured: zod.boolean().optional(),
+  displayOrder: zod.number().optional(),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
@@ -258,6 +261,7 @@ export const CreateProjectBody = zod.object({
   mapEmbedUrl: zod.string().optional(),
   mapIframeCode: zod.string().optional(),
   mapShareUrl: zod.string().optional(),
+  virtualTourUrl: zod.string().optional(),
   contactTitle: zod.string().optional(),
   contactSubtitle: zod.string().optional(),
   metaTitle: zod.string().optional(),
@@ -315,6 +319,7 @@ export const GetProjectResponse = zod.object({
   surfaceMax: zod.number().optional(),
   deliveryDate: zod.string().optional(),
   featured: zod.boolean(),
+  displayOrder: zod.number().optional(),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
@@ -346,6 +351,7 @@ export const GetProjectResponse = zod.object({
   mapEmbedUrl: zod.string().optional(),
   mapIframeCode: zod.string().optional(),
   mapShareUrl: zod.string().optional(),
+  virtualTourUrl: zod.string().optional(),
   contactTitle: zod.string().optional(),
   contactSubtitle: zod.string().optional(),
   metaTitle: zod.string().optional(),
@@ -390,6 +396,7 @@ export const UpdateProjectBody = zod.object({
   surfaceMax: zod.number().optional(),
   deliveryDate: zod.string().optional(),
   featured: zod.boolean().optional(),
+  displayOrder: zod.number().optional(),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
@@ -421,6 +428,7 @@ export const UpdateProjectBody = zod.object({
   mapEmbedUrl: zod.string().optional(),
   mapIframeCode: zod.string().optional(),
   mapShareUrl: zod.string().optional(),
+  virtualTourUrl: zod.string().optional(),
   contactTitle: zod.string().optional(),
   contactSubtitle: zod.string().optional(),
   metaTitle: zod.string().optional(),
@@ -471,6 +479,7 @@ export const UpdateProjectResponse = zod.object({
   surfaceMax: zod.number().optional(),
   deliveryDate: zod.string().optional(),
   featured: zod.boolean(),
+  displayOrder: zod.number().optional(),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
     .enum([
@@ -502,6 +511,7 @@ export const UpdateProjectResponse = zod.object({
   mapEmbedUrl: zod.string().optional(),
   mapIframeCode: zod.string().optional(),
   mapShareUrl: zod.string().optional(),
+  virtualTourUrl: zod.string().optional(),
   contactTitle: zod.string().optional(),
   contactSubtitle: zod.string().optional(),
   metaTitle: zod.string().optional(),

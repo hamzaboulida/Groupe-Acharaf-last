@@ -36,6 +36,7 @@ export interface CreateProjectBody {
   surfaceMax?: number;
   deliveryDate?: string;
   featured?: boolean;
+  displayOrder?: number;
   isOpportunity?: boolean;
   opportunityType?: CreateProjectBodyOpportunityType;
   opportunityTitle?: string;
@@ -60,6 +61,7 @@ export interface CreateProjectBody {
   mapEmbedUrl?: string;
   mapIframeCode?: string;
   mapShareUrl?: string;
+  virtualTourUrl?: string;
   contactTitle?: string;
   contactSubtitle?: string;
   metaTitle?: string;

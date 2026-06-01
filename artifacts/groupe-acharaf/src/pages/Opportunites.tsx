@@ -7,6 +7,8 @@ import { useListProjects } from "@workspace/api-client-react";
 import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
 import { sharedHeroImage } from "@/assets/hero-shared";
 import { usePageSeo } from "@/lib/seo";
+import { projectPath } from "@/lib/project-routing";
+import { breadcrumbSchema, useStructuredData } from "@/lib/structured-data";
 
 const EC = [0.22, 1, 0.36, 1] as const;
 
@@ -28,6 +30,13 @@ export default function Opportunites() {
       "Découvrez les opportunités immobilières Groupe Acharaf : lots R+1, lots R+2, lots R+3 et crèche au Maroc.",
     path: "/opportunites",
   });
+  useStructuredData(
+    "ga-breadcrumb-opportunites",
+    breadcrumbSchema([
+      { name: "Accueil", path: "/" },
+      { name: "Opportunités", path: "/opportunites" },
+    ]),
+  );
 
   const opportunities = useMemo(
     () => projects.filter((project) => project.isOpportunity),
@@ -41,53 +50,41 @@ export default function Opportunites() {
 
   const featured = filtered[0];
   const rest = filtered.slice(1);
+  const filterBtn = (active: boolean) =>
+    `px-5 py-2 text-xs tracking-[0.15em] uppercase border transition-all duration-300 ${
+      active
+        ? "border-[#082634]/50 text-[#082634] bg-[#082634]/6"
+        : "border-[#8EA4AF]/20 text-[#082634] hover:text-[#082634] hover:border-[#8EA4AF]/40"
+    }`;
 
   return (
     <Layout>
-      <section className="relative h-[64vh] w-full overflow-hidden flex items-end pb-20">
-        <picture>
-          <source srcSet={sharedHeroImage.srcSetWebp} sizes={sharedHeroImage.heroSizes} type="image/webp" />
-          <img
-            src={sharedHeroImage.src}
-            srcSet={sharedHeroImage.srcSetJpg}
-            sizes={sharedHeroImage.heroSizes}
-            alt=""
-            fetchPriority="high"
-            loading="eager"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover brightness-[0.75]"
-          />
-        </picture>
-        <div className="absolute inset-0 brand-overlay" />
-        <div className="relative z-10 ga-container">
-          <motion.div initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EC }}>
-            <p className="ga-kicker mb-6">Sélection Privée</p>
-            <h1 className="text-white font-serif font-light text-6xl md:text-8xl leading-none">Opportunités</h1>
-            <p className="text-white/70 text-sm md:text-base font-light max-w-xl mt-5">
-              Une sélection d’adresses à saisir, entre valeur, rareté et potentiel.
+      <section className="pt-32 md:pt-44 pb-14 md:pb-20 bg-white">
+        <div className="container mx-auto px-6">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EC }} className="mb-10 md:mb-16">
+            <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-5">SÉLECTION PRIVÉE</p>
+            <h1 className="text-5xl md:text-8xl font-serif text-[#082634] mb-4 font-light leading-none">Opportunités</h1>
+            <p className="text-[#082634] text-sm md:text-base font-light mt-4 max-w-2xl">
+              Une page courte, pensée pour les offres à forte valeur et à disponibilité limitée.
             </p>
           </motion.div>
-        </div>
-      </section>
 
-      <section className="section-white border-b border-[#8EA4AF]/16 sticky top-[64px] z-30">
-        <div className="ga-container py-6 flex flex-col gap-5">
-          <p className="text-[#082634]/72 text-sm font-light">
-            Une page courte, pensée pour les offres à forte valeur et à disponibilité limitée.
-          </p>
-          <div className="flex gap-2 overflow-x-auto">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            className="flex flex-wrap gap-2 border-t border-[#8EA4AF]/12 pt-6 md:pt-8"
+          >
             {(Object.keys(OPPORTUNITY_LABELS) as Array<keyof typeof OPPORTUNITY_LABELS>).map((type) => (
               <button
                 key={type}
                 onClick={() => setActiveType(type)}
-                className={`ga-badge shrink-0 transition-colors ${
-                  activeType === type ? "ga-badge-dark" : "ga-badge-light hover:bg-[#8EA4AF]/25"
-                }`}
+                className={filterBtn(activeType === type)}
               >
                 {OPPORTUNITY_LABELS[type]}
               </button>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -128,7 +125,7 @@ export default function Opportunites() {
                 className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-10"
               >
                 {featured && (
-                  <Link href={`/nos-projets/${featured.id}`} className="group block ga-card overflow-hidden brand-shadow">
+                  <Link href={projectPath(featured)} className="group block ga-card overflow-hidden brand-shadow">
                     <div className="relative aspect-[4/5] sm:aspect-[16/10] overflow-hidden">
                       <img src={featured.coverImageUrl || sharedHeroImage.src} alt={featured.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#082634]/78 via-[#082634]/18 to-transparent" />
@@ -156,7 +153,7 @@ export default function Opportunites() {
 
                 <div className="space-y-4">
                   {rest.map((project) => (
-                    <Link key={project.id} href={`/nos-projets/${project.id}`} className="group ga-card p-5 block hover:border-[#8EA4AF]/45 transition-colors">
+                    <Link key={project.id} href={projectPath(project)} className="group ga-card p-5 block hover:border-[#8EA4AF]/45 transition-colors">
                       <div className="flex gap-4">
                         <div className="w-28 h-24 shrink-0 overflow-hidden">
                           <img src={project.coverImageUrl || sharedHeroImage.src} alt={project.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />

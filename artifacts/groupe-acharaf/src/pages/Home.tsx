@@ -13,6 +13,8 @@ import { useGetStats, useListProjects } from "@workspace/api-client-react";
 import { CountUp } from "@/components/ui/count-up";
 import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
 import { usePageSeo } from "@/lib/seo";
+import { projectPath } from "@/lib/project-routing";
+import { breadcrumbSchema, useStructuredData } from "@/lib/structured-data";
 
 import presenceNationaleMap from "@/assets/presence-nationale-map.png";
 
@@ -107,6 +109,10 @@ export default function Home() {
       "Promoteur immobilier marocain d’excellence. Découvrez nos projets, nos opportunités et notre vision résidentielle premium.",
     path: "/",
   });
+  useStructuredData(
+    "ga-breadcrumb-home",
+    breadcrumbSchema([{ name: "Accueil", path: "/" }]),
+  );
 
   const { data: stats }    = useGetStats();
   const { data: projects } = useListProjects({ featured: true });
@@ -595,9 +601,9 @@ export default function Home() {
       {/* ══════════════════════════════════════════════
           FEATURED PROJECTS
       ══════════════════════════════════════════════ */}
-      <section className="pt-36 pb-40 bg-white">
+      <section className="pt-16 pb-14 md:pt-36 md:pb-40 bg-white">
         <SectionReveal className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-10 md:mb-20 gap-6">
             <motion.div {...fade(0)}>
               <p className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-4">Portfolio sélectionné</p>
               <h2 className="text-4xl md:text-6xl font-serif text-[#082634] font-light">Nos Projets Phares</h2>
@@ -612,7 +618,7 @@ export default function Home() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-20 lg:gap-28">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 lg:gap-28">
             {featuredSlice.map((project, i) => (
               <motion.div
                 key={project.id}
@@ -622,7 +628,7 @@ export default function Home() {
                 transition={{ duration: 1.4, delay: i * 0.2, ease: EC }}
                 className={`group cursor-pointer ${i % 2 !== 0 ? "md:mt-32" : ""}`}
               >
-                <Link href={`/nos-projets/${project.id}`}>
+                <Link href={projectPath(project)}>
                   <div className="relative overflow-hidden aspect-[4/5] mb-7 bg-[#DCE0E7]">
                     {project.coverImageUrl && (
                       <motion.img
@@ -669,9 +675,9 @@ export default function Home() {
       {/* ══════════════════════════════════════════════
           PRESENCE NATIONALE
       ══════════════════════════════════════════════ */}
-      <section className="pt-20 pb-24 md:pt-28 md:pb-28 bg-white relative overflow-hidden">
+      <section className="pt-10 pb-16 md:pt-28 md:pb-28 bg-white relative overflow-hidden">
         <SectionReveal className="container mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 lg:gap-6 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 lg:gap-6 items-center">
             <div className="lg:col-span-4 xl:col-span-4 lg:pr-4">
               <motion.div {...fade(0)}>
                 <p className="text-xs tracking-[0.22em] uppercase text-[#8EA4AF] mb-5">PRÉSENCE NATIONALE</p>
