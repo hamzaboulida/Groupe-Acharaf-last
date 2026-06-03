@@ -1236,6 +1236,10 @@ function ProjectsTab() {
                 <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={inputClass} />
               </div>
               <div>
+                <label className={labelClass}>Slug (identifiant d'URL) *</label>
+                <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputClass} placeholder="exemple-de-slug" />
+              </div>
+              <div>
                 <label className={labelClass}>Type</label>
                 <input value={form.projectType} onChange={(e) => setForm({ ...form, projectType: e.target.value })} className={inputClass} placeholder="Villa, Résidence, Lotissement..." />
               </div>

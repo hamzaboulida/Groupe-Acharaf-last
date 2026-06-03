@@ -35,7 +35,7 @@ export function Footer() {
                 <a href="#" aria-label="Instagram" className="w-8 h-8 border border-[#8EA4AF]/20 flex items-center justify-center text-[#8EA4AF] hover:text-[#082634] hover:border-[#8EA4AF]/45 transition-all duration-300">
                   <Instagram size={13} />
                 </a>
-                <a href="#" aria-label="LinkedIn" className="w-8 h-8 border border-[#8EA4AF]/20 flex items-center justify-center text-[#8EA4AF] hover:text-[#082634] hover:border-[#8EA4AF]/45 transition-all duration-300">
+                <a href="https://www.linkedin.com/company/groupeacharaf/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-8 h-8 border border-[#8EA4AF]/20 flex items-center justify-center text-[#8EA4AF] hover:text-[#082634] hover:border-[#8EA4AF]/45 transition-all duration-300">
                   <Linkedin size={13} />
                 </a>
               </div>

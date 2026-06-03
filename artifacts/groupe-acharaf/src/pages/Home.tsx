@@ -432,7 +432,7 @@ export default function Home() {
                 transition={{ duration: 1.5, ease: EC }}
                 className="text-4xl md:text-5xl lg:text-6xl font-serif text-[#082634] font-light leading-[1.1] tracking-tight"
               >
-                Développer des projets immobiliers durables et finement pensés, conçus pour répondre aux attentes réelles des acquéreurs.
+                Développer des projets immobiliers finement pensés pour répondre aux attentes réelles des acquéreurs.
               </motion.h2>
             </div>
           </div>

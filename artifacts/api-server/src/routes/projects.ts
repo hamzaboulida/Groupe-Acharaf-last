@@ -228,9 +228,12 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const resolvedSlug = cleanSlug(existing.slug)
-    ? existing.slug
-    : await ensureUniqueSlug(parsed.data.title || existing.title, { excludeId: existing.id });
+  let resolvedSlug = existing.slug;
+  if (parsed.data.slug && parsed.data.slug.trim() !== existing.slug) {
+    resolvedSlug = await ensureUniqueSlug(parsed.data.slug, { excludeId: existing.id });
+  } else if (!cleanSlug(existing.slug)) {
+    resolvedSlug = await ensureUniqueSlug(parsed.data.title || existing.title, { excludeId: existing.id });
+  }
 
   await db
     .update(projectsTable)
