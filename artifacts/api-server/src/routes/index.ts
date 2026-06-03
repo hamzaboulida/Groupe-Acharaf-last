@@ -15,7 +15,6 @@ import { requireAdminAuth } from "../lib/admin-auth";
 
 const router: IRouter = Router();
 
-router.use(seoRouter);
 router.use(healthRouter);
 router.use(adminAuthRouter);
 

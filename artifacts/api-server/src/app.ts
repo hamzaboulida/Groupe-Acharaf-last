@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { eq } from "drizzle-orm";
 import router from "./routes";
+import seoRouter from "./routes/seo";
 import { logger } from "./lib/logger";
 import { db, projectsTable } from "@workspace/db";
 import {
@@ -174,6 +175,7 @@ if (uploadsUpstreamBaseUrl) {
   });
 }
 
+app.use(seoRouter);
 app.use("/api", router);
 
 // Serve the Vite-built frontend in production
