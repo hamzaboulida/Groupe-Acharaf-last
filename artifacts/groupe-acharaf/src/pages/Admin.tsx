@@ -1973,9 +1973,12 @@ export default function Admin() {
       {/* Sidebar */}
       <aside className="w-64 bg-[#082634]/96 border-r border-white/10 flex-shrink-0">
         <div className="p-6 border-b border-white/10">
-          <div className="text-[#8EA4AF] font-serif text-xl tracking-widest">GROUPE</div>
-          <div className="text-white font-serif text-xl tracking-widest">ACHARAF</div>
-          <div className="text-white/30 text-xs tracking-widest mt-1">BACK-OFFICE</div>
+          <img
+            src="/logo.png"
+            alt="Groupe Acharaf"
+            className="h-7 w-auto object-contain mb-1.5"
+          />
+          <div className="text-white/30 text-[10px] tracking-widest uppercase">BACK-OFFICE</div>
         </div>
         <nav className="p-4 space-y-1">
           {NAV_ITEMS.map((item) => (

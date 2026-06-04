@@ -45,7 +45,11 @@ export default function AdminLogin() {
       <div className="w-full max-w-md border border-[#DCE0E7] bg-white p-8 md:p-10">
         <div className="text-center mb-8">
           <p className="text-[#8EA4AF] text-xs tracking-[0.2em] uppercase mb-3">Back-office</p>
-          <h1 className="text-[#082634] font-serif text-4xl font-light leading-none">Groupe Acharaf</h1>
+          <img
+            src="/logo.png"
+            alt="Groupe Acharaf"
+            className="h-10 w-auto object-contain mx-auto"
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
