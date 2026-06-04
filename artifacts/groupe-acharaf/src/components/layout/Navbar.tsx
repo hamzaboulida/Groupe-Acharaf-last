@@ -54,23 +54,12 @@ export function Navbar() {
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between py-5">
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-2">
-          <div
-            className={cn(
-              "font-serif text-xl font-medium tracking-[0.15em] uppercase transition-colors duration-500",
-              transparent ? "text-white" : "text-[#082634]"
-            )}
-          >
-            Groupe{" "}
-            <span
-              className={cn(
-                "font-light transition-colors duration-500",
-                transparent ? "text-white/65" : "text-[#8EA4AF]"
-              )}
-            >
-              Acharaf
-            </span>
-          </div>
+        <Link href="/" className="group flex items-center">
+          <img
+            src="/logo.png"
+            alt="Groupe Acharaf"
+            className="h-8 md:h-9 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
+          />
         </Link>
 
         {/* Desktop Nav */}
