@@ -37,7 +37,5 @@ export function projectPriceLabel(project: ProjectDisplay | null | undefined): s
 }
 
 export function projectPriceRangeLabel(project: ProjectDisplay | null | undefined): string | null {
-  if (!shouldShowProjectPrice(project)) return null;
-  if (!project?.priceMax || project.priceMax === project.priceMin) return null;
-  return `Jusqu'à ${formatProjectPrice(project.priceMax)} DH`;
+  return null;
 }

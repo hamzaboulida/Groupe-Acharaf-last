@@ -1393,18 +1393,14 @@ function ProjectsTab() {
             <p className="text-white/35 text-xs leading-relaxed">
               Si cette option est désactivée, le public verra uniquement “Prix à consulter”. Les montants restent stockés en interne.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className={labelClass}>Libellé prix</label>
                 <input value={form.priceLabel} onChange={(e) => setForm({ ...form, priceLabel: e.target.value })} className={inputClass} placeholder="Prix de départ" />
               </div>
               <div>
-                <label className={labelClass}>Prix min (MAD)</label>
+                <label className={labelClass}>Prix de départ (MAD)</label>
                 <input type="number" required={form.showPrice} value={form.priceMin} onChange={(e) => setForm({ ...form, priceMin: e.target.value })} className={inputClass} />
-              </div>
-              <div>
-                <label className={labelClass}>Prix max (MAD)</label>
-                <input type="number" value={form.priceMax} onChange={(e) => setForm({ ...form, priceMax: e.target.value })} className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>Surface min (m²)</label>
