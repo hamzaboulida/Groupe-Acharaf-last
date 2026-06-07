@@ -156,14 +156,10 @@ export const ListProjectsResponseItem = zod.object({
   deliveryDate: zod.string().optional(),
   featured: zod.boolean(),
   displayOrder: zod.number().optional(),
+  displayType: zod.enum(["estya", "acharaf", "opportunity"]).optional(),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
-    .enum([
-      "lots_r1",
-      "lots_r2",
-      "lots_r3",
-      "creche",
-    ])
+    .enum(["lots_r1", "lots_r2", "lots_r3", "creche"])
     .optional(),
   opportunityTitle: zod.string().optional(),
   opportunityDescription: zod.string().optional(),
@@ -230,14 +226,10 @@ export const CreateProjectBody = zod.object({
   deliveryDate: zod.string().optional(),
   featured: zod.boolean().optional(),
   displayOrder: zod.number().optional(),
+  displayType: zod.enum(["estya", "acharaf", "opportunity"]),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
-    .enum([
-      "lots_r1",
-      "lots_r2",
-      "lots_r3",
-      "creche",
-    ])
+    .enum(["lots_r1", "lots_r2", "lots_r3", "creche"])
     .optional(),
   opportunityTitle: zod.string().optional(),
   opportunityDescription: zod.string().optional(),
@@ -320,14 +312,10 @@ export const GetProjectResponse = zod.object({
   deliveryDate: zod.string().optional(),
   featured: zod.boolean(),
   displayOrder: zod.number().optional(),
+  displayType: zod.enum(["estya", "acharaf", "opportunity"]).optional(),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
-    .enum([
-      "lots_r1",
-      "lots_r2",
-      "lots_r3",
-      "creche",
-    ])
+    .enum(["lots_r1", "lots_r2", "lots_r3", "creche"])
     .optional(),
   opportunityTitle: zod.string().optional(),
   opportunityDescription: zod.string().optional(),
@@ -397,14 +385,10 @@ export const UpdateProjectBody = zod.object({
   deliveryDate: zod.string().optional(),
   featured: zod.boolean().optional(),
   displayOrder: zod.number().optional(),
+  displayType: zod.enum(["estya", "acharaf", "opportunity"]),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
-    .enum([
-      "lots_r1",
-      "lots_r2",
-      "lots_r3",
-      "creche",
-    ])
+    .enum(["lots_r1", "lots_r2", "lots_r3", "creche"])
     .optional(),
   opportunityTitle: zod.string().optional(),
   opportunityDescription: zod.string().optional(),
@@ -480,14 +464,10 @@ export const UpdateProjectResponse = zod.object({
   deliveryDate: zod.string().optional(),
   featured: zod.boolean(),
   displayOrder: zod.number().optional(),
+  displayType: zod.enum(["estya", "acharaf", "opportunity"]).optional(),
   isOpportunity: zod.boolean().optional(),
   opportunityType: zod
-    .enum([
-      "lots_r1",
-      "lots_r2",
-      "lots_r3",
-      "creche",
-    ])
+    .enum(["lots_r1", "lots_r2", "lots_r3", "creche"])
     .optional(),
   opportunityTitle: zod.string().optional(),
   opportunityDescription: zod.string().optional(),
@@ -744,7 +724,7 @@ export const ApplyForCareerBody = zod.object({
  */
 export const ListApplicationsResponseItem = zod.object({
   id: zod.number(),
-  careerId: zod.number().nullable().optional(),
+  careerId: zod.number().nullish(),
   applicationType: zod.enum(["job", "spontaneous"]).optional(),
   desiredPosition: zod.string().optional(),
   career: zod
@@ -769,6 +749,19 @@ export const ListApplicationsResponseItem = zod.object({
   createdAt: zod.coerce.date(),
 });
 export const ListApplicationsResponse = zod.array(ListApplicationsResponseItem);
+
+/**
+ * @summary Submit a spontaneous application
+ */
+export const ApplySpontaneousBody = zod.object({
+  firstName: zod.string(),
+  lastName: zod.string(),
+  email: zod.string(),
+  phone: zod.string().optional(),
+  desiredPosition: zod.string().optional(),
+  message: zod.string().optional(),
+  cvUrl: zod.string().optional(),
+});
 
 /**
  * @summary List all contact leads (admin)

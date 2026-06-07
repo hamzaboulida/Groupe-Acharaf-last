@@ -39,7 +39,7 @@ export default function Opportunites() {
   );
 
   const opportunities = useMemo(
-    () => projects.filter((project) => project.isOpportunity),
+    () => projects.filter((project) => project.displayType === "opportunity"),
     [projects],
   );
 

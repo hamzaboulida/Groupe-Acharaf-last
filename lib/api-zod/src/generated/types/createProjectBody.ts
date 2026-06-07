@@ -5,6 +5,7 @@
  * API specification for Groupe Acharaf luxury real estate website
  * OpenAPI spec version: 0.1.0
  */
+import type { CreateProjectBodyDisplayType } from "./createProjectBodyDisplayType";
 import type { CreateProjectBodyOpportunityType } from "./createProjectBodyOpportunityType";
 import type { CreateProjectBodyStatus } from "./createProjectBodyStatus";
 
@@ -37,6 +38,7 @@ export interface CreateProjectBody {
   deliveryDate?: string;
   featured?: boolean;
   displayOrder?: number;
+  displayType: CreateProjectBodyDisplayType;
   isOpportunity?: boolean;
   opportunityType?: CreateProjectBodyOpportunityType;
   opportunityTitle?: string;

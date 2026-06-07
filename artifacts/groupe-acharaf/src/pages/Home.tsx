@@ -120,8 +120,9 @@ export default function Home() {
   /* Exactly 4 curated projects — 2 Estya + 2 Acharaf, interleaved */
   const featuredSlice = useMemo(() => {
     if (!projects?.length || !Array.isArray(projects)) return [];
-    const estya   = projects.filter((p) => p.brand?.slug === "estya").slice(0, 2);
-    const acharaf = projects.filter((p) => p.brand?.slug === "acharaf-immobilier").slice(0, 2);
+    const mainProjects = projects.filter((p) => p.displayType === "estya" || p.displayType === "acharaf");
+    const estya   = mainProjects.filter((p) => p.brand?.slug === "estya").slice(0, 2);
+    const acharaf = mainProjects.filter((p) => p.brand?.slug === "acharaf-immobilier").slice(0, 2);
     // Interleave so the grid alternates brands: Estya / Acharaf / Estya / Acharaf
     const result: typeof projects = [];
     for (let i = 0; i < 2; i++) {
@@ -130,7 +131,7 @@ export default function Home() {
     }
     // Fallback: if one brand has fewer than 2, fill from the other up to 4
     if (result.length < 4) {
-      const rest = projects.filter((p) => !result.includes(p));
+      const rest = mainProjects.filter((p) => !result.includes(p));
       result.push(...rest.slice(0, 4 - result.length));
     }
     return result.slice(0, 4);

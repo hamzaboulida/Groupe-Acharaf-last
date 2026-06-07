@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { Brand } from "./brand";
+import type { ProjectDisplayType } from "./projectDisplayType";
 import type { ProjectOpportunityType } from "./projectOpportunityType";
 import type { ProjectStatus } from "./projectStatus";
 
@@ -40,6 +41,7 @@ export interface Project {
   deliveryDate?: string;
   featured: boolean;
   displayOrder?: number;
+  displayType?: ProjectDisplayType;
   isOpportunity?: boolean;
   opportunityType?: ProjectOpportunityType;
   opportunityTitle?: string;

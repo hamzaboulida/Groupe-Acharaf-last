@@ -674,6 +674,9 @@ components:
           type: boolean
         displayOrder:
           type: integer
+        displayType:
+          type: string
+          enum: [estya, acharaf, opportunity]
         isOpportunity:
           type: boolean
         opportunityType:
@@ -816,6 +819,9 @@ components:
           type: boolean
         displayOrder:
           type: integer
+        displayType:
+          type: string
+          enum: [estya, acharaf, opportunity]
         isOpportunity:
           type: boolean
         opportunityType:
@@ -888,6 +894,7 @@ components:
         - title
         - slug
         - status
+        - displayType
 
     Article:
       type: object

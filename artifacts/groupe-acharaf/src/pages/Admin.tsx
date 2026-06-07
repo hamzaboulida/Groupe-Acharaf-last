@@ -58,14 +58,14 @@ function slugFromTitle(title: string): string {
 
 function Badge({ children, color = "gold" }: { children: React.ReactNode; color?: "gold" | "blue" | "green" | "red" | "gray" }) {
   const colors = {
-    gold: "ga-badge-medium",
-    blue: "ga-badge-light",
-    green: "ga-badge-light",
-    red: "ga-badge-medium",
+    gold: "bg-amber-500/15 text-amber-400 border border-amber-500/20",
+    blue: "bg-blue-500/15 text-blue-400 border border-blue-500/20",
+    green: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20",
+    red: "bg-red-500/15 text-red-400 border border-red-500/20",
     gray: "bg-white/10 text-white/60 border border-white/10",
   };
   return (
-    <span className={`ga-badge ${colors[color]}`}>{children}</span>
+    <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-semibold tracking-wider border ${colors[color]}`}>{children}</span>
   );
 }
 
@@ -128,6 +128,7 @@ type ProjectForm = {
   deliveryDate: string;
   featured: boolean;
   displayOrder: string;
+  displayType: "estya" | "acharaf" | "opportunity";
   isOpportunity: boolean;
   opportunityType: OpportunityCategory;
   opportunityTitle: string;
@@ -190,6 +191,7 @@ function emptyProjectForm(brandId = 1): ProjectForm {
     deliveryDate: "",
     featured: false,
     displayOrder: "",
+    displayType: "estya",
     isOpportunity: false,
     opportunityType: "lots_r1",
     opportunityTitle: "",
@@ -1025,6 +1027,17 @@ function MapPreview({ iframeCode, embedUrl, address }: { iframeCode: string; emb
   );
 }
 
+function getDisplayTypeBadge(displayType: string | null | undefined, isOpportunity: boolean) {
+  const type = displayType ?? (isOpportunity ? "opportunity" : "estya");
+  if (type === "opportunity") {
+    return <Badge color="green">Opportunité</Badge>;
+  }
+  if (type === "acharaf") {
+    return <Badge color="gold">Acharaf Immobilier</Badge>;
+  }
+  return <Badge color="blue">Estya</Badge>;
+}
+
 function ProjectsTab() {
   const qc = useQueryClient();
   const { data: projects = [] } = useListProjects();
@@ -1038,6 +1051,7 @@ function ProjectsTab() {
   const [form, setForm] = useState<ProjectForm>(() => emptyProjectForm());
   const [orderedIds, setOrderedIds] = useState<number[]>([]);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
+  const [filterType, setFilterType] = useState<"all" | "estya" | "acharaf" | "opportunity">("all");
 
   useEffect(() => {
     setOrderedIds(projects.map((p) => p.id));
@@ -1049,6 +1063,14 @@ function ProjectsTab() {
       .filter((p): p is NonNullable<typeof p> => Boolean(p)),
     [orderedIds, projects],
   );
+
+  const filteredProjects = useMemo(() => {
+    return orderedProjects.filter((p) => {
+      if (filterType === "all") return true;
+      const type = p.displayType ?? (p.isOpportunity ? "opportunity" : (p.brandId === 2 ? "acharaf" : "estya"));
+      return type === filterType;
+    });
+  }, [orderedProjects, filterType]);
 
   const orderDirty = useMemo(() => {
     if (orderedIds.length !== projects.length) return false;
@@ -1092,6 +1114,7 @@ function ProjectsTab() {
       deliveryDate: p.deliveryDate ?? "",
       featured: p.featured,
       displayOrder: p.displayOrder !== undefined && p.displayOrder !== null ? String(p.displayOrder) : "",
+      displayType: p.displayType ?? (p.isOpportunity ? "opportunity" : (p.brandId === 2 ? "acharaf" : "estya")),
       isOpportunity: p.isOpportunity ?? false,
       opportunityType: normalizeOpportunityType(p.opportunityType),
       opportunityTitle: p.opportunityTitle ?? "",
@@ -1138,11 +1161,11 @@ function ProjectsTab() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.title.trim() || !form.brandId || !form.status) {
-      setFormError("Titre, marque et statut sont obligatoires.");
+    if (!form.title.trim() || !form.displayType || !form.status) {
+      setFormError("Titre, type d’affichage et statut sont obligatoires.");
       return;
     }
-    if (form.isOpportunity && !form.opportunityType) {
+    if (form.displayType === "opportunity" && !form.opportunityType) {
       setFormError("La catégorie d’opportunité est obligatoire.");
       return;
     }
@@ -1191,6 +1214,7 @@ function ProjectsTab() {
             slug: project.slug,
             status: project.status,
             displayOrder: index + 1,
+            displayType: project.displayType || "estya",
           },
         });
       }
@@ -1258,17 +1282,27 @@ function ProjectsTab() {
             </div>
           </FormGroup>
 
-          <FormGroup title="2. Marque & statut">
+          <FormGroup title="2. Type d’affichage & statut">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className={labelClass}>Marque *</label>
+              <label className={labelClass}>Type d’affichage *</label>
               <select
                 required
-                value={form.brandId}
-                onChange={(e) => setForm({ ...form, brandId: Number(e.target.value) })}
+                value={form.displayType}
+                onChange={(e) => {
+                  const val = e.target.value as "estya" | "acharaf" | "opportunity";
+                  setForm({
+                    ...form,
+                    displayType: val,
+                    isOpportunity: val === "opportunity",
+                    brandId: val === "estya" ? 1 : (val === "acharaf" ? 2 : form.brandId),
+                  });
+                }}
                 className={inputClass}
               >
-                {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                <option value="estya">Estya</option>
+                <option value="acharaf">Acharaf Immobilier</option>
+                <option value="opportunity">Opportunité</option>
               </select>
             </div>
             <div>
@@ -1309,47 +1343,45 @@ function ProjectsTab() {
             </label>
           </FormGroup>
 
-          <FormGroup title="2bis. Opportunités">
-            <label className="flex items-center gap-3 text-white/70 text-sm">
-              <input type="checkbox" checked={form.isOpportunity} onChange={(e) => setForm({ ...form, isOpportunity: e.target.checked })} />
-              Afficher dans Opportunités
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Type d’opportunité</label>
-                <select
-                  value={form.opportunityType}
-                  onChange={(e) => setForm({ ...form, opportunityType: e.target.value as ProjectForm["opportunityType"] })}
-                  className={inputClass}
-                >
-                  <option value="lots_r1">LOTS R+1</option>
-                  <option value="lots_r2">LOTS R+2</option>
-                  <option value="lots_r3">LOTS R+3</option>
-                  <option value="creche">CRÈCHE</option>
-                </select>
+          {form.displayType === "opportunity" && (
+            <FormGroup title="2bis. Spécificités de l’opportunité">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Type d’opportunité</label>
+                  <select
+                    value={form.opportunityType}
+                    onChange={(e) => setForm({ ...form, opportunityType: e.target.value as ProjectForm["opportunityType"] })}
+                    className={inputClass}
+                  >
+                    <option value="lots_r1">LOTS R+1</option>
+                    <option value="lots_r2">LOTS R+2</option>
+                    <option value="lots_r3">LOTS R+3</option>
+                    <option value="creche">CRÈCHE</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelClass}>Valable jusqu’au (optionnel)</label>
+                  <input value={form.opportunityValidUntil} onChange={(e) => setForm({ ...form, opportunityValidUntil: e.target.value })} className={inputClass} placeholder="31/12/2026" />
+                </div>
+                <div>
+                  <label className={labelClass}>Titre d’opportunité</label>
+                  <input value={form.opportunityTitle} onChange={(e) => setForm({ ...form, opportunityTitle: e.target.value })} className={inputClass} placeholder="Offre spéciale lancement" />
+                </div>
+                <div>
+                  <label className={labelClass}>Highlight</label>
+                  <input value={form.opportunityHighlight} onChange={(e) => setForm({ ...form, opportunityHighlight: e.target.value })} className={inputClass} placeholder="-10% / Frais offerts / Dernières unités" />
+                </div>
               </div>
               <div>
-                <label className={labelClass}>Valable jusqu’au (optionnel)</label>
-                <input value={form.opportunityValidUntil} onChange={(e) => setForm({ ...form, opportunityValidUntil: e.target.value })} className={inputClass} placeholder="31/12/2026" />
+                <label className={labelClass}>Description courte</label>
+                <textarea rows={3} value={form.opportunityDescription} onChange={(e) => setForm({ ...form, opportunityDescription: e.target.value })} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>Titre d’opportunité</label>
-                <input value={form.opportunityTitle} onChange={(e) => setForm({ ...form, opportunityTitle: e.target.value })} className={inputClass} placeholder="Offre spéciale lancement" />
+                <label className={labelClass}>Libellé CTA opportunité</label>
+                <input value={form.opportunityCtaLabel} onChange={(e) => setForm({ ...form, opportunityCtaLabel: e.target.value })} className={inputClass} />
               </div>
-              <div>
-                <label className={labelClass}>Highlight</label>
-                <input value={form.opportunityHighlight} onChange={(e) => setForm({ ...form, opportunityHighlight: e.target.value })} className={inputClass} placeholder="-10% / Frais offerts / Dernières unités" />
-              </div>
-            </div>
-            <div>
-              <label className={labelClass}>Description courte</label>
-              <textarea rows={3} value={form.opportunityDescription} onChange={(e) => setForm({ ...form, opportunityDescription: e.target.value })} className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>Libellé CTA opportunité</label>
-              <input value={form.opportunityCtaLabel} onChange={(e) => setForm({ ...form, opportunityCtaLabel: e.target.value })} className={inputClass} />
-            </div>
-          </FormGroup>
+            </FormGroup>
+          )}
 
           <FormGroup title="3. Pricing">
             <label className="flex items-center gap-3 text-white/70 text-sm">
@@ -1566,8 +1598,30 @@ function ProjectsTab() {
         </form>
       )}
 
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-white/10 pb-4">
+        {[
+          { label: "Tous", val: "all" },
+          { label: "Estya", val: "estya" },
+          { label: "Acharaf Immobilier", val: "acharaf" },
+          { label: "Opportunité", val: "opportunity" },
+        ].map((f) => (
+          <button
+            key={f.val}
+            type="button"
+            onClick={() => setFilterType(f.val as any)}
+            className={`px-4 py-1.5 text-xs font-medium uppercase tracking-wider border rounded transition-all duration-200 ${
+              filterType === f.val
+                ? "bg-white text-[#082634] border-white"
+                : "text-white/60 border-white/10 hover:text-white hover:border-white/30"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       <Reorder.Group axis="y" values={orderedIds} onReorder={setOrderedIds} className="space-y-2">
-        {orderedProjects.map((p) => (
+        {filteredProjects.map((p) => (
           <Reorder.Item
             key={p.id}
             value={p.id}
@@ -1580,7 +1634,10 @@ function ProjectsTab() {
               </div>
               {p.coverImageUrl && <img src={p.coverImageUrl} alt="" className="w-16 h-12 object-cover opacity-70" />}
               <div>
-                <div className="text-white font-medium">{p.title}</div>
+                <div className="text-white font-medium flex items-center gap-2">
+                  {p.title}
+                  {getDisplayTypeBadge(p.displayType, p.isOpportunity)}
+                </div>
                 <div className="text-white/40 text-sm">{p.city} · {p.brand?.name} · {projectPriceLabel(p)}</div>
               </div>
             </div>
@@ -1598,7 +1655,7 @@ function ProjectsTab() {
             </div>
           </Reorder.Item>
         ))}
-        {projects.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucun projet.</p>}
+        {filteredProjects.length === 0 && <p className="text-white/30 text-sm py-8 text-center">Aucun projet trouvé dans cette catégorie.</p>}
       </Reorder.Group>
     </div>
   );

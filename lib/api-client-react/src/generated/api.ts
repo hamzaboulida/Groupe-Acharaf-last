@@ -2010,6 +2010,92 @@ export function useListApplications<
 }
 
 /**
+ * @summary Submit a spontaneous application
+ */
+export const getApplySpontaneousUrl = () => {
+  return `/api/applications/spontaneous`;
+};
+
+export const applySpontaneous = async (
+  createApplicationBody: CreateApplicationBody,
+  options?: RequestInit,
+): Promise<Application> => {
+  return customFetch<Application>(getApplySpontaneousUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createApplicationBody),
+  });
+};
+
+export const getApplySpontaneousMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof applySpontaneous>>,
+    TError,
+    { data: BodyType<CreateApplicationBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof applySpontaneous>>,
+  TError,
+  { data: BodyType<CreateApplicationBody> },
+  TContext
+> => {
+  const mutationKey = ["applySpontaneous"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof applySpontaneous>>,
+    { data: BodyType<CreateApplicationBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return applySpontaneous(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ApplySpontaneousMutationResult = NonNullable<
+  Awaited<ReturnType<typeof applySpontaneous>>
+>;
+export type ApplySpontaneousMutationBody = BodyType<CreateApplicationBody>;
+export type ApplySpontaneousMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Submit a spontaneous application
+ */
+export const useApplySpontaneous = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof applySpontaneous>>,
+    TError,
+    { data: BodyType<CreateApplicationBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof applySpontaneous>>,
+  TError,
+  { data: BodyType<CreateApplicationBody> },
+  TContext
+> => {
+  return useMutation(getApplySpontaneousMutationOptions(options));
+};
+
+/**
  * @summary List all contact leads (admin)
  */
 export const getListLeadsUrl = () => {

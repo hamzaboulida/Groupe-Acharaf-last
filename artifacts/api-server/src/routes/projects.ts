@@ -43,13 +43,13 @@ async function ensureUniqueSlug(baseTitle: string, options?: { excludeId?: numbe
 }
 
 function validateOpportunityCategory(payload: {
-  isOpportunity?: boolean;
+  displayType?: string;
   opportunityType?: string;
 }) {
-  if (!payload.isOpportunity) return null;
+  if (payload.displayType !== "opportunity") return null;
   const category = payload.opportunityType?.trim();
   if (!category) {
-    return "Opportunity category is required when isOpportunity is true.";
+    return "Opportunity category is required when displayType is opportunity.";
   }
   if (!OPPORTUNITY_TYPES.has(category)) {
     return "Invalid opportunity category.";
@@ -87,6 +87,7 @@ const projectSelection = {
   deliveryDate: projectsTable.deliveryDate,
   featured: projectsTable.featured,
   displayOrder: projectsTable.displayOrder,
+  displayType: projectsTable.displayType,
   isOpportunity: projectsTable.isOpportunity,
   opportunityType: projectsTable.opportunityType,
   opportunityTitle: projectsTable.opportunityTitle,
@@ -169,9 +170,20 @@ router.post("/projects", async (req, res): Promise<void> => {
     return;
   }
   const resolvedSlug = await ensureUniqueSlug(parsed.data.title);
+
+  // Map brandId and isOpportunity based on displayType
+  const displayType = parsed.data.displayType;
+  const brandId = displayType === "estya" ? 1 : (displayType === "acharaf" ? 2 : parsed.data.brandId);
+  const isOpportunity = displayType === "opportunity";
+
   const [project] = await db
     .insert(projectsTable)
-    .values({ ...parsed.data, slug: resolvedSlug })
+    .values({
+      ...parsed.data,
+      brandId,
+      isOpportunity,
+      slug: resolvedSlug,
+    })
     .returning();
 
   const [full] = await db
@@ -235,9 +247,20 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
     resolvedSlug = await ensureUniqueSlug(parsed.data.title || existing.title, { excludeId: existing.id });
   }
 
+  // Map brandId and isOpportunity based on displayType
+  const displayType = parsed.data.displayType;
+  const brandId = displayType === "estya" ? 1 : (displayType === "acharaf" ? 2 : parsed.data.brandId);
+  const isOpportunity = displayType === "opportunity";
+
   await db
     .update(projectsTable)
-    .set({ ...parsed.data, slug: resolvedSlug, updatedAt: new Date() })
+    .set({
+      ...parsed.data,
+      brandId,
+      isOpportunity,
+      slug: resolvedSlug,
+      updatedAt: new Date(),
+    })
     .where(eq(projectsTable.id, params.data.id));
 
   const [full] = await db

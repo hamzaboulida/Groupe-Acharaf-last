@@ -5,12 +5,13 @@
  * API specification for Groupe Acharaf luxury real estate website
  * OpenAPI spec version: 0.1.0
  */
+import type { ApplicationApplicationType } from "./applicationApplicationType";
 import type { Career } from "./career";
 
 export interface Application {
   id: number;
   careerId?: number | null;
-  applicationType?: "job" | "spontaneous";
+  applicationType?: ApplicationApplicationType;
   desiredPosition?: string;
   career?: Career;
   firstName: string;

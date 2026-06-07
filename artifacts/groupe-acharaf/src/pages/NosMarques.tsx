@@ -321,8 +321,16 @@ export default function NosMarques() {
   const [hoveredBrand, setHoveredBrand]   = useState<Brand | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { data: estyaProjects }   = useListProjects({ brandId: 1 });
-  const { data: acharafProjects } = useListProjects({ brandId: 2 });
+  const { data: rawEstyaProjects }   = useListProjects({ brandId: 1 });
+  const { data: rawAcharafProjects } = useListProjects({ brandId: 2 });
+
+  const estyaProjects = useMemo(() => {
+    return rawEstyaProjects?.filter((p) => p.displayType === "estya") ?? [];
+  }, [rawEstyaProjects]);
+
+  const acharafProjects = useMemo(() => {
+    return rawAcharafProjects?.filter((p) => p.displayType === "acharaf") ?? [];
+  }, [rawAcharafProjects]);
 
   const selectBrand = useCallback((brand: Brand) => {
     if (selectedBrand === brand) return;

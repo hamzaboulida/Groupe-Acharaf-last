@@ -33,10 +33,15 @@ export default function NosProjets() {
   );
   const [activeStatusFilter, setActiveStatusFilter] = useState<string | null>(null);
 
-  const { data: projects, isLoading } = useListProjects({
+  const { data: rawProjects, isLoading } = useListProjects({
     brandId: activeBrandFilter || undefined,
     status: activeStatusFilter as any || undefined,
   });
+
+  const projects = useMemo(() => {
+    if (!rawProjects) return [];
+    return rawProjects.filter((p) => p.displayType === "estya" || p.displayType === "acharaf");
+  }, [rawProjects]);
 
   const featuredProject = useMemo(() => projects?.find((p) => p.featured) || projects?.[0], [projects]);
   const galleryProjects = useMemo(() => projects?.filter((p) => p.id !== featuredProject?.id) || [], [projects, featuredProject]);

@@ -58,6 +58,15 @@ export const ProjectStatus = {
   completed: "completed",
 } as const;
 
+export type ProjectDisplayType =
+  (typeof ProjectDisplayType)[keyof typeof ProjectDisplayType];
+
+export const ProjectDisplayType = {
+  estya: "estya",
+  acharaf: "acharaf",
+  opportunity: "opportunity",
+} as const;
+
 export type ProjectOpportunityType =
   (typeof ProjectOpportunityType)[keyof typeof ProjectOpportunityType];
 
@@ -99,6 +108,7 @@ export interface Project {
   deliveryDate?: string;
   featured: boolean;
   displayOrder?: number;
+  displayType?: ProjectDisplayType;
   isOpportunity?: boolean;
   opportunityType?: ProjectOpportunityType;
   opportunityTitle?: string;
@@ -142,6 +152,15 @@ export const CreateProjectBodyStatus = {
   completed: "completed",
 } as const;
 
+export type CreateProjectBodyDisplayType =
+  (typeof CreateProjectBodyDisplayType)[keyof typeof CreateProjectBodyDisplayType];
+
+export const CreateProjectBodyDisplayType = {
+  estya: "estya",
+  acharaf: "acharaf",
+  opportunity: "opportunity",
+} as const;
+
 export type CreateProjectBodyOpportunityType =
   (typeof CreateProjectBodyOpportunityType)[keyof typeof CreateProjectBodyOpportunityType];
 
@@ -181,6 +200,7 @@ export interface CreateProjectBody {
   deliveryDate?: string;
   featured?: boolean;
   displayOrder?: number;
+  displayType: CreateProjectBodyDisplayType;
   isOpportunity?: boolean;
   opportunityType?: CreateProjectBodyOpportunityType;
   opportunityTitle?: string;
@@ -283,10 +303,18 @@ export interface CreateCareerBody {
   active?: boolean;
 }
 
+export type ApplicationApplicationType =
+  (typeof ApplicationApplicationType)[keyof typeof ApplicationApplicationType];
+
+export const ApplicationApplicationType = {
+  job: "job",
+  spontaneous: "spontaneous",
+} as const;
+
 export interface Application {
   id: number;
   careerId?: number | null;
-  applicationType?: "job" | "spontaneous";
+  applicationType?: ApplicationApplicationType;
   desiredPosition?: string;
   career?: Career;
   firstName: string;
