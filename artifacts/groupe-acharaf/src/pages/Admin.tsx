@@ -1072,6 +1072,22 @@ function ProjectsTab() {
     });
   }, [orderedProjects, filterType]);
 
+  const handleReorder = (newFilteredIds: number[]) => {
+    if (filterType === "all") {
+      setOrderedIds(newFilteredIds);
+    } else {
+      const filteredSet = new Set(newFilteredIds);
+      let filteredIndex = 0;
+      const nextOrderedIds = orderedIds.map((id) => {
+        if (filteredSet.has(id)) {
+          return newFilteredIds[filteredIndex++];
+        }
+        return id;
+      });
+      setOrderedIds(nextOrderedIds);
+    }
+  };
+
   const orderDirty = useMemo(() => {
     if (orderedIds.length !== projects.length) return false;
     return orderedIds.some((id, index) => id !== projects[index]?.id);
@@ -1321,20 +1337,6 @@ function ProjectsTab() {
             <div>
               <label className={labelClass}>Livraison</label>
               <input value={form.deliveryDate} onChange={(e) => setForm({ ...form, deliveryDate: e.target.value })} className={inputClass} placeholder="ex: T4 2025" />
-            </div>
-            <div>
-              <label className={labelClass}>Ordre d’affichage</label>
-              <input
-                type="number"
-                min={1}
-                value={form.displayOrder}
-                onChange={(e) => setForm({ ...form, displayOrder: e.target.value })}
-                className={inputClass}
-                placeholder="1"
-              />
-              <p className="text-white/35 text-[11px] mt-1">
-                Les projets avec le plus petit numéro apparaissent en premier.
-              </p>
             </div>
             </div>
             <label className="flex items-center gap-3 text-white/70 text-sm">
@@ -1620,7 +1622,7 @@ function ProjectsTab() {
         ))}
       </div>
 
-      <Reorder.Group axis="y" values={orderedIds} onReorder={setOrderedIds} className="space-y-2">
+      <Reorder.Group axis="y" values={orderedIds} onReorder={handleReorder} className="space-y-2">
         {filteredProjects.map((p) => (
           <Reorder.Item
             key={p.id}
