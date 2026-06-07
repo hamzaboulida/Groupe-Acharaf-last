@@ -21,8 +21,8 @@ const EC = [0.22, 1, 0.36, 1] as const;
 const FALLBACK = [proj1, proj2, proj3];
 const ACHARAF_PRIMARY = "#043235";
 const ACHARAF_SECONDARY = "#88978D";
-const ACHARAF_TERTIARY = "#C0C7C2";
-const ESTYA_PRIMARY = "#181F39";
+const ACHARAF_TERTIARY = "#ffffff";
+const ESTYA_PRIMARY = "#082634";
 const ESTYA_SECONDARY = "#CCDCE1";
 const ESTYA_TERTIARY = "#000000";
 
