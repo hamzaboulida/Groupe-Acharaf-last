@@ -58,7 +58,7 @@ export default function Contact() {
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "customer support",
-        telephone: "+212600000000",
+        telephone: "+212522406848",
         areaServed: "MA",
         availableLanguage: ["fr", "ar"],
       },
@@ -146,9 +146,9 @@ export default function Contact() {
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#8EA4AF]/15">
             {[
-              { icon: <Phone size={14} />, label: "Téléphone", value: "+212 522 00 00 00", href: "tel:+212522000000" },
-              { icon: <Mail size={14} />, label: "Email", value: "contact@groupeacharaf.ma", href: "mailto:contact@groupeacharaf.ma" },
-              { icon: <MapPin size={14} />, label: "Bureaux", value: "Boulevard d'Anfa, Casablanca", href: "#map" },
+              { icon: <Phone size={14} />, label: "Téléphone", value: "05 22 40 68 48", href: "tel:+212522406848" },
+              { icon: <Mail size={14} />, label: "Email", value: "infos@groupeacharaf.ma", href: "mailto:infos@groupeacharaf.ma" },
+              { icon: <MapPin size={14} />, label: "Bureaux", value: "465, Ave Ambassadeur Ben Aïcha, Casablanca", href: "https://www.google.com/maps/search/461%20R322%2C%20Casablanca%2020100%2C%20Maroc/@33.60371017456055,-7.580126762390137,17z?hl=en" },
             ].map((item, i) => (
               <a
                 key={i}
@@ -258,7 +258,7 @@ export default function Contact() {
               <div id="map" className="w-full h-60 mb-8 overflow-hidden border border-[#8EA4AF]/15">
                 <iframe
                   title="Groupe Acharaf — Casablanca"
-                  src="https://www.openstreetmap.org/export/embed.html?bbox=-7.6870%2C33.5800%2C-7.5800%2C33.6200&layer=mapnik&marker=33.5992%2C-7.6322"
+                  src="https://www.openstreetmap.org/export/embed.html?bbox=-7.59513%2C33.59371%2C-7.56513%2C33.61371&layer=mapnik&marker=33.60371%2C-7.58013"
                   width="100%"
                   height="100%"
                   style={{ border: 0, filter: "brightness(0.95) contrast(0.9)" }}
@@ -268,14 +268,14 @@ export default function Contact() {
               <div className="space-y-7">
                 <div>
                   <p className="text-[#8EA4AF] text-xs tracking-[0.18em] uppercase mb-2">Adresse</p>
-                  <p className="text-[#082634] font-light text-sm">Boulevard d'Anfa, Casablanca 20050</p>
+                  <p className="text-[#082634] font-light text-sm">465, Avenue Ambassadeur Ben Aïcha, Roches Noires - 20300 Casablanca</p>
                 </div>
                 <div>
                   <p className="text-[#8EA4AF] text-xs tracking-[0.18em] uppercase mb-2">Heures d'ouverture</p>
                   <p className="text-[#082634] font-light text-sm">Lundi – Vendredi : 9h – 18h</p>
                   <p className="text-[#082634] font-light text-sm">Samedi : 10h – 14h</p>
                 </div>
-                <a href="tel:+212600000000" className="btn-outline-dark">
+                <a href="tel:+212522406848" className="btn-outline-dark">
                   <Phone size={12} /> Appeler directement
                 </a>
               </div>

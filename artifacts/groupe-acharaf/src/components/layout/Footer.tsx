@@ -73,9 +73,26 @@ export function Footer() {
             <div className="md:col-span-2">
               <h4 className="text-xs tracking-[0.2em] uppercase text-[#8EA4AF] mb-7">Contact</h4>
               <ul className="space-y-5 text-sm text-[#082634] font-light">
-                <li className="flex flex-col gap-1 leading-relaxed">Boulevard d'Anfa<br />Casablanca, Maroc</li>
-                <li>contact@groupeacharaf.ma</li>
-                <li>+212 522 00 00 00</li>
+                <li className="flex flex-col gap-1 leading-relaxed">
+                  <a
+                    href="https://www.google.com/maps/search/461%20R322%2C%20Casablanca%2020100%2C%20Maroc/@33.60371017456055,-7.580126762390137,17z?hl=en"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#8EA4AF] transition-colors"
+                  >
+                    465, Avenue Ambassadeur Ben Aïcha<br />Roches Noires - 20300 Casablanca
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:infos@groupeacharaf.ma" className="hover:text-[#8EA4AF] transition-colors">
+                    infos@groupeacharaf.ma
+                  </a>
+                </li>
+                <li>
+                  <a href="tel:+212522406848" className="hover:text-[#8EA4AF] transition-colors">
+                    05 22 40 68 48
+                  </a>
+                </li>
               </ul>
             </div>
           </div>

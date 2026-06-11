@@ -50,7 +50,7 @@ export function Layout({
       name: SITE_NAME,
       url: SITE_URL,
       areaServed: "MA",
-      telephone: "+212600000000",
+      telephone: "+212522406848",
       image: `${SITE_URL}/og-default.jpg`,
     },
   ]);
@@ -83,7 +83,7 @@ export function Layout({
 
       {/* ── Floating WhatsApp ── */}
       <motion.a
-        href="https://wa.me/212600000000"
+        href="https://wa.me/212522406848"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Nous contacter sur WhatsApp"
