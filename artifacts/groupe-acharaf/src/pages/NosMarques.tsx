@@ -116,7 +116,9 @@ function EstyaContent({ projects }: { projects?: BrandPreviewProject[] }) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.1, ease: EC }}
             >
+              {/* L'univers Estya caché à la demande du client
               <p className="text-[9px] tracking-[0.35em] uppercase mb-8" style={{ color: "rgba(204,220,225,0.72)" }}>L'univers Estya</p>
+              */}
               <h2 className="text-4xl md:text-5xl font-light text-white leading-[1.1] mb-8">
                 L'art de vivre<br />à son apogée
               </h2>
@@ -228,7 +230,9 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
               transition={{ duration: 1, delay: 0.1, ease: EC }}
               className="order-1 lg:order-2"
             >
+              {/* L'univers Acharaf caché à la demande du client
               <p className="text-[9px] tracking-[0.35em] uppercase mb-8" style={{ color: ACHARAF_SECONDARY }}>L'univers Acharaf</p>
+              */}
               <h2 className="text-4xl md:text-5xl font-serif font-light leading-[1.1] mb-8" style={{ color: ACHARAF_PRIMARY }}>
                 L'excellence<br />accessible
               </h2>

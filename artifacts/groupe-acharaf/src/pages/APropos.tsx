@@ -76,6 +76,7 @@ export default function APropos() {
         <div className="relative z-10 container mx-auto px-6">
 
           {/* Kicker — letterSpacing expands inward on load */}
+          {/* Notre Héritage - caché à la demande du client
           <motion.div
             initial={{ opacity: 0, letterSpacing: "0.48em" }}
             animate={{ opacity: 1, letterSpacing: "0.22em" }}
@@ -85,6 +86,7 @@ export default function APropos() {
               Notre Héritage
             </p>
           </motion.div>
+          */}
 
           {/* Headline — clip-reveal slide up */}
           <div className="overflow-hidden mb-7">
