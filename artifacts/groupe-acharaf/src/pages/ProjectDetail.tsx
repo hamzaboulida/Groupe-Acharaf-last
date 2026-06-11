@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { Layout } from "@/components/layout/Layout";
 import { useParams, Link, useLocation } from "wouter";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
@@ -93,7 +92,12 @@ function Lightbox({
   images: string[]; index: number;
   onClose: () => void; onPrev: () => void; onNext: () => void;
 }) {
+  const [scrollY, setScrollY] = useState(0);
+
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      setScrollY(window.scrollY);
+    }
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
@@ -112,7 +116,8 @@ function Lightbox({
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-[#082634]/96 backdrop-blur-lg z-50 flex items-center justify-center"
+      className="absolute inset-x-0 bg-[#082634]/96 backdrop-blur-lg z-50 flex items-center justify-center"
+      style={{ top: `${scrollY}px`, height: "100vh" }}
       onClick={onClose}
     >
       <button
@@ -1082,15 +1087,14 @@ export default function ProjectDetail() {
 
       {/* Lightbox */}
       <AnimatePresence>
-        {lightbox !== null && createPortal(
+        {lightbox !== null && (
           <Lightbox
             images={gallery}
             index={lightbox}
             onClose={() => setLightbox(null)}
             onPrev={() => setLightbox((l) => (l! - 1 + gallery.length) % gallery.length)}
             onNext={() => setLightbox((l) => (l! + 1) % gallery.length)}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
     </Layout>
