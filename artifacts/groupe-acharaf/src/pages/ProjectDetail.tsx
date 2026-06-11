@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Layout } from "@/components/layout/Layout";
 import { useParams, Link, useLocation } from "wouter";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
@@ -93,13 +94,19 @@ function Lightbox({
   onClose: () => void; onPrev: () => void; onNext: () => void;
 }) {
   useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     const fn = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowLeft") onPrev();
       if (e.key === "ArrowRight") onNext();
     };
     window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
+    return () => {
+      window.removeEventListener("keydown", fn);
+      document.body.style.overflow = originalOverflow;
+    };
   }, [onClose, onPrev, onNext]);
 
   return (
@@ -1075,14 +1082,15 @@ export default function ProjectDetail() {
 
       {/* Lightbox */}
       <AnimatePresence>
-        {lightbox !== null && (
+        {lightbox !== null && createPortal(
           <Lightbox
             images={gallery}
             index={lightbox}
             onClose={() => setLightbox(null)}
             onPrev={() => setLightbox((l) => (l! - 1 + gallery.length) % gallery.length)}
             onNext={() => setLightbox((l) => (l! + 1) % gallery.length)}
-          />
+          />,
+          document.body
         )}
       </AnimatePresence>
     </Layout>
