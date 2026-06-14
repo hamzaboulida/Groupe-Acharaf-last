@@ -83,7 +83,7 @@ export function Layout({
 
       {/* ── Floating WhatsApp ── */}
       <motion.a
-        href="https://wa.me/212522406848"
+        href="https://wa.me/212666863315"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Nous contacter sur WhatsApp"
