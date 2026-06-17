@@ -447,7 +447,7 @@ export default function NosMarques() {
                   <span className="w-4 h-4 rounded-full border border-[#8EA4AF] flex items-center justify-center flex-shrink-0">
                     <Check size={8} className="text-[#8EA4AF]" />
                   </span>
-                  <span className="text-[#8EA4AF]">Univers sélectionné</span>
+                  <span className="text-[#8EA4AF]">Marque sélectionnée</span>
                 </>
               ) : (
                 <motion.span
@@ -455,7 +455,7 @@ export default function NosMarques() {
                   animate={{ x: hoveredBrand === "estya" ? 4 : 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  Choisir cet univers
+                  Découvrez Estya
                   <ArrowRight size={10} />
                 </motion.span>
               )}
@@ -565,7 +565,7 @@ export default function NosMarques() {
                   <span className="w-4 h-4 rounded-full border border-[#082634]/50 flex items-center justify-center flex-shrink-0">
                     <Check size={8} className="text-[#082634]" />
                   </span>
-                  <span className="text-[#082634]/70">Univers sélectionné</span>
+                  <span className="text-[#082634]/70">Marque sélectionnée</span>
                 </>
               ) : (
                 <motion.span
@@ -573,7 +573,7 @@ export default function NosMarques() {
                   animate={{ x: hoveredBrand === "acharaf" ? 4 : 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  Choisir cet univers
+                  Découvrez Acharaf Immobilier
                   <ArrowRight size={10} />
                 </motion.span>
               )}
