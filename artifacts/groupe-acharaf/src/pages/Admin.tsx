@@ -245,6 +245,206 @@ function normalizeOpportunityType(value?: string | null): OpportunityCategory {
   }
 }
 
+import {
+  Check,
+  Home,
+  Building2,
+  TreePine,
+  Leaf,
+  Car,
+  ParkingCircle,
+  Shield,
+  Lock,
+  Camera,
+  Waves,
+  ArrowUpDown,
+  Accessibility,
+  Phone,
+  Wifi,
+  Droplet,
+  Sun,
+  ShoppingBag,
+  School,
+  Hospital,
+  MapPin,
+  Flower2,
+  Key,
+  Star
+} from "lucide-react";
+
+const amenityIconMap: Record<string, React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>> = {
+  check: Check,
+  home: Home,
+  building: Building2,
+  tree: TreePine,
+  leaf: Leaf,
+  car: Car,
+  parking: ParkingCircle,
+  shield: Shield,
+  lock: Lock,
+  camera: Camera,
+  pool: Waves,
+  elevator: ArrowUpDown,
+  accessibility: Accessibility,
+  phone: Phone,
+  wifi: Wifi,
+  water: Droplet,
+  sun: Sun,
+  shopping: ShoppingBag,
+  school: School,
+  hospital: Hospital,
+  location: MapPin,
+  garden: Flower2,
+  key: Key,
+  star: Star,
+};
+
+const AMENITY_ICONS = [
+  { value: "check", label: "Check (Défaut)" },
+  { value: "home", label: "Maison (Home)" },
+  { value: "building", label: "Bâtiment (Building)" },
+  { value: "tree", label: "Arbre / Parc (Tree)" },
+  { value: "leaf", label: "Feuille / Éco (Leaf)" },
+  { value: "car", label: "Voiture (Car)" },
+  { value: "parking", label: "Parking" },
+  { value: "shield", label: "Sécurité / Gardien (Shield)" },
+  { value: "lock", label: "Verrou (Lock)" },
+  { value: "camera", label: "Caméra / Vidéosurveillance (Camera)" },
+  { value: "pool", label: "Piscine (Pool)" },
+  { value: "elevator", label: "Ascenseur (Elevator)" },
+  { value: "accessibility", label: "PMR / Accessibilité" },
+  { value: "phone", label: "Téléphone (Phone)" },
+  { value: "wifi", label: "Wifi" },
+  { value: "water", label: "Eau (Water)" },
+  { value: "sun", label: "Soleil / Énergie solaire (Sun)" },
+  { value: "shopping", label: "Commerce / Magasins (Shopping)" },
+  { value: "school", label: "École / Éducation (School)" },
+  { value: "hospital", label: "Hôpital / Santé (Hospital)" },
+  { value: "location", label: "Localisation (Pin)" },
+  { value: "garden", label: "Jardin / Fleur (Garden)" },
+  { value: "key", label: "Clé / Clé en main (Key)" },
+  { value: "star", label: "Étoile / Prestation de luxe (Star)" },
+];
+
+function parseAmenity(val: string): { text: string; icon: string } {
+  try {
+    const trimmed = val.trim();
+    if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed.text === "string") {
+        return { text: parsed.text, icon: parsed.icon || "check" };
+      }
+    }
+  } catch (e) {}
+  return { text: val, icon: "check" };
+}
+
+function stringifyAmenity(text: string, icon: string): string {
+  if (icon === "check") return text;
+  return JSON.stringify({ text, icon });
+}
+
+function AmenitiesEditor({
+  values,
+  onChange,
+}: {
+  values: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const normalized = values.length ? values : [""];
+  return (
+    <div>
+      <label className={labelClass}>Prestations</label>
+      <div className="space-y-2">
+        {normalized.map((value, index) => {
+          const parsed = parseAmenity(value);
+          const IconComponent = amenityIconMap[parsed.icon] || Check;
+          return (
+            <div key={index} className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-2 items-center">
+              {/* Icon Preview */}
+              <div className="w-10 h-10 border border-white/15 bg-white/5 flex items-center justify-center text-white/70 flex-shrink-0">
+                <IconComponent size={16} strokeWidth={1.4} />
+              </div>
+              {/* Text Input */}
+              <input
+                value={parsed.text}
+                placeholder="Piscine, parking sécurisé..."
+                onChange={(e) => {
+                  const next = [...normalized];
+                  next[index] = stringifyAmenity(e.target.value, parsed.icon);
+                  onChange(next);
+                }}
+                className={inputClass}
+              />
+              {/* Icon Dropdown */}
+              <select
+                value={parsed.icon}
+                onChange={(e) => {
+                  const next = [...normalized];
+                  next[index] = stringifyAmenity(parsed.text, e.target.value);
+                  onChange(next);
+                }}
+                className={`${inputClass} max-w-[170px] cursor-pointer`}
+              >
+                {AMENITY_ICONS.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+              {/* Reorder Up */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (index === 0) return;
+                  const next = [...normalized];
+                  [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                  onChange(next);
+                }}
+                disabled={index === 0}
+                className="px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs disabled:opacity-20"
+                aria-label="Monter"
+              >
+                <ArrowUp size={14} />
+              </button>
+              {/* Reorder Down */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (index === normalized.length - 1) return;
+                  const next = [...normalized];
+                  [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                  onChange(next);
+                }}
+                disabled={index === normalized.length - 1}
+                className="px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs disabled:opacity-20"
+                aria-label="Descendre"
+              >
+                <ArrowDown size={14} />
+              </button>
+              {/* Remove */}
+              <button
+                type="button"
+                onClick={() => onChange(normalized.filter((_, i) => i !== index))}
+                className="px-3 py-2 border border-white/15 text-white/45 hover:text-white hover:border-white/35 text-xs"
+              >
+                Retirer
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <button
+        type="button"
+        onClick={() => onChange([...normalized, ""])}
+        className="mt-2 text-[#8EA4AF] hover:text-white text-xs tracking-[0.12em] uppercase"
+      >
+        + Ajouter
+      </button>
+    </div>
+  );
+}
+
 const inputClass = "ga-input ga-input-dark";
 const labelClass = "ga-label ga-label-dark";
 
@@ -1541,7 +1741,7 @@ function ProjectsTab() {
               <label className={labelClass}>Titre prestations</label>
               <input value={form.featuresTitle} onChange={(e) => setForm({ ...form, featuresTitle: e.target.value })} className={inputClass} />
             </div>
-            <ArrayEditor label="Prestations" values={form.amenities} placeholder="Piscine, parking sécurisé..." onChange={(amenities) => setForm({ ...form, amenities })} />
+            <AmenitiesEditor values={form.amenities} onChange={(amenities) => setForm({ ...form, amenities })} />
           </FormGroup>
 
           <FormGroup title="9. Art de vivre">
@@ -1634,7 +1834,7 @@ function ProjectsTab() {
               <div>
                 <div className="text-white font-medium flex items-center gap-2">
                   {p.title}
-                  {getDisplayTypeBadge(p.displayType, p.isOpportunity)}
+                  {getDisplayTypeBadge(p.displayType, !!p.isOpportunity)}
                 </div>
                 <div className="text-white/40 text-sm">{p.city} · {p.brand?.name} · {projectPriceLabel(p)}</div>
               </div>

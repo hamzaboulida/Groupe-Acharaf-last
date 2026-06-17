@@ -80,9 +80,74 @@ function normalizeVirtualTourUrl(value: string | null | undefined): string {
   }
 }
 
+import {
+  Home,
+  TreePine,
+  Leaf,
+  Car,
+  ParkingCircle,
+  Shield,
+  Lock,
+  Camera,
+  Waves,
+  ArrowUpDown,
+  Accessibility,
+  Phone,
+  Wifi,
+  Droplet,
+  Sun,
+  ShoppingBag,
+  School,
+  Hospital,
+  Flower2,
+  Key,
+  Star
+} from "lucide-react";
+
+const amenityIconMap: Record<string, React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>> = {
+  check: Check,
+  home: Home,
+  building: Building2,
+  tree: TreePine,
+  leaf: Leaf,
+  car: Car,
+  parking: ParkingCircle,
+  shield: Shield,
+  lock: Lock,
+  camera: Camera,
+  pool: Waves,
+  elevator: ArrowUpDown,
+  accessibility: Accessibility,
+  phone: Phone,
+  wifi: Wifi,
+  water: Droplet,
+  sun: Sun,
+  shopping: ShoppingBag,
+  school: School,
+  hospital: Hospital,
+  location: MapPin,
+  garden: Flower2,
+  key: Key,
+  star: Star,
+};
+
+function parseAmenity(val: string): { text: string; icon: string } {
+  try {
+    const trimmed = val.trim();
+    if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed.text === "string") {
+        return { text: parsed.text, icon: parsed.icon || "check" };
+      }
+    }
+  } catch (e) {}
+  return { text: val, icon: "check" };
+}
+
 function AmenityIcon({ label }: { label: string }) {
-  void label;
-  return <Check size={16} strokeWidth={1.4} />;
+  const parsed = parseAmenity(label);
+  const IconComponent = amenityIconMap[parsed.icon] || Check;
+  return <IconComponent size={16} strokeWidth={1.4} />;
 }
 
 /* ── Lightbox ───────────────────────────────────────────────── */
@@ -383,7 +448,7 @@ export default function ProjectDetail() {
   } = useGetProject(resolvedProjectId, {
     query: {
       enabled: resolvedProjectId > 0,
-    },
+    } as any,
   });
 
   const [activeImage, setActiveImage] = useState(0);
@@ -745,7 +810,7 @@ export default function ProjectDetail() {
             >
               {/* Text */}
               <div>
-                <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-6">Le projet</p>
+                {/* <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-6">Le projet</p> */}
                 <h2 className="text-3xl md:text-4xl font-serif font-light text-[#082634] mb-8 leading-tight">
                   {projectSectionTitle}
                 </h2>
@@ -890,7 +955,7 @@ export default function ProjectDetail() {
                     <AmenityIcon label={item} />
                   </div>
                   <p className="text-[#082634] font-light text-sm leading-snug group-hover:text-[#082634] transition-colors duration-300">
-                    {item}
+                    {parseAmenity(item).text}
                   </p>
                 </motion.div>
               ))}

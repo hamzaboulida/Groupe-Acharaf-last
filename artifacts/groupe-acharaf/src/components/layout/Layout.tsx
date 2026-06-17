@@ -14,7 +14,7 @@ const pageTransition = {
   type: "tween",
   ease: [0.22, 1, 0.36, 1],
   duration: 0.75,
-};
+} as const;
 
 export function Layout({
   children,

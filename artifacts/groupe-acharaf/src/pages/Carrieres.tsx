@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { useListCareers, useApplyForCareer } from "@workspace/api-client-react";
+import { useListCareers, useApplyForCareer, Career } from "@workspace/api-client-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { MapPin, Briefcase } from "lucide-react";
@@ -31,7 +31,7 @@ function CareerCard({
   career,
   onApply,
 }: {
-  career: NonNullable<ReturnType<typeof useListCareers>["data"]>[0];
+  career: Career;
   onApply: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -489,7 +489,7 @@ export default function Carrieres() {
             : undefined,
           employmentType: career.type || "FULL_TIME",
           datePosted: career.createdAt,
-          validThrough: career.updatedAt,
+          validThrough: undefined,
         }))
       : null,
   );

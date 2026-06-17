@@ -120,7 +120,7 @@ function EstyaContent({ projects }: { projects?: BrandPreviewProject[] }) {
               <p className="text-[9px] tracking-[0.35em] uppercase mb-8" style={{ color: "rgba(204,220,225,0.72)" }}>L'univers Estya</p>
               */}
               <h2 className="text-4xl md:text-5xl font-light text-white leading-[1.1] mb-8">
-                L'art de vivre<br />à son apogée
+                Des lieux de vie<br />qui élèvent le quotidien.
               </h2>
               <div className="h-px w-12 mb-8" style={{ backgroundColor: "rgba(204,220,225,0.3)" }} />
               <p className="text-white/70 font-light leading-relaxed text-[15px] mb-5">
@@ -234,7 +234,7 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
               <p className="text-[9px] tracking-[0.35em] uppercase mb-8" style={{ color: ACHARAF_SECONDARY }}>L'univers Acharaf</p>
               */}
               <h2 className="text-4xl md:text-5xl font-serif font-light leading-[1.1] mb-8" style={{ color: ACHARAF_PRIMARY }}>
-                L'excellence<br />accessible
+                L'exigence au <br />service de l'essentiel.
               </h2>
               <div className="h-px w-12 mb-8" style={{ backgroundColor: "rgba(4,50,53,0.22)" }} />
               <p className="font-light leading-relaxed text-[15px] mb-5" style={{ color: ACHARAF_PRIMARY }}>
