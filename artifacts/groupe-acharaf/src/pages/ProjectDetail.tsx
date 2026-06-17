@@ -101,7 +101,9 @@ import {
   Hospital,
   Flower2,
   Key,
-  Star
+  Star,
+  Wind,
+  Layers
 } from "lucide-react";
 
 const amenityIconMap: Record<string, React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>> = {
@@ -129,6 +131,8 @@ const amenityIconMap: Record<string, React.ComponentType<{ size?: number; classN
   garden: Flower2,
   key: Key,
   star: Star,
+  wind: Wind,
+  terrace: Layers,
 };
 
 function parseAmenity(val: string): { text: string; icon: string } {

@@ -269,7 +269,9 @@ import {
   MapPin,
   Flower2,
   Key,
-  Star
+  Star,
+  Wind,
+  Layers
 } from "lucide-react";
 
 const amenityIconMap: Record<string, React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>> = {
@@ -297,6 +299,8 @@ const amenityIconMap: Record<string, React.ComponentType<{ size?: number; classN
   garden: Flower2,
   key: Key,
   star: Star,
+  wind: Wind,
+  terrace: Layers,
 };
 
 const AMENITY_ICONS = [
@@ -324,6 +328,8 @@ const AMENITY_ICONS = [
   { value: "garden", label: "Jardin / Fleur (Garden)" },
   { value: "key", label: "Clé / Clé en main (Key)" },
   { value: "star", label: "Étoile / Prestation de luxe (Star)" },
+  { value: "wind", label: "Climatisation (Wind)" },
+  { value: "terrace", label: "Balcon / Terrasse (Layers)" },
 ];
 
 function parseAmenity(val: string): { text: string; icon: string } {
