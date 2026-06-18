@@ -19,6 +19,18 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+function slugifyProjectTitle(value: string | null | undefined): string {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 const app: Express = express();
 
 app.use(
@@ -214,16 +226,17 @@ if (process.env.NODE_ENV === "production") {
       }
 
       const [project] = await db
-        .select({ slug: projectsTable.slug })
+        .select({ slug: projectsTable.slug, title: projectsTable.title })
         .from(projectsTable)
         .where(eq(projectsTable.id, projectId));
 
-      if (!project?.slug) {
+      if (!project) {
         next();
         return;
       }
 
-      res.redirect(301, `/nos-projets/${project.slug}`);
+      const cleanSlug = slugifyProjectTitle(project.slug) || slugifyProjectTitle(project.title) || projectId.toString();
+      res.redirect(301, `/nos-projets/${cleanSlug}`);
     } catch {
       next();
     }
@@ -250,33 +263,74 @@ if (process.env.NODE_ENV === "production") {
       const projectMatch = urlPath.match(/^\/nos-projets\/([^/]+)\/?$/);
       if (projectMatch) {
         const slug = projectMatch[1];
-        const [project] = await db
-          .select({
-            title: projectsTable.title,
-            metaTitle: projectsTable.metaTitle,
-            metaDescription: projectsTable.metaDescription,
-            shortDescription: projectsTable.shortDescription,
-            description: projectsTable.description,
-            coverImageUrl: projectsTable.coverImageUrl,
-            ogImageUrl: projectsTable.ogImageUrl,
-            city: projectsTable.city,
-            location: projectsTable.location,
-            addressText: projectsTable.addressText,
-            brandId: projectsTable.brandId,
-            status: projectsTable.status,
-            priceMin: projectsTable.priceMin,
-            showPrice: projectsTable.showPrice,
-          })
-          .from(projectsTable)
-          .where(
-            isNaN(Number(slug))
-              ? eq(projectsTable.slug, slug)
-              : eq(projectsTable.id, Number(slug))
-          );
+        
+        let project;
+        if (!isNaN(Number(slug))) {
+          [project] = await db
+            .select({
+              title: projectsTable.title,
+              metaTitle: projectsTable.metaTitle,
+              metaDescription: projectsTable.metaDescription,
+              shortDescription: projectsTable.shortDescription,
+              description: projectsTable.description,
+              coverImageUrl: projectsTable.coverImageUrl,
+              ogImageUrl: projectsTable.ogImageUrl,
+              city: projectsTable.city,
+              location: projectsTable.location,
+              addressText: projectsTable.addressText,
+              brandId: projectsTable.brandId,
+              status: projectsTable.status,
+              priceMin: projectsTable.priceMin,
+              showPrice: projectsTable.showPrice,
+            })
+            .from(projectsTable)
+            .where(eq(projectsTable.id, Number(slug)));
+        } else {
+          // Fetch id, slug, title of all projects to match case-insensitively/slugified
+          const allProjects = await db
+            .select({
+              id: projectsTable.id,
+              slug: projectsTable.slug,
+              title: projectsTable.title,
+            })
+            .from(projectsTable);
+
+          const targetSlug = slugifyProjectTitle(slug);
+          const matched = allProjects.find((p) => {
+            const pSlug = slugifyProjectTitle(p.slug) || slugifyProjectTitle(p.title) || p.id.toString();
+            return pSlug === targetSlug;
+          });
+
+          if (matched) {
+            [project] = await db
+              .select({
+                title: projectsTable.title,
+                metaTitle: projectsTable.metaTitle,
+                metaDescription: projectsTable.metaDescription,
+                shortDescription: projectsTable.shortDescription,
+                description: projectsTable.description,
+                coverImageUrl: projectsTable.coverImageUrl,
+                ogImageUrl: projectsTable.ogImageUrl,
+                city: projectsTable.city,
+                location: projectsTable.location,
+                addressText: projectsTable.addressText,
+                brandId: projectsTable.brandId,
+                status: projectsTable.status,
+                priceMin: projectsTable.priceMin,
+                showPrice: projectsTable.showPrice,
+              })
+              .from(projectsTable)
+              .where(eq(projectsTable.id, matched.id));
+          }
+        }
 
         if (project) {
           const title = (project.metaTitle || `${project.title} | Immobilier à ${project.city ?? project.location} | Groupe Acharaf`).trim();
-          const description = (project.metaDescription || project.shortDescription || project.description || "").trim();
+          let description = (project.metaDescription || project.shortDescription || project.description || "").trim();
+          if (!description) {
+            const cityPart = project.city || project.location ? ` à ${project.city || project.location}` : "";
+            description = `Découvrez ${project.title}, un projet immobilier d'exception réalisé par le Groupe Acharaf${cityPart}. Retrouvez toutes les informations, caractéristiques et prestations de haut standing.`;
+          }
           const cover = project.ogImageUrl || project.coverImageUrl || "https://groupeacharaf.ma/opengraph.jpg";
           const ogUrl = `https://groupeacharaf.ma/nos-projets/${slug}`;
 
