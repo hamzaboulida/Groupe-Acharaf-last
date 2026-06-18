@@ -34,9 +34,9 @@ const formSchema = z.object({
 
 export default function Contact() {
   usePageSeo({
-    title: "Contact | Groupe Acharaf",
+    title: "Contact & Bureaux de Vente | Groupe Acharaf Maroc",
     description:
-      "Contactez Groupe Acharaf pour vos projets immobiliers au Maroc et échangez avec notre équipe.",
+      "Contactez le Groupe Acharaf, promoteur immobilier au Maroc. Nos coordonnées, adresse de notre siège à Casablanca et formulaires de contact.",
     path: "/contact",
   });
   useStructuredData(

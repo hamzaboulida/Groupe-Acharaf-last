@@ -445,9 +445,9 @@ function SpontaneousApplicationModal({ onClose }: { onClose: () => void }) {
 /* ── Page ────────────────────────────────────────────────── */
 export default function Carrieres() {
   usePageSeo({
-    title: "Carrières | Groupe Acharaf",
+    title: "Carrières & Recrutement | Rejoindre le Groupe Acharaf",
     description:
-      "Consultez nos opportunités de carrière et déposez votre candidature spontanée pour rejoindre Groupe Acharaf.",
+      "Rejoignez Groupe Acharaf, promoteur immobilier marocain d'excellence. Consultez nos offres d'emploi ou déposez une candidature spontanée.",
     path: "/carrieres",
   });
 

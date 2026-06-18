@@ -18,9 +18,9 @@ const fade = (delay = 0, y = 28) => ({
 
 export default function APropos() {
   usePageSeo({
-    title: "À propos | Groupe Acharaf",
+    title: "À propos du Groupe Acharaf | Promoteur Immobilier Maroc",
     description:
-      "Découvrez l’histoire, la vision et l’exigence de Groupe Acharaf, promoteur immobilier premium au Maroc.",
+      "Découvrez l’histoire, la vision et l’exigence de Groupe Acharaf, promoteur immobilier marocain d'excellence de haut standing. Plus de 40 ans de savoir-faire.",
     path: "/a-propos",
   });
   useStructuredData(

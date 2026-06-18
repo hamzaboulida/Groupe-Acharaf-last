@@ -25,9 +25,9 @@ export default function Opportunites() {
   const [activeType, setActiveType] = useState<keyof typeof OPPORTUNITY_LABELS>("all");
 
   usePageSeo({
-    title: "Opportunités immobilières au Maroc | Groupe Acharaf",
+    title: "Opportunités d'Investissement Immobilier au Maroc | Groupe Acharaf",
     description:
-      "Découvrez les opportunités immobilières Groupe Acharaf : lots R+1, lots R+2, lots R+3 et crèche au Maroc.",
+      "Découvrez nos opportunités d'investissement immobilier au Maroc : terrains et lots R+1, R+2, R+3 et locaux commerciaux de haut standing.",
     path: "/opportunites",
   });
   useStructuredData(

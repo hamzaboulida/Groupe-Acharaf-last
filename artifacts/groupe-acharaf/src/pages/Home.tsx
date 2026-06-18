@@ -104,9 +104,9 @@ function SectionReveal({
 /* ════════════════════════════════════════════════════════ */
 export default function Home() {
   usePageSeo({
-    title: "Groupe Acharaf — Immobilier d'Exception au Maroc",
+    title: "Groupe Acharaf | Promoteur Immobilier d'Exception au Maroc",
     description:
-      "Promoteur immobilier marocain d’excellence. Découvrez nos projets, nos opportunités et notre vision résidentielle premium.",
+      "Groupe Acharaf, promoteur immobilier marocain d'excellence. Découvrez nos projets de luxe et de haut standing à Casablanca, Marrakech, Agadir et Meknès.",
     path: "/",
   });
   useStructuredData(
@@ -364,13 +364,13 @@ export default function Home() {
             </motion.h1>
           </div>
           <div className="overflow-hidden mb-14">
-            <motion.h1
+            <motion.p
               className="text-[13vw] md:text-[10vw] lg:text-[8vw] font-serif font-light italic text-white/50 leading-[0.88] tracking-tight"
               initial={{ y: "110%" }} animate={{ y: 0 }}
               transition={{ duration: 1.2, delay: 0.7, ease: EC }}
             >
               commence ici.
-            </motion.h1>
+            </motion.p>
           </div>
 
           <motion.div

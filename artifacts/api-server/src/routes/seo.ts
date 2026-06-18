@@ -7,6 +7,18 @@ const router = Router();
 
 const BASE_URL = "https://groupeacharaf.ma";
 
+function slugifyProjectTitle(value: string | null | undefined): string {
+  return (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 router.get("/robots.txt", (_req, res) => {
   res.type("text/plain");
   res.send(`User-agent: *
@@ -21,7 +33,12 @@ Sitemap: ${BASE_URL}/sitemap.xml
 router.get("/sitemap.xml", async (_req, res) => {
   try {
     const [allProjects, allArticles] = await Promise.all([
-      db.select({ id: projectsTable.id, slug: projectsTable.slug, updatedAt: projectsTable.updatedAt }).from(projectsTable),
+      db.select({
+        id: projectsTable.id,
+        slug: projectsTable.slug,
+        title: projectsTable.title,
+        updatedAt: projectsTable.updatedAt
+      }).from(projectsTable),
       db.select({ id: articlesTable.id, slug: articlesTable.slug, updatedAt: articlesTable.updatedAt })
         .from(articlesTable)
         .where(eq(articlesTable.published, true)),
@@ -35,22 +52,27 @@ router.get("/sitemap.xml", async (_req, res) => {
       { loc: `${BASE_URL}/opportunites`, priority: "0.8", changefreq: "weekly" },
       { loc: `${BASE_URL}/carrieres`, priority: "0.6", changefreq: "weekly" },
       { loc: `${BASE_URL}/contact`, priority: "0.7", changefreq: "monthly" },
-      { loc: `${BASE_URL}/actualites`, priority: "0.4", changefreq: "monthly" },
     ];
 
-    const projectUrls = allProjects.map((p) => ({
-      loc: `${BASE_URL}/nos-projets/${p.slug || p.id}`,
-      priority: "0.8",
-      changefreq: "monthly",
-      lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().split("T")[0] : undefined,
-    }));
+    const projectUrls = allProjects.map((p) => {
+      const slug = slugifyProjectTitle(p.slug) || slugifyProjectTitle(p.title) || p.id.toString();
+      return {
+        loc: `${BASE_URL}/nos-projets/${slug}`,
+        priority: "0.8",
+        changefreq: "monthly",
+        lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().split("T")[0] : undefined,
+      };
+    });
 
-    const articleUrls = allArticles.map((a) => ({
-      loc: `${BASE_URL}/actualites/${a.slug || a.id}`,
-      priority: "0.7",
-      changefreq: "monthly",
-      lastmod: a.updatedAt ? new Date(a.updatedAt).toISOString().split("T")[0] : undefined,
-    }));
+    const articleUrls = allArticles.map((a) => {
+      const slug = a.slug || a.id.toString();
+      return {
+        loc: `${BASE_URL}/actualites/${slug}`,
+        priority: "0.7",
+        changefreq: "monthly",
+        lastmod: a.updatedAt ? new Date(a.updatedAt).toISOString().split("T")[0] : undefined,
+      };
+    });
 
     const allUrls = [...staticUrls, ...projectUrls, ...articleUrls];
 

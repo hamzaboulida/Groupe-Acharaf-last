@@ -308,9 +308,9 @@ function AcharafContent({ projects }: { projects?: BrandPreviewProject[] }) {
 
 export default function NosMarques() {
   usePageSeo({
-    title: "Nos Marques | Groupe Acharaf",
+    title: "Nos Marques : Estya & Acharaf | Immobilier de Luxe & Premium Maroc",
     description:
-      "Explorez les univers Estya et Acharaf Immobilier, deux signatures complémentaires du Groupe Acharaf.",
+      "Découvrez Estya (immobilier de luxe au Maroc) et Acharaf Immobilier (résidences premium de haut standing), les deux signatures de prestige du Groupe Acharaf.",
     path: "/nos-marques",
   });
   useStructuredData(

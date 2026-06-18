@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { eq } from "drizzle-orm";
 import router from "./routes";
@@ -189,6 +190,21 @@ if (process.env.NODE_ENV === "production") {
     "public",
   );
 
+  // www to non-www 301 redirection
+  app.use((req, res, next) => {
+    const host = req.headers.host || "";
+    if (host.startsWith("www.")) {
+      const nonWwwHost = host.slice(4);
+      return res.redirect(301, `https://${nonWwwHost}${req.originalUrl}`);
+    }
+    next();
+  });
+
+  // Server-side 301 redirect for /projets
+  app.get("/projets", (_req, res) => {
+    res.redirect(301, "/nos-projets");
+  });
+
   app.get(/^\/(?:nos-projets|projets)\/(\d+)\/?$/, async (req, res, next) => {
     try {
       const projectId = Number(req.params[0]);
@@ -214,9 +230,149 @@ if (process.env.NODE_ENV === "production") {
   });
 
   app.use(express.static(frontendDist));
-  // SPA fallback — send index.html for any non-API route (Express v5 syntax)
-  app.get(/.*/, (_req, res) => {
-    res.sendFile(path.join(frontendDist, "index.html"));
+
+  // Load index.html in memory for dynamic prerendering
+  const indexPath = path.join(frontendDist, "index.html");
+  let indexHtml = "";
+  try {
+    indexHtml = fs.readFileSync(indexPath, "utf-8");
+  } catch (err) {
+    logger.error(err, "Failed to read index.html");
+  }
+
+  // SPA fallback — serve dynamically populated HTML for bots and crawlers
+  app.get(/.*/, async (req, res) => {
+    const urlPath = req.path;
+    let html = indexHtml;
+
+    try {
+      // 1. Project Detail Page
+      const projectMatch = urlPath.match(/^\/nos-projets\/([^/]+)\/?$/);
+      if (projectMatch) {
+        const slug = projectMatch[1];
+        const [project] = await db
+          .select({
+            title: projectsTable.title,
+            metaTitle: projectsTable.metaTitle,
+            metaDescription: projectsTable.metaDescription,
+            shortDescription: projectsTable.shortDescription,
+            description: projectsTable.description,
+            coverImageUrl: projectsTable.coverImageUrl,
+            ogImageUrl: projectsTable.ogImageUrl,
+            city: projectsTable.city,
+            location: projectsTable.location,
+            addressText: projectsTable.addressText,
+            brandId: projectsTable.brandId,
+            status: projectsTable.status,
+            priceMin: projectsTable.priceMin,
+            showPrice: projectsTable.showPrice,
+          })
+          .from(projectsTable)
+          .where(
+            isNaN(Number(slug))
+              ? eq(projectsTable.slug, slug)
+              : eq(projectsTable.id, Number(slug))
+          );
+
+        if (project) {
+          const title = (project.metaTitle || `${project.title} | Immobilier à ${project.city ?? project.location} | Groupe Acharaf`).trim();
+          const description = (project.metaDescription || project.shortDescription || project.description || "").trim();
+          const cover = project.ogImageUrl || project.coverImageUrl || "https://groupeacharaf.ma/opengraph.jpg";
+          const ogUrl = `https://groupeacharaf.ma/nos-projets/${slug}`;
+
+          html = html
+            .replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
+            .replace(/<meta property="og:title" content=".*?"\s*\/?>/g, `<meta property="og:title" content="${title}" />`)
+            .replace(/<meta name="twitter:title" content=".*?"\s*\/?>/g, `<meta name="twitter:title" content="${title}" />`)
+            .replace(/<meta name="description" content=".*?"\s*\/?>/g, `<meta name="description" content="${description}" />`)
+            .replace(/<meta property="og:description" content=".*?"\s*\/?>/g, `<meta property="og:description" content="${description}" />`)
+            .replace(/<meta name="twitter:description" content=".*?"\s*\/?>/g, `<meta name="twitter:description" content="${description}" />`)
+            .replace(/<meta property="og:url" content=".*?"\s*\/?>/g, `<meta property="og:url" content="${ogUrl}" />`)
+            .replace(/<meta property="og:image" content=".*?"\s*\/?>/g, `<meta property="og:image" content="${cover}" />`)
+            .replace(/<meta name="twitter:image" content=".*?"\s*\/?>/g, `<meta name="twitter:image" content="${cover}" />`)
+            .replace(/<link rel="canonical" href=".*?"\s*\/?>/g, `<link rel="canonical" href="${ogUrl}" />`);
+
+          const brandName = project.brandId === 1 ? "Estya" : "Acharaf Immobilier";
+          const projectSchema = {
+            "@context": "https://schema.org",
+            "@type": "Residence",
+            name: project.title,
+            url: ogUrl,
+            description: description,
+            image: cover,
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: project.city || project.location || "",
+              addressCountry: "MA",
+              streetAddress: project.addressText || "",
+            },
+            brand: {
+              "@type": "Brand",
+              name: brandName,
+            },
+            offers: {
+              "@type": "Offer",
+              priceCurrency: "MAD",
+              availability: project.status === "completed" ? "https://schema.org/LimitedAvailability" : "https://schema.org/InStock",
+              price: (project.showPrice && project.priceMin) ? project.priceMin : undefined,
+            }
+          };
+
+          const breadcrumb = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Accueil", item: "https://groupeacharaf.ma/" },
+              { "@type": "ListItem", position: 2, name: "Nos Projets", item: "https://groupeacharaf.ma/nos-projets" },
+              { "@type": "ListItem", position: 3, name: project.title, item: ogUrl }
+            ]
+          };
+
+          const schemaScript = `
+            <script type="application/ld+json" id="ga-project-schema">${JSON.stringify(projectSchema)}</script>
+            <script type="application/ld+json" id="ga-breadcrumb-project">${JSON.stringify(breadcrumb)}</script>
+          </head>`;
+          html = html.replace("</head>", schemaScript);
+        }
+      }
+
+      // 2. Static Pages
+      if (urlPath === "/a-propos") {
+        html = html
+          .replace(/<title>.*?<\/title>/, "<title>À propos du Groupe Acharaf | Promoteur Immobilier Maroc</title>")
+          .replace(/<meta name="description" content=".*?"\s*\/?>/g, '<meta name="description" content="Découvrez l’histoire, la vision et l’exigence de Groupe Acharaf, promoteur immobilier marocain d\'excellence de haut standing. Plus de 40 ans de savoir-faire." />')
+          .replace(/<link rel="canonical" href=".*?"\s*\/?>/g, '<link rel="canonical" href="https://groupeacharaf.ma/a-propos" />');
+      } else if (urlPath === "/nos-marques") {
+        html = html
+          .replace(/<title>.*?<\/title>/, "<title>Nos Marques : Estya & Acharaf | Immobilier de Luxe & Premium Maroc</title>")
+          .replace(/<meta name="description" content=".*?"\s*\/?>/g, '<meta name="description" content="Découvrez Estya (immobilier de luxe au Maroc) et Acharaf Immobilier (résidences premium de haut standing), les deux signatures de prestige du Groupe Acharaf." />')
+          .replace(/<link rel="canonical" href=".*?"\s*\/?>/g, '<link rel="canonical" href="https://groupeacharaf.ma/nos-marques" />');
+      } else if (urlPath === "/nos-projets") {
+        html = html
+          .replace(/<title>.*?<\/title>/, "<title>Projets Immobiliers de Haut Standing au Maroc | Groupe Acharaf</title>")
+          .replace(/<meta name="description" content=".*?"\s*\/?>/g, '<meta name="description" content="Découvrez les projets immobiliers de haut standing et de luxe du Groupe Acharaf à Agadir, Marrakech et Meknès. Résidences neuves d\'exception." />')
+          .replace(/<link rel="canonical" href=".*?"\s*\/?>/g, '<link rel="canonical" href="https://groupeacharaf.ma/nos-projets" />');
+      } else if (urlPath === "/opportunites") {
+        html = html
+          .replace(/<title>.*?<\/title>/, "<title>Opportunités d'Investissement Immobilier au Maroc | Groupe Acharaf</title>")
+          .replace(/<meta name="description" content=".*?"\s*\/?>/g, '<meta name="description" content="Découvrez nos opportunités d\'investissement immobilier au Maroc : terrains et lots R+1, R+2, R+3 et locaux commerciaux de haut standing." />')
+          .replace(/<link rel="canonical" href=".*?"\s*\/?>/g, '<link rel="canonical" href="https://groupeacharaf.ma/opportunites" />');
+      } else if (urlPath === "/carrieres") {
+        html = html
+          .replace(/<title>.*?<\/title>/, "<title>Carrières & Recrutement | Rejoindre le Groupe Acharaf</title>")
+          .replace(/<meta name="description" content=".*?"\s*\/?>/g, '<meta name="description" content="Rejoignez Groupe Acharaf, promoteur immobilier marocain d\'excellence. Consultez nos offres d\'emploi ou déposez une candidature spontanée." />')
+          .replace(/<link rel="canonical" href=".*?"\s*\/?>/g, '<link rel="canonical" href="https://groupeacharaf.ma/carrieres" />');
+      } else if (urlPath === "/contact") {
+        html = html
+          .replace(/<title>.*?<\/title>/, "<title>Contact & Bureaux de Vente | Groupe Acharaf Maroc</title>")
+          .replace(/<meta name="description" content=".*?"\s*\/?>/g, '<meta name="description" content="Contactez le Groupe Acharaf, promoteur immobilier au Maroc. Nos coordonnées, adresse de notre siège à Casablanca et formulaires de contact." />')
+          .replace(/<link rel="canonical" href=".*?"\s*\/?>/g, '<link rel="canonical" href="https://groupeacharaf.ma/contact" />');
+      }
+    } catch (err) {
+      logger.error(err, "Prerender meta replacement failed");
+    }
+
+    res.send(html);
   });
 }
 

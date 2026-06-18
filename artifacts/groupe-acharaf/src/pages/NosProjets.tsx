@@ -11,9 +11,9 @@ import { breadcrumbSchema, useStructuredData } from "@/lib/structured-data";
 
 export default function NosProjets() {
   usePageSeo({
-    title: "Projets immobiliers au Maroc | Groupe Acharaf",
+    title: "Projets Immobiliers de Haut Standing au Maroc | Groupe Acharaf",
     description:
-      "Découvrez les projets immobiliers Groupe Acharaf au Maroc : résidences premium, adresses d’exception et opportunités en cours.",
+      "Découvrez les projets immobiliers de haut standing et de luxe du Groupe Acharaf à Agadir, Marrakech et Meknès. Résidences neuves d'exception.",
     path: "/nos-projets",
   });
   useStructuredData(
@@ -141,6 +141,8 @@ export default function NosProjets() {
                             className="w-full h-full object-cover"
                             whileHover={{ scale: 1.04 }}
                             transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+                            loading="eager"
+                            fetchPriority="high"
                           />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-[#082634]/55 via-transparent to-transparent" />
@@ -192,6 +194,7 @@ export default function NosProjets() {
                               className="w-full h-full object-cover"
                               whileHover={{ scale: 1.06 }}
                               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                              loading="lazy"
                             />
                           )}
                           <div className="absolute inset-0 bg-[#082634]/10 group-hover:bg-transparent transition-colors duration-700" />
