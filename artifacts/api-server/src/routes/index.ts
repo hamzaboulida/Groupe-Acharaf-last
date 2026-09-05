@@ -10,6 +10,7 @@ import statsRouter from "./stats";
 import seoRouter from "./seo";
 import uploadsRouter from "./uploads";
 import homepageHeroRouter from "./homepage-hero";
+import homepageImpactRouter from "./homepage-impact";
 import adminAuthRouter from "./admin-auth";
 import { requireAdminAuth } from "../lib/admin-auth";
 
@@ -30,6 +31,7 @@ router.use(
     "/careers/:id",
     "/applications",
     "/homepage-hero",
+    "/homepage-impact",
     "/leads",
     "/leads/:id",
     "/subscribers",
@@ -54,8 +56,10 @@ router.use(
 
 router.use(uploadsRouter);
 router.use(homepageHeroRouter);
+router.use(homepageImpactRouter);
 router.use(brandsRouter);
 router.use(projectsRouter);
+
 router.use(articlesRouter);
 router.use(careersRouter);
 router.use(leadsRouter);

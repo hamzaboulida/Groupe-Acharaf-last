@@ -5,3 +5,5 @@ export * from "./careers";
 export * from "./leads";
 export * from "./subscribers";
 export * from "./homepageHeroSettings";
+export * from "./homepageImpactSettings";
+

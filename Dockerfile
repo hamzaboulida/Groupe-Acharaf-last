@@ -25,13 +25,9 @@ COPY artifacts/api-server/ ./artifacts/api-server/
 COPY artifacts/groupe-acharaf/ ./artifacts/groupe-acharaf/
 COPY lib/ ./lib/
 
-# Build shared libs first
-RUN pnpm --filter "@workspace/api-zod" --filter "@workspace/api-client-react" --filter "@workspace/db" install --frozen-lockfile
-
-# Note: We run the root build. This will trigger typechecking and building all workspaces
-# PORT is not used at build time but prevents vite config crashing if any plugin reads it
+# Build api-server and groupe-acharaf
 ENV PORT=5000
-RUN pnpm run build
+RUN pnpm --filter "@workspace/api-server" --filter "@workspace/groupe-acharaf" run build
 
 # ---
 # Runner Stage

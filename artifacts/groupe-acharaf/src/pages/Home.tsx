@@ -101,6 +101,140 @@ function SectionReveal({
   );
 }
 
+type StatItem = {
+  id: string;
+  value: number;
+  label: string;
+  suffix?: string;
+  isVisible: boolean;
+};
+
+type HomepageImpactData = {
+  isVisible: boolean;
+  title: string;
+  items: StatItem[];
+};
+
+const DEFAULT_IMPACT_ITEMS: StatItem[] = [
+  { id: "stat-1", value: 41, label: "Projets livrés", suffix: "", isVisible: true },
+  { id: "stat-2", value: 46, label: "Années d'expérience", suffix: "", isVisible: true },
+  { id: "stat-3", value: 9720, label: "Unités livrées", suffix: "", isVisible: true },
+  { id: "stat-4", value: 7, label: "Villes présentes", suffix: "", isVisible: true },
+];
+
+function HomeStatsSection() {
+  const [impactData, setImpactData] = useState<HomepageImpactData | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/homepage-impact")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!isMounted) return;
+        if (data) {
+          setImpactData({
+            isVisible: data.isVisible ?? true,
+            title: data.title ?? "Notre Impact · En chiffres",
+            items: data.items ?? DEFAULT_IMPACT_ITEMS,
+          });
+        } else {
+          setImpactData({
+            isVisible: true,
+            title: "Notre Impact · En chiffres",
+            items: DEFAULT_IMPACT_ITEMS,
+          });
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setImpactData({
+            isVisible: true,
+            title: "Notre Impact · En chiffres",
+            items: DEFAULT_IMPACT_ITEMS,
+          });
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (!impactData || !impactData.isVisible) {
+    return null;
+  }
+
+  const visibleItems = impactData.items.filter((item) => item.isVisible);
+  if (visibleItems.length === 0) {
+    return null;
+  }
+
+  const gridColsClass =
+    visibleItems.length === 1
+      ? "grid-cols-1"
+      : visibleItems.length === 2
+      ? "grid-cols-2 lg:grid-cols-2"
+      : visibleItems.length === 3
+      ? "grid-cols-2 lg:grid-cols-3"
+      : "grid-cols-2 lg:grid-cols-4";
+
+  return (
+    <section className="bg-[#DCE0E7] relative overflow-hidden py-20 md:py-28">
+      <SectionReveal className="container mx-auto px-6 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: EC }}
+          className="flex items-center gap-4 mb-10 md:mb-14"
+        >
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.0, ease: EC }}
+            style={{ originX: 0 }}
+            className="w-10 h-px bg-[#8EA4AF]/50"
+          />
+          <p className="text-[10px] tracking-[0.32em] uppercase text-[#082634]">
+            {impactData.title}
+          </p>
+        </motion.div>
+
+        <div className={`grid ${gridColsClass} gap-0`}>
+          {visibleItems.map((stat, i) => (
+            <motion.div
+              key={stat.id || i}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 1.1, delay: i * 0.14, ease: EC }}
+              className="group relative min-w-0 px-6 lg:px-10 py-8 lg:py-0 border-r border-[#8EA4AF]/15 last:border-r-0 even:border-r-0 lg:even:border-r lg:last:border-r-0"
+            >
+              <motion.div
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.1, delay: i * 0.14, ease: EC }}
+                style={{ originX: 0 }}
+                className="w-full h-px bg-[#8EA4AF]/25 mb-8 lg:mb-10 hidden lg:block"
+              />
+              <div
+                className="font-serif font-light text-[#082634] leading-none tracking-tight mb-3 tabular-nums whitespace-nowrap"
+                style={{ fontSize: "clamp(2.6rem, 5vw, 5.5rem)" }}
+              >
+                <CountUp end={stat.value} duration={2.0} suffix={stat.suffix || ""} />
+              </div>
+              <p className="text-[10px] tracking-[0.26em] uppercase text-[#082634] group-hover:text-[#082634] transition-colors duration-700">
+                {stat.label}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </SectionReveal>
+    </section>
+  );
+}
+
 /* ════════════════════════════════════════════════════════ */
 export default function Home() {
   usePageSeo({
@@ -538,66 +672,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════
           KEY NUMBERS — Typographic authority monument
       ══════════════════════════════════════════════ */}
-      {stats && (
-        <section className="bg-[#DCE0E7] relative overflow-hidden py-20 md:py-28">
-          <SectionReveal className="container mx-auto px-6 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.2, ease: EC }}
-              className="flex items-center gap-4 mb-10 md:mb-14"
-            >
-              <motion.div
-                initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.0, ease: EC }}
-                style={{ originX: 0 }}
-                className="w-10 h-px bg-[#8EA4AF]/50"
-              />
-              <p className="text-[10px] tracking-[0.32em] uppercase text-[#082634]">
-                Notre Impact · En chiffres
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-0">
-              {[
-                { label: "Projets livrés",      value: stats.deliveredProjects, suffix: ""  },
-                { label: "Années d'expérience", value: stats.yearsExperience,   suffix: ""  },
-                { label: "Unités livrées",       value: stats.totalUnits,        suffix: "" },
-                { label: "Villes présentes",     value: stats.cities,            suffix: ""  },
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 1.1, delay: i * 0.14, ease: EC }}
-                  className="group relative min-w-0 px-6 lg:px-10 py-8 lg:py-0 border-r border-[#8EA4AF]/15 last:border-r-0 even:border-r-0 lg:even:border-r lg:last:border-r-0"
-                >
-                  <motion.div
-                    initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1.1, delay: i * 0.14, ease: EC }}
-                    style={{ originX: 0 }}
-                    className="w-full h-px bg-[#8EA4AF]/25 mb-8 lg:mb-10 hidden lg:block"
-                  />
-                  <div
-                    className="font-serif font-light text-[#082634] leading-none tracking-tight mb-3 tabular-nums whitespace-nowrap"
-                    style={{ fontSize: "clamp(2.6rem, 5vw, 5.5rem)" }}
-                  >
-                    <CountUp end={stat.value} duration={2.0} suffix={stat.suffix} />
-                  </div>
-                  <p className="text-[10px] tracking-[0.26em] uppercase text-[#082634] group-hover:text-[#082634] transition-colors duration-700">
-                    {stat.label}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </SectionReveal>
-        </section>
-      )}
+      <HomeStatsSection />
 
       {/* ══════════════════════════════════════════════
           FEATURED PROJECTS

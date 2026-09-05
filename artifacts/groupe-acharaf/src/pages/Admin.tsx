@@ -26,14 +26,15 @@ import {
 } from "@workspace/api-client-react";
 import { motion, Reorder } from "framer-motion";
 import { projectPriceLabel, statusBadgeClass, statusLabel } from "@/lib/project-display";
-import { ArrowDown, ArrowUp, GripVertical, Image as ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
+import { ArrowDown, ArrowUp, GripVertical, Image as ImageIcon, Loader2, Trash2, Upload, Eye, EyeOff, Plus, Save } from "lucide-react";
 import { usePageSeo } from "@/lib/seo";
 
-type Tab = "projects" | "leads" | "articles" | "careers" | "applications";
+type Tab = "projects" | "impact" | "leads" | "articles" | "careers" | "applications";
 type OpportunityCategory = "lots_r1" | "lots_r2" | "lots_r3" | "creche";
 
 const NAV_ITEMS: { id: Tab; label: string }[] = [
   { id: "projects", label: "Projets" },
+  { id: "impact", label: "Impact en chiffres" },
   { id: "leads", label: "Leads" },
   { id: "articles", label: "Articles" },
   { id: "careers", label: "Offres d'emploi" },
@@ -2208,6 +2209,281 @@ function ApplicationsTab() {
 }
 
 // ──────────────────────────────────────────────────────────
+// IMPACT EN CHIFFRES TAB
+// ──────────────────────────────────────────────────────────
+type StatItem = {
+  id: string;
+  value: number;
+  label: string;
+  suffix?: string;
+  isVisible: boolean;
+};
+
+type HomepageImpactSettings = {
+  id: number;
+  isVisible: boolean;
+  title: string;
+  items: StatItem[];
+};
+
+function ImpactTab() {
+  const [settings, setSettings] = useState<HomepageImpactSettings>({
+    id: 1,
+    isVisible: true,
+    title: "NOTRE IMPACT · EN CHIFFRES",
+    items: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    async function loadImpactSettings() {
+      try {
+        setIsLoading(true);
+        const res = await fetch("/api/homepage-impact");
+        if (!res.ok) throw new Error("Erreur de chargement");
+        const data = await res.json();
+        setSettings({
+          id: data.id ?? 1,
+          isVisible: data.isVisible ?? true,
+          title: data.title ?? "NOTRE IMPACT · EN CHIFFRES",
+          items: data.items ?? [],
+        });
+      } catch (err: any) {
+        setErrorMessage(err.message || "Erreur au chargement de la section impact.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadImpactSettings();
+  }, []);
+
+  async function handleSave() {
+    try {
+      setIsSaving(true);
+      setMessage("");
+      setErrorMessage("");
+      const res = await fetch("/api/homepage-impact", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isVisible: settings.isVisible,
+          title: settings.title,
+          items: settings.items,
+        }),
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || "Impossible d’enregistrer la section.");
+      }
+      const saved = await res.json();
+      setSettings({
+        id: saved.id ?? 1,
+        isVisible: saved.isVisible ?? true,
+        title: saved.title ?? "NOTRE IMPACT · EN CHIFFRES",
+        items: saved.items ?? [],
+      });
+      setMessage("Réglages enregistrés avec succès.");
+    } catch (err: any) {
+      setErrorMessage(err.message || "Une erreur est survenue.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  function handleAddItem() {
+    const newItem: StatItem = {
+      id: `stat-${Date.now()}`,
+      value: 0,
+      label: "NOUVELLE STATISTIQUE",
+      suffix: "",
+      isVisible: true,
+    };
+    setSettings((prev) => ({ ...prev, items: [...prev.items, newItem] }));
+  }
+
+  function handleUpdateItem(id: string, field: keyof StatItem, val: any) {
+    setSettings((prev) => ({
+      ...prev,
+      items: prev.items.map((item) => (item.id === id ? { ...item, [field]: val } : item)),
+    }));
+  }
+
+  function handleToggleItem(id: string) {
+    setSettings((prev) => ({
+      ...prev,
+      items: prev.items.map((item) => (item.id === id ? { ...item, isVisible: !item.isVisible } : item)),
+    }));
+  }
+
+  function handleDeleteItem(id: string) {
+    setSettings((prev) => ({
+      ...prev,
+      items: prev.items.filter((item) => item.id !== id),
+    }));
+  }
+
+  function handleReorder(newItems: StatItem[]) {
+    setSettings((prev) => ({ ...prev, items: newItems }));
+  }
+
+  if (isLoading) {
+    return (
+      <div className="ga-admin-panel p-8 text-[#8EA4AF] flex items-center gap-3">
+        <Loader2 size={16} className="animate-spin" /> Chargement de la section Impact...
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 max-w-4xl">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-serif text-white">Notre impact · En chiffres</h2>
+          <p className="text-[#8EA4AF] text-sm mt-1">Gérez la section d’impact de la page d’accueil, ses titres et ses chiffres clés.</p>
+        </div>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="ga-btn btn-medium px-6 py-2.5 flex items-center gap-2 text-xs uppercase tracking-wider disabled:opacity-50"
+        >
+          {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          {isSaving ? "Enregistrement..." : "Enregistrer les modifications"}
+        </button>
+      </div>
+
+      {message && <div className="border border-emerald-500/35 bg-emerald-500/10 text-emerald-400 text-sm px-4 py-3 rounded">{message}</div>}
+      {errorMessage && <div className="border border-red-500/35 bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded">{errorMessage}</div>}
+
+      {/* Global Section Settings */}
+      <div className="ga-admin-panel p-6 space-y-6">
+        <h3 className="text-white font-serif text-lg border-b border-white/10 pb-3">Paramètres généraux de la section</h3>
+
+        <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded">
+          <div>
+            <div className="text-white font-medium text-sm">Affichage de la section</div>
+            <div className="text-[#8EA4AF] text-xs mt-0.5">Activer ou masquer l’ensemble de la section "Notre impact · En chiffres" sur la page d’accueil.</div>
+          </div>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.isVisible}
+              onChange={(e) => setSettings((prev) => ({ ...prev, isVisible: e.target.checked }))}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8EA4AF]"></div>
+          </label>
+        </div>
+
+        <div>
+          <label className={labelClass}>Titre / Label de la section</label>
+          <input
+            type="text"
+            value={settings.title}
+            onChange={(e) => setSettings((prev) => ({ ...prev, title: e.target.value }))}
+            className={inputClass}
+            placeholder="NOTRE IMPACT · EN CHIFFRES"
+          />
+        </div>
+      </div>
+
+      {/* Individual Statistics list */}
+      <div className="ga-admin-panel p-6 space-y-6">
+        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div>
+            <h3 className="text-white font-serif text-lg">Statistiques ({settings.items.length})</h3>
+            <p className="text-[#8EA4AF] text-xs mt-0.5">Glissez-déposez pour réordonner les statistiques.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleAddItem}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#8EA4AF]/40 text-[#DCE0E7] hover:border-[#8EA4AF] hover:bg-white/5 text-xs tracking-wider uppercase transition-colors"
+          >
+            <Plus size={14} /> Ajouter une statistique
+          </button>
+        </div>
+
+        {settings.items.length === 0 ? (
+          <div className="text-center py-8 text-[#8EA4AF] text-sm">
+            Aucune statistique configurée. Cliquez sur "Ajouter une statistique" pour en créer une.
+          </div>
+        ) : (
+          <Reorder.Group axis="y" values={settings.items} onReorder={handleReorder} className="space-y-3">
+            {settings.items.map((item) => (
+              <Reorder.Item
+                key={item.id}
+                value={item}
+                className="ga-card-dark p-4 rounded border border-white/10 hover:border-white/20 transition-colors space-y-4"
+                whileDrag={{ scale: 1.01 }}
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="text-white/40 cursor-grab active:cursor-grabbing hover:text-white p-1">
+                      <GripVertical size={20} />
+                    </div>
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                      <div className="sm:col-span-3">
+                        <label className="text-[10px] text-[#8EA4AF] uppercase tracking-wider block mb-1">Valeur (Nombre)</label>
+                        <input
+                          type="number"
+                          value={item.value}
+                          onChange={(e) => handleUpdateItem(item.id, "value", Number(e.target.value))}
+                          className={inputClass}
+                          placeholder="Ex: 41"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="text-[10px] text-[#8EA4AF] uppercase tracking-wider block mb-1">Suffixe (opt.)</label>
+                        <input
+                          type="text"
+                          value={item.suffix || ""}
+                          onChange={(e) => handleUpdateItem(item.id, "suffix", e.target.value)}
+                          className={inputClass}
+                          placeholder="Ex: +"
+                        />
+                      </div>
+                      <div className="sm:col-span-7">
+                        <label className="text-[10px] text-[#8EA4AF] uppercase tracking-wider block mb-1">Libellé / Description</label>
+                        <input
+                          type="text"
+                          value={item.label}
+                          onChange={(e) => handleUpdateItem(item.id, "label", e.target.value)}
+                          className={inputClass}
+                          placeholder="Ex: PROJETS LIVRÉS"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-4 sm:pt-0 border-t sm:border-t-0 border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleItem(item.id)}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1.5 border text-xs tracking-wider uppercase transition-colors rounded ${
+                        item.isVisible
+                          ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20"
+                          : "border-white/20 text-white/40 bg-white/5 hover:bg-white/10"
+                      }`}
+                      title={item.isVisible ? "Masquer cette statistique" : "Afficher cette statistique"}
+                    >
+                      {item.isVisible ? <Eye size={14} /> : <EyeOff size={14} />}
+                      <span>{item.isVisible ? "Visible" : "Masqué"}</span>
+                    </button>
+                    <ConfirmButton onConfirm={() => handleDeleteItem(item.id)} />
+                  </div>
+                </div>
+              </Reorder.Item>
+            ))}
+          </Reorder.Group>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────
 // MAIN ADMIN PAGE
 // ──────────────────────────────────────────────────────────
 export default function Admin() {
@@ -2284,6 +2560,7 @@ export default function Admin() {
             transition={{ duration: 0.3 }}
           >
             {activeTab === "projects" && <ProjectsTab />}
+            {activeTab === "impact" && <ImpactTab />}
             {activeTab === "leads" && <LeadsTab />}
             {activeTab === "articles" && <ArticlesTab />}
             {activeTab === "careers" && <CareersTab />}
