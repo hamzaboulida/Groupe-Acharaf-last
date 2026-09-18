@@ -31,6 +31,11 @@ export function shouldShowProjectPrice(project: ProjectDisplay | null | undefine
 }
 
 export function projectPriceLabel(project: ProjectDisplay | null | undefined): string {
+  if (project?.status === "completed") {
+    if (!shouldShowProjectPrice(project) || !project?.priceMin) {
+      return "";
+    }
+  }
   if (!shouldShowProjectPrice(project)) return "Prix à consulter";
   if (!project?.priceMin) return "Prix à consulter";
   return `À partir de ${formatProjectPrice(project.priceMin)} DH`;

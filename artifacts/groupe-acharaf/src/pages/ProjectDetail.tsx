@@ -787,14 +787,16 @@ export default function ProjectDetail() {
             </div>
 
             {/* PRICE — dominant */}
-            <div className="col-span-2 md:col-span-3 lg:col-span-1 flex items-center gap-5 px-6 lg:px-8 py-7 bg-[#DCE0E7]/50">
-              <div className="min-w-0 flex-1">
-                <p className="text-[#8EA4AF] text-[10px] tracking-[0.2em] uppercase mb-2">{pricingLabel}</p>
-                <p className="text-[#082634] font-serif text-2xl lg:text-3xl font-semibold leading-none tracking-tight">
-                  {priceLabel}
-                </p>
+            {priceLabel && (
+              <div className="col-span-2 md:col-span-3 lg:col-span-1 flex items-center gap-5 px-6 lg:px-8 py-7 bg-[#DCE0E7]/50">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[#8EA4AF] text-[10px] tracking-[0.2em] uppercase mb-2">{pricingLabel}</p>
+                  <p className="text-[#082634] font-serif text-2xl lg:text-3xl font-semibold leading-none tracking-tight">
+                    {priceLabel}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -1098,50 +1100,52 @@ export default function ProjectDetail() {
       {/* ════════════════════════════════════════════════════
           8 · PRICE CTA BLOCK — Conversion trigger
       ════════════════════════════════════════════════════ */}
-      <section className="py-24 bg-[#082634]">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, ease: EC }}
-          className="container mx-auto px-6 text-center"
-        >
-          <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-5">Tarification</p>
-          <p className="text-white/60 text-sm font-light uppercase tracking-[0.18em] mb-3">
-            {pricingLabel}
-          </p>
-          <p className="text-5xl md:text-7xl font-serif font-light text-white tracking-tight mb-4">
-            {priceLabel}
-          </p>
-          {priceRangeLabel && (
-            <p className="text-white/50 font-light text-sm mb-8 tracking-wider">
-              {priceRangeLabel}
+      {project.status !== "completed" && Boolean(priceLabel) && (
+        <section className="py-24 bg-[#082634]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: EC }}
+            className="container mx-auto px-6 text-center"
+          >
+            <p className="text-[#8EA4AF] text-xs tracking-[0.22em] uppercase mb-5">Tarification</p>
+            <p className="text-white/60 text-sm font-light uppercase tracking-[0.18em] mb-3">
+              {pricingLabel}
             </p>
-          )}
-          {project.priceNote && (
-            <p className="text-white/55 text-xs font-light max-w-xs mx-auto leading-relaxed mb-10">
-              {project.priceNote}
+            <p className="text-5xl md:text-7xl font-serif font-light text-white tracking-tight mb-4">
+              {priceLabel}
             </p>
-          )}
-          {availabilityNote && (
-            <p className="text-white/45 text-xs font-light max-w-xs mx-auto leading-relaxed mb-10">
-              {availabilityNote}
-            </p>
-          )}
-          <div className="flex justify-center">
-            <a
-              href="#contact"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="flex items-center gap-3 bg-white text-[#082634] px-12 py-4 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#DCE0E7] transition-colors"
-            >
-              {secondaryCtaLabel} <ArrowRight size={13} />
-            </a>
-          </div>
-        </motion.div>
-      </section>
+            {priceRangeLabel && (
+              <p className="text-white/50 font-light text-sm mb-8 tracking-wider">
+                {priceRangeLabel}
+              </p>
+            )}
+            {project.priceNote && (
+              <p className="text-white/55 text-xs font-light max-w-xs mx-auto leading-relaxed mb-10">
+                {project.priceNote}
+              </p>
+            )}
+            {availabilityNote && (
+              <p className="text-white/45 text-xs font-light max-w-xs mx-auto leading-relaxed mb-10">
+                {availabilityNote}
+              </p>
+            )}
+            <div className="flex justify-center">
+              <a
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="flex items-center gap-3 bg-white text-[#082634] px-12 py-4 text-xs font-medium tracking-[0.15em] uppercase hover:bg-[#DCE0E7] transition-colors"
+              >
+                {secondaryCtaLabel} <ArrowRight size={13} />
+              </a>
+            </div>
+          </motion.div>
+        </section>
+      )}
 
       {/* ════════════════════════════════════════════════════
           9 · LEAD FORM
