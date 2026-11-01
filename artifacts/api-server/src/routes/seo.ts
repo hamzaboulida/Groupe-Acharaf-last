@@ -19,8 +19,17 @@ function slugifyProjectTitle(value: string | null | undefined): string {
     .replace(/^-|-$/g, "");
 }
 
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 router.get("/robots.txt", (_req, res) => {
-  res.type("text/plain");
+  res.set("Content-Type", "text/plain; charset=utf-8");
   res.send(`User-agent: *
 Allow: /
 Disallow: /admin
@@ -37,61 +46,87 @@ router.get("/sitemap.xml", async (_req, res) => {
         id: projectsTable.id,
         slug: projectsTable.slug,
         title: projectsTable.title,
-        updatedAt: projectsTable.updatedAt
+        published: projectsTable.published,
+        noIndex: projectsTable.noIndex,
+        createdAt: projectsTable.createdAt,
+        updatedAt: projectsTable.updatedAt,
       }).from(projectsTable),
-      db.select({ id: articlesTable.id, slug: articlesTable.slug, updatedAt: articlesTable.updatedAt })
+      db.select({
+        id: articlesTable.id,
+        slug: articlesTable.slug,
+        createdAt: articlesTable.createdAt,
+        updatedAt: articlesTable.updatedAt,
+      })
         .from(articlesTable)
         .where(eq(articlesTable.published, true)),
     ]);
 
+    const indexableProjects = allProjects.filter(
+      (p) => p.published !== false && p.noIndex !== true,
+    );
+
+    const latestProjectMod = indexableProjects.reduce<string | undefined>((latest, p) => {
+      const d = p.updatedAt || p.createdAt;
+      if (!d) return latest;
+      const iso = new Date(d).toISOString().split("T")[0];
+      return !latest || iso > latest ? iso : latest;
+    }, undefined);
+
     const staticUrls: { loc: string; priority: string; changefreq: string; lastmod?: string }[] = [
-      { loc: `${BASE_URL}/`, priority: "1.0", changefreq: "weekly" },
+      { loc: `${BASE_URL}/`, priority: "1.0", changefreq: "weekly", lastmod: latestProjectMod },
       { loc: `${BASE_URL}/a-propos`, priority: "0.8", changefreq: "monthly" },
       { loc: `${BASE_URL}/nos-marques`, priority: "0.9", changefreq: "monthly" },
-      { loc: `${BASE_URL}/nos-projets`, priority: "0.9", changefreq: "weekly" },
-      { loc: `${BASE_URL}/opportunites`, priority: "0.8", changefreq: "weekly" },
+      { loc: `${BASE_URL}/nos-projets`, priority: "0.9", changefreq: "weekly", lastmod: latestProjectMod },
+      { loc: `${BASE_URL}/opportunites`, priority: "0.8", changefreq: "weekly", lastmod: latestProjectMod },
       { loc: `${BASE_URL}/carrieres`, priority: "0.6", changefreq: "weekly" },
       { loc: `${BASE_URL}/contact`, priority: "0.7", changefreq: "monthly" },
     ];
 
-    const projectUrls = allProjects.map((p) => {
+    const projectUrls = indexableProjects.map((p) => {
       const slug = slugifyProjectTitle(p.slug) || slugifyProjectTitle(p.title) || p.id.toString();
+      const modDate = p.updatedAt || p.createdAt;
       return {
         loc: `${BASE_URL}/nos-projets/${slug}`,
         priority: "0.8",
         changefreq: "monthly",
-        lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().split("T")[0] : undefined,
+        lastmod: modDate ? new Date(modDate).toISOString().split("T")[0] : undefined,
       };
     });
 
     const articleUrls = allArticles.map((a) => {
-      const slug = a.slug || a.id.toString();
+      const slug = slugifyProjectTitle(a.slug) || a.id.toString();
+      const modDate = a.updatedAt || a.createdAt;
       return {
         loc: `${BASE_URL}/actualites/${slug}`,
         priority: "0.7",
         changefreq: "monthly",
-        lastmod: a.updatedAt ? new Date(a.updatedAt).toISOString().split("T")[0] : undefined,
+        lastmod: modDate ? new Date(modDate).toISOString().split("T")[0] : undefined,
       };
     });
 
-    const allUrls = [...staticUrls, ...projectUrls, ...articleUrls];
+    const seen = new Set<string>();
+    const allUrls = [...staticUrls, ...projectUrls, ...articleUrls].filter((u) => {
+      if (seen.has(u.loc)) return false;
+      seen.add(u.loc);
+      return true;
+    });
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${allUrls
   .map(
     (u) => `  <url>
-    <loc>${u.loc}</loc>
-    ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
+    <loc>${escapeXml(u.loc)}</loc>${u.lastmod ? `\n    <lastmod>${escapeXml(u.lastmod)}</lastmod>` : ""}
+    <changefreq>${escapeXml(u.changefreq)}</changefreq>
+    <priority>${escapeXml(u.priority)}</priority>
   </url>`
   )
   .join("\n")}
 </urlset>`;
 
-    res.type("application/xml");
-    res.send(xml);
+    res.set("Content-Type", "application/xml; charset=utf-8");
+    res.set("Cache-Control", "no-cache");
+    res.status(200).send(xml);
   } catch (err) {
     res.status(500).send("Error generating sitemap");
   }

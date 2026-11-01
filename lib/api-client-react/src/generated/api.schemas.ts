@@ -139,6 +139,9 @@ export interface Project {
   metaTitle?: string;
   metaDescription?: string;
   ogImageUrl?: string;
+  published?: boolean;
+  noIndex?: boolean;
+  previousSlugs?: string[];
   createdAt: string;
   updatedAt?: string;
 }
@@ -231,6 +234,9 @@ export interface CreateProjectBody {
   metaTitle?: string;
   metaDescription?: string;
   ogImageUrl?: string;
+  published?: boolean;
+  noIndex?: boolean;
+  previousSlugs?: string[];
 }
 
 export interface Article {

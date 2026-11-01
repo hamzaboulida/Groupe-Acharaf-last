@@ -439,21 +439,34 @@ export default function ProjectDetail() {
   const isNumericKey = /^\d+$/.test(projectKey);
   const numericId = isNumericKey ? Number(projectKey) : null;
 
+  const initialSsrProject = React.useMemo(() => {
+    if (typeof window === "undefined") return undefined;
+    const w = window as unknown as { __INITIAL_PROJECT__?: any };
+    const candidate = w.__INITIAL_PROJECT__;
+    if (!candidate) return undefined;
+    if (numericId && candidate.id === numericId) return candidate;
+    if (projectMatchesSlug(candidate, projectKey)) return candidate;
+    return undefined;
+  }, [numericId, projectKey]);
+
   const { data: projects = [], isLoading: isProjectsLoading } = useListProjects();
   const projectFromSlug = !isNumericKey
     ? projects.find((p) => projectMatchesSlug(p, projectKey))
-    : undefined;
-  const resolvedProjectId = numericId ?? projectFromSlug?.id ?? 0;
+    : projects.find((p) => p.id === numericId);
+  const resolvedProjectId = numericId ?? initialSsrProject?.id ?? projectFromSlug?.id ?? 0;
 
   const {
-    data: project,
+    data: fetchedProject,
     isLoading: isProjectLoading,
     isError,
   } = useGetProject(resolvedProjectId, {
     query: {
       enabled: resolvedProjectId > 0,
+      initialData: initialSsrProject ?? projectFromSlug,
     } as any,
   });
+
+  const project = fetchedProject ?? initialSsrProject ?? projectFromSlug;
 
   const [activeImage, setActiveImage] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -469,6 +482,13 @@ export default function ProjectDetail() {
   const projectImages = project?.images?.filter(Boolean) ?? [];
   const cover = clean(project?.coverImageUrl) || FB[resolvedProjectId % 3];
   const gallery = projectImages.length ? projectImages : [FB[0], FB[1], FB[2]];
+
+  const toAbsoluteSiteUrl = (rawUrl: string) => {
+    const trimmed = clean(rawUrl);
+    if (!trimmed) return `${SITE_URL}/opengraph.jpg`;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return trimmed.startsWith("/") ? `${SITE_URL}${trimmed}` : `${SITE_URL}/${trimmed}`;
+  };
 
   useStructuredData(
     "ga-breadcrumb-project",
@@ -486,27 +506,35 @@ export default function ProjectDetail() {
     project
       ? {
           "@context": "https://schema.org",
-          "@type": "Residence",
+          "@type": project.displayType === "opportunity" ? "RealEstateListing" : "Residence",
           name: project.title,
           url: `${SITE_URL}${projectPath(project)}`,
-          description: clean(project.metaDescription) || clean(project.shortDescription) || clean(project.description),
-          image: clean(project.ogImageUrl) || clean(project.coverImageUrl),
+          description:
+            clean(project.metaDescription) ||
+            clean(project.shortDescription) ||
+            clean(project.description) ||
+            `Découvrez ${project.title}, projet immobilier du Groupe Acharaf à ${project.city || project.location || "Maroc"}.`,
+          image: toAbsoluteSiteUrl(clean(project.ogImageUrl) || clean(project.coverImageUrl) || cover),
           address: {
             "@type": "PostalAddress",
-            addressLocality: project.city || project.location || "",
+            addressLocality: project.city || project.location || "Maroc",
             addressCountry: "MA",
-            streetAddress: clean(project.addressText),
+            streetAddress: clean(project.addressText) || undefined,
           },
           brand: {
             "@type": "Brand",
             name: project.brand?.name || SITE_NAME,
           },
-          offers: {
-            "@type": "Offer",
-            priceCurrency: "MAD",
-            availability: project.status === "completed" ? "https://schema.org/LimitedAvailability" : "https://schema.org/InStock",
-            price: shouldShowProjectPrice(project) ? project.priceMin ?? undefined : undefined,
-          },
+          ...(shouldShowProjectPrice(project) && project.priceMin
+            ? {
+                offers: {
+                  "@type": "Offer",
+                  priceCurrency: "MAD",
+                  availability: "https://schema.org/InStock",
+                  price: project.priceMin,
+                },
+              }
+            : {}),
         }
       : null,
   );
@@ -522,17 +550,23 @@ export default function ProjectDetail() {
   /* SEO */
   useEffect(() => {
     if (project) {
+      const cityOrLoc = clean(project.city) || clean(project.location);
+      const typeLabel = clean(project.projectType) || "Projet Immobilier";
       document.title =
         clean(project.metaTitle) ||
-        `${project.title} | Immobilier à ${project.city ?? project.location} | Groupe Acharaf`;
+        (cityOrLoc
+          ? `${project.title} | ${typeLabel} à ${cityOrLoc} | Groupe Acharaf`
+          : `${project.title} | ${typeLabel} | Groupe Acharaf`);
       const seoDescription =
         clean(project.metaDescription) ||
         clean(project.shortDescription) ||
         clean(project.description) ||
-        clean(project.longDescription);
-      const ogImage = clean(project.ogImageUrl) || cover;
+        clean(project.longDescription) ||
+        `Découvrez ${project.title}, ${typeLabel.toLowerCase()}${cityOrLoc ? ` à ${cityOrLoc}` : ""} réalisé par le Groupe Acharaf.`;
+      const ogImage = toAbsoluteSiteUrl(clean(project.ogImageUrl) || cover);
 
       upsertMeta("name", "description", seoDescription);
+      upsertMeta("name", "robots", project.noIndex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1");
       upsertMeta("property", "og:title", document.title);
       upsertMeta("property", "og:description", seoDescription);
       upsertMeta("property", "og:image", ogImage);
@@ -549,7 +583,7 @@ export default function ProjectDetail() {
   }, [cover, project]);
 
   /* Loading state */
-  if (isProjectLoading || (!isNumericKey && isProjectsLoading)) {
+  if (!project && (isProjectLoading || (!isNumericKey && isProjectsLoading))) {
     return (
       <Layout>
         <div className="h-screen bg-white flex items-center justify-center">

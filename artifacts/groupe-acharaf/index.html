@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>Groupe Acharaf | Promoteur Immobilier d'Exception au Maroc</title>
     <meta name="description" content="Groupe Acharaf, promoteur immobilier marocain d'excellence. Découvrez nos projets de luxe et de haut standing à Casablanca, Marrakech, Agadir et Meknès." />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
     <link rel="canonical" href="https://groupeacharaf.ma/" />
+    <link rel="alternate" hreflang="fr" href="https://groupeacharaf.ma/" />
+    <link rel="alternate" hreflang="x-default" href="https://groupeacharaf.ma/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -21,27 +24,43 @@
     <meta name="twitter:description" content="Promoteur immobilier d'exception au Maroc. Deux marques, une vision : l'art de vivre au sommet." />
     <meta name="twitter:image" content="https://groupeacharaf.ma/opengraph.jpg" />
 
-    <!-- Organization Schema Markup -->
+    <!-- Organization & WebSite Schema Markup -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "RealEstateAgent",
-      "name": "Groupe Acharaf",
-      "url": "https://groupeacharaf.ma",
-      "logo": "https://groupeacharaf.ma/logo.png",
-      "description": "Promoteur immobilier marocain proposant des résidences d'exception à travers deux signatures : Estya (ultra-luxe) et Acharaf Immobilier (premium).",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "465, Avenue Ambassadeur Ben Aïcha, Roches Noires",
-        "addressLocality": "Casablanca",
-        "postalCode": "20300",
-        "addressCountry": "MA"
-      },
-      "telephone": "+212522406848",
-      "email": "infos@groupeacharaf.ma",
-      "sameAs": [
-        "https://www.instagram.com/estya.immobilier",
-        "https://www.linkedin.com/company/groupeacharaf"
+      "@graph": [
+        {
+          "@type": ["Organization", "RealEstateAgent"],
+          "@id": "https://groupeacharaf.ma/#organization",
+          "name": "Groupe Acharaf",
+          "url": "https://groupeacharaf.ma",
+          "logo": "https://groupeacharaf.ma/logo.png",
+          "image": "https://groupeacharaf.ma/opengraph.jpg",
+          "description": "Promoteur immobilier marocain proposant des résidences d'exception à travers deux signatures : Estya (ultra-luxe) et Acharaf Immobilier (premium).",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "465, Avenue Ambassadeur Ben Aïcha, Roches Noires",
+            "addressLocality": "Casablanca",
+            "postalCode": "20300",
+            "addressCountry": "MA"
+          },
+          "telephone": "+212522406848",
+          "email": "infos@groupeacharaf.ma",
+          "sameAs": [
+            "https://www.instagram.com/estya.immobilier",
+            "https://www.linkedin.com/company/groupeacharaf"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://groupeacharaf.ma/#website",
+          "url": "https://groupeacharaf.ma/",
+          "name": "Groupe Acharaf",
+          "inLanguage": "fr-MA",
+          "publisher": {
+            "@id": "https://groupeacharaf.ma/#organization"
+          }
+        }
       ]
     }
     </script>

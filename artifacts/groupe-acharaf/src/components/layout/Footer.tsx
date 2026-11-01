@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 const col1 = [
   { href: "/a-propos", label: "Groupe" },
   { href: "/nos-marques", label: "Marques" },
-  { href: "/projets", label: "Projets" },
+  { href: "/nos-projets", label: "Projets" },
 ];
 const col2 = [
   { href: "/opportunites", label: "Opportunités" },

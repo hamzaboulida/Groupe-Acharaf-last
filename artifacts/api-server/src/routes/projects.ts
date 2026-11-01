@@ -118,6 +118,9 @@ const projectSelection = {
   metaTitle: projectsTable.metaTitle,
   metaDescription: projectsTable.metaDescription,
   ogImageUrl: projectsTable.ogImageUrl,
+  published: projectsTable.published,
+  noIndex: projectsTable.noIndex,
+  previousSlugs: projectsTable.previousSlugs,
   createdAt: projectsTable.createdAt,
   updatedAt: projectsTable.updatedAt,
   brand: {
@@ -134,6 +137,25 @@ const projectSelection = {
   },
 };
 
+function isAdminRequest(req: { query?: Record<string, unknown>; headers?: Record<string, unknown> }) {
+  if (req.query?.includeUnpublished === "true") return true;
+  const referer = typeof req.headers?.referer === "string" ? req.headers.referer : "";
+  if (referer.includes("/admin")) return true;
+  return false;
+}
+
+function sanitizeProjectRow<T extends Record<string, any>>(row: T): T {
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(row)) {
+    if (k === "brand") {
+      out[k] = v && v.id ? v : undefined;
+    } else {
+      out[k] = v === null ? undefined : v;
+    }
+  }
+  return out as T;
+}
+
 router.get("/projects", async (req, res): Promise<void> => {
   const queryParams = ListProjectsQueryParams.safeParse(req.query);
   const projects = await db
@@ -143,6 +165,9 @@ router.get("/projects", async (req, res): Promise<void> => {
     .orderBy(asc(projectsTable.displayOrder), desc(projectsTable.createdAt));
 
   let filtered = projects;
+  if (!isAdminRequest(req)) {
+    filtered = filtered.filter((p) => p.published !== false);
+  }
   if (queryParams.success) {
     if (queryParams.data.brandId !== undefined) {
       filtered = filtered.filter((p) => p.brandId === queryParams.data.brandId);
@@ -155,7 +180,7 @@ router.get("/projects", async (req, res): Promise<void> => {
     }
   }
 
-  res.json(ListProjectsResponse.parse(filtered));
+  res.json(ListProjectsResponse.parse(filtered.map(sanitizeProjectRow)));
 });
 
 router.post("/projects", async (req, res): Promise<void> => {
@@ -169,7 +194,8 @@ router.post("/projects", async (req, res): Promise<void> => {
     res.status(400).json({ error: opportunityValidationError });
     return;
   }
-  const resolvedSlug = await ensureUniqueSlug(parsed.data.title);
+  const slugSource = parsed.data.slug?.trim() ? parsed.data.slug.trim() : parsed.data.title;
+  const resolvedSlug = await ensureUniqueSlug(slugSource);
 
   // Map brandId and isOpportunity based on displayType
   const displayType = parsed.data.displayType;
@@ -183,6 +209,20 @@ router.post("/projects", async (req, res): Promise<void> => {
       brandId,
       isOpportunity,
       slug: resolvedSlug,
+      description: parsed.data.description ?? "",
+      location: parsed.data.location ?? "",
+      city: parsed.data.city ?? "",
+      deliveryDate: parsed.data.deliveryDate ?? "",
+      coverImageUrl: parsed.data.coverImageUrl ?? "",
+      images: parsed.data.images ?? [],
+      amenities: parsed.data.amenities ?? [],
+      priceMin: parsed.data.priceMin ?? 0,
+      priceMax: parsed.data.priceMax ?? 0,
+      surfaceMin: parsed.data.surfaceMin ?? 0,
+      surfaceMax: parsed.data.surfaceMax ?? 0,
+      published: parsed.data.published ?? true,
+      noIndex: parsed.data.noIndex ?? false,
+      previousSlugs: parsed.data.previousSlugs ?? [],
     })
     .returning();
 
@@ -192,13 +232,54 @@ router.post("/projects", async (req, res): Promise<void> => {
     .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id))
     .where(eq(projectsTable.id, project.id));
 
-  res.status(201).json(GetProjectResponse.parse(full));
+  res.status(201).json(GetProjectResponse.parse(sanitizeProjectRow(full)));
+});
+
+router.get("/projects/by-slug/:slug", async (req, res): Promise<void> => {
+  const rawSlug = decodeURIComponent(req.params.slug || "").trim().toLowerCase();
+  if (!rawSlug) {
+    res.status(400).json({ error: "Invalid slug" });
+    return;
+  }
+  const allProjects = await db
+    .select(projectSelection)
+    .from(projectsTable)
+    .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id));
+
+  const project =
+    allProjects.find((p) => p.slug.toLowerCase() === rawSlug) ??
+    allProjects.find((p) =>
+      Array.isArray(p.previousSlugs) &&
+      p.previousSlugs.some((oldSlug) => oldSlug.toLowerCase() === rawSlug),
+    );
+
+  if (!project || (!isAdminRequest(req) && project.published === false)) {
+    res.status(404).json({ error: "Project not found" });
+    return;
+  }
+  res.json(GetProjectResponse.parse(sanitizeProjectRow(project)));
 });
 
 router.get("/projects/:id", async (req, res): Promise<void> => {
   const params = GetProjectParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    // Allow fallback lookup by slug if :id is a non-numeric slug
+    const rawSlug = decodeURIComponent(req.params.id || "").trim().toLowerCase();
+    const allProjects = await db
+      .select(projectSelection)
+      .from(projectsTable)
+      .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id));
+    const bySlug =
+      allProjects.find((p) => p.slug.toLowerCase() === rawSlug) ??
+      allProjects.find((p) =>
+        Array.isArray(p.previousSlugs) &&
+        p.previousSlugs.some((oldSlug) => oldSlug.toLowerCase() === rawSlug),
+      );
+    if (!bySlug || (!isAdminRequest(req) && bySlug.published === false)) {
+      res.status(404).json({ error: "Project not found" });
+      return;
+    }
+    res.json(GetProjectResponse.parse(sanitizeProjectRow(bySlug)));
     return;
   }
   const [project] = await db
@@ -207,11 +288,11 @@ router.get("/projects/:id", async (req, res): Promise<void> => {
     .leftJoin(brandsTable, eq(projectsTable.brandId, brandsTable.id))
     .where(eq(projectsTable.id, params.data.id));
 
-  if (!project) {
+  if (!project || (!isAdminRequest(req) && project.published === false)) {
     res.status(404).json({ error: "Project not found" });
     return;
   }
-  res.json(GetProjectResponse.parse(project));
+  res.json(GetProjectResponse.parse(sanitizeProjectRow(project)));
 });
 
 router.put("/projects/:id", async (req, res): Promise<void> => {
@@ -231,7 +312,12 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
     return;
   }
   const [existing] = await db
-    .select({ id: projectsTable.id, slug: projectsTable.slug, title: projectsTable.title })
+    .select({
+      id: projectsTable.id,
+      slug: projectsTable.slug,
+      title: projectsTable.title,
+      previousSlugs: projectsTable.previousSlugs,
+    })
     .from(projectsTable)
     .where(eq(projectsTable.id, params.data.id));
 
@@ -240,12 +326,20 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  let resolvedSlug = existing.slug;
-  if (parsed.data.slug && parsed.data.slug.trim() !== existing.slug) {
+  let resolvedSlug = slugifyTitle(existing.slug) || existing.slug;
+  if (parsed.data.slug && slugifyTitle(parsed.data.slug) !== resolvedSlug) {
     resolvedSlug = await ensureUniqueSlug(parsed.data.slug, { excludeId: existing.id });
   } else if (!cleanSlug(existing.slug)) {
     resolvedSlug = await ensureUniqueSlug(parsed.data.title || existing.title, { excludeId: existing.id });
   }
+
+  const prevSet = new Set<string>(Array.isArray(existing.previousSlugs) ? existing.previousSlugs : []);
+  if (existing.slug && existing.slug !== resolvedSlug) {
+    prevSet.add(existing.slug);
+    prevSet.add(existing.slug.toLowerCase());
+  }
+  prevSet.delete(resolvedSlug);
+  const updatedPreviousSlugs = Array.from(prevSet);
 
   // Map brandId and isOpportunity based on displayType
   const displayType = parsed.data.displayType;
@@ -259,6 +353,7 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
       brandId,
       isOpportunity,
       slug: resolvedSlug,
+      previousSlugs: updatedPreviousSlugs,
       updatedAt: new Date(),
     })
     .where(eq(projectsTable.id, params.data.id));
@@ -273,7 +368,7 @@ router.put("/projects/:id", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Project not found" });
     return;
   }
-  res.json(UpdateProjectResponse.parse(full));
+  res.json(UpdateProjectResponse.parse(sanitizeProjectRow(full)));
 });
 
 router.delete("/projects/:id", async (req, res): Promise<void> => {

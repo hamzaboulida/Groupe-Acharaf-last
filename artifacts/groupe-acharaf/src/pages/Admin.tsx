@@ -160,6 +160,8 @@ type ProjectForm = {
   metaTitle: string;
   metaDescription: string;
   ogImageUrl: string;
+  published: boolean;
+  noIndex: boolean;
 };
 
 function emptyProjectForm(brandId = 1): ProjectForm {
@@ -223,6 +225,8 @@ function emptyProjectForm(brandId = 1): ProjectForm {
     metaTitle: "",
     metaDescription: "",
     ogImageUrl: "",
+    published: true,
+    noIndex: false,
   };
 }
 
@@ -1368,6 +1372,8 @@ function ProjectsTab() {
       metaTitle: p.metaTitle ?? "",
       metaDescription: p.metaDescription ?? "",
       ogImageUrl: p.ogImageUrl ?? "",
+      published: p.published !== false,
+      noIndex: p.noIndex === true,
     });
     setFormError("");
     setEditing(p.id);
@@ -1400,7 +1406,7 @@ function ProjectsTab() {
     const payload = {
       ...form,
       title: form.title.trim(),
-      slug: form.slug.trim() || slugFromTitle(form.title.trim()) || `projet-${Date.now()}`,
+      slug: slugFromTitle(form.slug.trim() || form.title.trim()) || `projet-${Date.now()}`,
       priceLabel: form.priceLabel.trim() || "Prix de départ",
       galleryTitle: form.galleryTitle.trim() || "Visuels du projet",
       featuresTitle: form.featuresTitle.trim() || "Points forts du projet",
@@ -1412,6 +1418,8 @@ function ProjectsTab() {
       images: cleanList(form.images),
       amenities: cleanList(form.amenities),
       locationAdvantages: cleanList(form.locationAdvantages),
+      published: form.published,
+      noIndex: form.noIndex,
     };
     if (editing !== null) {
       await updateProject.mutateAsync({ id: editing, data: payload });
@@ -1438,6 +1446,8 @@ function ProjectsTab() {
             status: project.status,
             displayOrder: index + 1,
             displayType: project.displayType || "estya",
+            published: project.published !== false,
+            noIndex: project.noIndex === true,
           },
         });
       }
@@ -1446,6 +1456,46 @@ function ProjectsTab() {
       setIsSavingOrder(false);
     }
   }
+
+  const autoSeoSlug = slugFromTitle(form.slug.trim() || form.title.trim()) || "nom-du-projet";
+  const autoSeoCity = (form.city || form.location).trim();
+  const autoSeoType = (
+    form.projectType ||
+    (form.displayType === "opportunity" ? "Opportunité Immobilière" : "Projet Immobilier")
+  ).trim();
+  const autoSeoTitle = form.title.trim()
+    ? autoSeoCity
+      ? `${form.title.trim()} | ${autoSeoType} à ${autoSeoCity} | Groupe Acharaf`
+      : `${form.title.trim()} | ${autoSeoType} | Groupe Acharaf`
+    : "Titre du projet | Projet Immobilier | Groupe Acharaf";
+  const rawBodyForSeo = (
+    form.shortDescription ||
+    form.description ||
+    form.opportunityDescription ||
+    form.longDescription
+  )
+    .replace(/\s+/g, " ")
+    .trim();
+  const autoSeoDescription = (() => {
+    const titleStr = form.title.trim() || "Ce projet";
+    if (rawBodyForSeo.length >= 50) {
+      const prefix = autoSeoCity ? `${titleStr} (${autoSeoCity}) : ` : `${titleStr} : `;
+      const combined = rawBodyForSeo.toLowerCase().includes(titleStr.toLowerCase())
+        ? rawBodyForSeo
+        : `${prefix}${rawBodyForSeo}`;
+      return combined.length > 160 ? `${combined.slice(0, 157).trim()}...` : combined;
+    }
+    const locPart = autoSeoCity ? ` à ${autoSeoCity}` : " au Maroc";
+    const fallback = `Découvrez ${titleStr}, ${autoSeoType.toLowerCase()}${locPart} réalisé par le Groupe Acharaf. Architecture, prestations et localisation d'exception.`;
+    return fallback.length > 160 ? `${fallback.slice(0, 157).trim()}...` : fallback;
+  })();
+
+  const effectiveSeoTitle = form.metaTitle.trim() || autoSeoTitle;
+  const effectiveSeoDesc = form.metaDescription.trim() || autoSeoDescription;
+  const hasRecommendedSeoInfo =
+    Boolean(form.title.trim()) &&
+    Boolean(autoSeoCity) &&
+    Boolean(rawBodyForSeo || form.metaDescription.trim());
 
   return (
     <div>
@@ -1778,18 +1828,154 @@ function ProjectsTab() {
             </div>
           </FormGroup>
 
-          <FormGroup title="11. SEO">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormGroup title="11. SEO & Indexation Google">
+            {/* Statut d'éligibilité SEO */}
+            <div className="border border-white/10 bg-white/[0.03] p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
-                <label className={labelClass}>Meta title</label>
-                <input value={form.metaTitle} onChange={(e) => setForm({ ...form, metaTitle: e.target.value })} className={inputClass} />
+                <p className="text-white/50 text-[10px] tracking-[0.18em] uppercase mb-1">Statut technique d'indexation</p>
+                {!form.published ? (
+                  <p className="text-white/80 text-sm font-medium">
+                    Non publié — Exclus du sitemap.xml et renvoie HTTP 404 aux moteurs de recherche
+                  </p>
+                ) : form.noIndex ? (
+                  <p className="text-[#C9A86A] text-sm font-medium">
+                    Exclu de l'indexation (directive noindex active — non inclus dans sitemap.xml)
+                  </p>
+                ) : !hasRecommendedSeoInfo ? (
+                  <p className="text-[#C9A86A] text-sm font-medium">
+                    Publié et éligible à l'indexation — Informations SEO recommandées incomplètes (renseignez ville et description)
+                  </p>
+                ) : (
+                  <p className="text-emerald-300 text-sm font-medium">
+                    Publié et éligible à l'indexation Google (SSR actif + inclus dans sitemap.xml)
+                  </p>
+                )}
               </div>
               <div>
-                <label className={labelClass}>Meta description</label>
-                <input value={form.metaDescription} onChange={(e) => setForm({ ...form, metaDescription: e.target.value })} className={inputClass} />
+                {!form.published ? (
+                  <Badge color="gray">Non publié (404)</Badge>
+                ) : form.noIndex ? (
+                  <Badge color="gold">Noindex</Badge>
+                ) : !hasRecommendedSeoInfo ? (
+                  <Badge color="gold">SEO à compléter</Badge>
+                ) : (
+                  <Badge color="green">Éligible à l'indexation</Badge>
+                )}
               </div>
             </div>
-            <ImageUploadField id="project-og-upload" label="Image OG / partage social" value={form.ogImageUrl} onChange={(ogImageUrl) => setForm({ ...form, ogImageUrl })} />
+
+            {/* Publication & Indexation Toggles */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              <label className="flex items-start gap-3 border border-white/10 bg-white/[0.02] p-3.5 text-white/80 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.published}
+                  onChange={(e) => setForm({ ...form, published: e.target.checked })}
+                  className="mt-1"
+                />
+                <span>
+                  <strong className="block text-white font-normal">Projet publié (visible sur le site)</strong>
+                  <span className="text-white/40 text-xs block mt-0.5">
+                    Si décoché, la page projet est retirée du site et du sitemap XML et renvoie un code HTTP 404.
+                  </span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 border border-white/10 bg-white/[0.02] p-3.5 text-white/80 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!form.noIndex}
+                  onChange={(e) => setForm({ ...form, noIndex: !e.target.checked })}
+                  className="mt-1"
+                />
+                <span>
+                  <strong className="block text-white font-normal">Autoriser l'indexation Google (index, follow)</strong>
+                  <span className="text-white/40 text-xs block mt-0.5">
+                    Si décoché, ajoute une balise meta robots "noindex, follow" et retire la page du sitemap.xml.
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            {/* Slug & Canonical URL */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Slug URL SEO</label>
+                <input
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  className={inputClass}
+                  placeholder={autoSeoSlug}
+                />
+                <p className="text-white/35 text-xs mt-1">
+                  En cas de modification du slug d'un projet existant, une redirection permanente 301 est automatiquement créée depuis l'ancienne URL.
+                </p>
+              </div>
+              <div>
+                <label className={labelClass}>URL Canonique générée</label>
+                <div className="px-3.5 py-2.5 border border-white/10 bg-white/[0.02] text-[#8EA4AF] text-xs font-mono break-all">
+                  https://groupeacharaf.ma/nos-projets/{autoSeoSlug}
+                </div>
+              </div>
+            </div>
+
+            {/* Meta Title & Meta Description */}
+            <div className="flex items-center justify-between pt-1">
+              <p className="text-white/40 text-xs">
+                Laissez vide pour utiliser les métadonnées dynamiques générées automatiquement, ou personnalisez-les ci-dessous :
+              </p>
+              <button
+                type="button"
+                onClick={() =>
+                  setForm({
+                    ...form,
+                    metaTitle: autoSeoTitle,
+                    metaDescription: autoSeoDescription,
+                  })
+                }
+                className="text-[#8EA4AF] hover:text-white text-xs tracking-[0.1em] uppercase underline"
+              >
+                Pré-remplir avec les valeurs suggérées
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>SEO Title (Balise &lt;title&gt;)</label>
+                <input
+                  value={form.metaTitle}
+                  onChange={(e) => setForm({ ...form, metaTitle: e.target.value })}
+                  className={inputClass}
+                  placeholder={autoSeoTitle}
+                />
+                <p className="text-white/30 text-[11px] mt-1">
+                  Longueur effective : {effectiveSeoTitle.length} caractères (recommandé : 45–65)
+                </p>
+              </div>
+              <div>
+                <label className={labelClass}>Meta Description</label>
+                <textarea
+                  rows={2}
+                  value={form.metaDescription}
+                  onChange={(e) => setForm({ ...form, metaDescription: e.target.value })}
+                  className={inputClass}
+                  placeholder={autoSeoDescription}
+                />
+                <p className="text-white/30 text-[11px] mt-1">
+                  Longueur effective : {effectiveSeoDesc.length} caractères (recommandé : 120–160)
+                </p>
+              </div>
+            </div>
+
+            {/* Aperçu Google SERP */}
+            <div className="border border-white/10 bg-white/[0.03] p-4 space-y-1">
+              <p className="text-white/40 text-[10px] tracking-[0.18em] uppercase mb-2">Aperçu dans les résultats Google</p>
+              <p className="text-xs text-white/60 font-mono">https://groupeacharaf.ma › nos-projets › {autoSeoSlug}</p>
+              <p className="text-base text-[#8AB4F8] font-normal leading-snug">{effectiveSeoTitle}</p>
+              <p className="text-xs text-white/70 leading-relaxed max-w-2xl">{effectiveSeoDesc}</p>
+            </div>
+
+            <ImageUploadField id="project-og-upload" label="Image OG / partage social (optionnel — utilise l'image Hero par défaut)" value={form.ogImageUrl} onChange={(ogImageUrl) => setForm({ ...form, ogImageUrl })} />
           </FormGroup>
 
           <div className="flex gap-3 pt-2">
@@ -1839,11 +2025,20 @@ function ProjectsTab() {
               </div>
               {p.coverImageUrl && <img src={p.coverImageUrl} alt="" className="w-16 h-12 object-cover opacity-70" />}
               <div>
-                <div className="text-white font-medium flex items-center gap-2">
+                <div className="text-white font-medium flex items-center gap-2 flex-wrap">
                   {p.title}
                   {getDisplayTypeBadge(p.displayType, !!p.isOpportunity)}
+                  {p.published === false ? (
+                    <Badge color="gray">Non publié (404)</Badge>
+                  ) : p.noIndex ? (
+                    <Badge color="gold">Noindex</Badge>
+                  ) : (
+                    <Badge color="green">Indexable</Badge>
+                  )}
                 </div>
-                <div className="text-white/40 text-sm">{p.city} · {p.brand?.name} · {projectPriceLabel(p)}</div>
+                <div className="text-white/40 text-sm">
+                  {p.city} · {p.brand?.name} · /nos-projets/{p.slug}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-4">

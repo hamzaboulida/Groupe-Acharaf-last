@@ -77,6 +77,9 @@ export const projectsTable = pgTable("projects", {
   metaTitle: text("meta_title").notNull().default(""),
   metaDescription: text("meta_description").notNull().default(""),
   ogImageUrl: text("og_image_url").notNull().default(""),
+  published: boolean("published").notNull().default(true),
+  noIndex: boolean("no_index").notNull().default(false),
+  previousSlugs: text("previous_slugs").array().notNull().default(sql`'{}'::text[]`),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

@@ -189,6 +189,9 @@ export const ListProjectsResponseItem = zod.object({
   metaTitle: zod.string().optional(),
   metaDescription: zod.string().optional(),
   ogImageUrl: zod.string().optional(),
+  published: zod.boolean().optional(),
+  noIndex: zod.boolean().optional(),
+  previousSlugs: zod.array(zod.string()).optional(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date().optional(),
 });
@@ -259,6 +262,9 @@ export const CreateProjectBody = zod.object({
   metaTitle: zod.string().optional(),
   metaDescription: zod.string().optional(),
   ogImageUrl: zod.string().optional(),
+  published: zod.boolean().optional(),
+  noIndex: zod.boolean().optional(),
+  previousSlugs: zod.array(zod.string()).optional(),
 });
 
 /**
@@ -345,6 +351,9 @@ export const GetProjectResponse = zod.object({
   metaTitle: zod.string().optional(),
   metaDescription: zod.string().optional(),
   ogImageUrl: zod.string().optional(),
+  published: zod.boolean().optional(),
+  noIndex: zod.boolean().optional(),
+  previousSlugs: zod.array(zod.string()).optional(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date().optional(),
 });
@@ -418,6 +427,9 @@ export const UpdateProjectBody = zod.object({
   metaTitle: zod.string().optional(),
   metaDescription: zod.string().optional(),
   ogImageUrl: zod.string().optional(),
+  published: zod.boolean().optional(),
+  noIndex: zod.boolean().optional(),
+  previousSlugs: zod.array(zod.string()).optional(),
 });
 
 export const UpdateProjectResponse = zod.object({
@@ -497,6 +509,9 @@ export const UpdateProjectResponse = zod.object({
   metaTitle: zod.string().optional(),
   metaDescription: zod.string().optional(),
   ogImageUrl: zod.string().optional(),
+  published: zod.boolean().optional(),
+  noIndex: zod.boolean().optional(),
+  previousSlugs: zod.array(zod.string()).optional(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date().optional(),
 });
