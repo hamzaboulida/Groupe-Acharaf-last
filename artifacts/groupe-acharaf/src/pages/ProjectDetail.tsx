@@ -461,7 +461,7 @@ export default function ProjectDetail() {
     isError,
   } = useGetProject(resolvedProjectId, {
     query: {
-      enabled: resolvedProjectId > 0,
+      enabled: resolvedProjectId > 0 && !initialSsrProject, staleTime: 60000,
       initialData: initialSsrProject ?? projectFromSlug,
     } as any,
   });
@@ -595,7 +595,7 @@ export default function ProjectDetail() {
     );
   }
 
-  if (isError || !project) {
+  if (!project) {
     return (
       <Layout>
         <div className="h-screen bg-white flex items-center justify-center px-6 text-center">

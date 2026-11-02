@@ -24,9 +24,35 @@ const queryClient = new QueryClient({
     queries: {
       retry: false,
       refetchOnWindowFocus: false,
+      staleTime: 60 * 1000,
     },
   },
 });
+
+if (typeof window !== "undefined") {
+  const w = window as unknown as {
+    __INITIAL_PROJECT__?: any;
+    __INITIAL_PROJECTS__?: any[];
+  };
+  if (Array.isArray(w.__INITIAL_PROJECTS__) && w.__INITIAL_PROJECTS__.length > 0) {
+    queryClient.setQueryData(["/api/projects"], w.__INITIAL_PROJECTS__);
+    queryClient.setQueryData(
+      ["/api/projects", { featured: true }],
+      w.__INITIAL_PROJECTS__.filter((p: any) => p && p.featured),
+    );
+    for (const p of w.__INITIAL_PROJECTS__) {
+      if (p && p.id) {
+        queryClient.setQueryData([`/api/projects/${p.id}`], p);
+      }
+    }
+  }
+  if (w.__INITIAL_PROJECT__ && w.__INITIAL_PROJECT__.id) {
+    queryClient.setQueryData(
+      [`/api/projects/${w.__INITIAL_PROJECT__.id}`],
+      w.__INITIAL_PROJECT__,
+    );
+  }
+}
 
 function ScrollToTop() {
   const [location] = useLocation();

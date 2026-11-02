@@ -373,7 +373,10 @@ if (uploadsUpstreamBaseUrl) {
 }
 
 app.use(seoRouter);
-app.use("/api", router);
+app.use("/api", (_req, res, next) => {
+  res.setHeader("X-Robots-Tag", "noindex");
+  next();
+}, router);
 
 // Serve the Vite-built frontend in production
 if (process.env.NODE_ENV === "production") {
@@ -826,9 +829,10 @@ if (process.env.NODE_ENV === "production") {
 </div></div>`;
 
         html = html.replace('<div id="root"></div>', ssrProjectContent);
+        const publishedProjectsList = allProjects.filter((p) => p.published !== false);
         html = html.replace(
           "</body>",
-          `<script>window.__INITIAL_PROJECT__ = ${safeJsonForScript(matched)};</script>\n  </body>`,
+          `<script>window.__INITIAL_PROJECT__ = ${safeJsonForScript(matched)};window.__INITIAL_PROJECTS__ = ${safeJsonForScript(publishedProjectsList)};</script>\n  </body>`,
         );
 
         res.status(200).send(html);

@@ -30,10 +30,12 @@ function escapeXml(value: string): string {
 
 router.get("/robots.txt", (_req, res) => {
   res.set("Content-Type", "text/plain; charset=utf-8");
+  res.set("Cache-Control", "no-cache");
   res.send(`User-agent: *
 Allow: /
+Allow: /api/
 Disallow: /admin
-Disallow: /api/
+Disallow: /api/admin
 
 Sitemap: ${BASE_URL}/sitemap.xml
 `);
